@@ -81,10 +81,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES sdf_3d_reconstruction
-#  CATKIN_DEPENDS roscpp std_msgs
-#  DEPENDS system_lib
+  INCLUDE_DIRS include
+  LIBRARIES sdf_3d_reconstruction
+  CATKIN_DEPENDS roscpp std_msgs
+  DEPENDS system_lib
 )
 
 ###########
@@ -104,16 +104,16 @@ include_directories(
 # )
 
 ## Declare a cpp executable
-# add_executable(sdf_3d_reconstruction_node src/sdf_3d_reconstruction_node.cpp)
+ add_executable(sdf_3d_reconstruction_node src/main.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(sdf_3d_reconstruction_node sdf_3d_reconstruction_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(sdf_3d_reconstruction_node
-#   ${catkin_LIBRARIES}
-# )
+ target_link_libraries(sdf_3d_reconstruction_node
+   ${catkin_LIBRARIES}
+ )
 
 #############
 ## Install ##
@@ -130,11 +130,11 @@ include_directories(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS sdf_3d_reconstruction sdf_3d_reconstruction_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+ install(TARGETS sdf_3d_reconstruction_node
+   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
