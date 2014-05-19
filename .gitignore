@@ -5,3 +5,7 @@
 #
 *.o
 *~
+
+#eclipse
+.project
+.cproject
