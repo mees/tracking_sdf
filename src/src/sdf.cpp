@@ -9,8 +9,6 @@
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
-//#include <Eigen/Dense>
-//using namespace Eigen;
 SDF::SDF(int m, float width, float height, float depth): m(m), width(width),height(height), depth(depth){
 	D = new float[this->m * this->m * this->m];
 	W = new float[this->m * this->m * this->m];
