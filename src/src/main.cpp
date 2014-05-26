@@ -80,6 +80,15 @@ main (int argc, char** argv)
   ros::init (argc, argv, "sdf_3d_reconstruction");
   ros::NodeHandle nh;
   std::cout<<"Hello World1"<<std::endl;
+  
+  SDF sdf(256, 1.0, 1.0, 1.0);
+  sdf.create_circle(0.2, 0.5, 0.5, 0.5);
+  std::cout<<"circle created ..." << std::endl;
+  std::string visualeOutput;
+  ros::param::get("~visualOutput", visualeOutput);
+  
+  sdf.visualize(visualeOutput);
+  std::cout<<"circle visualized ..." << std::endl;
   // Create a ROS subscriber for the input point cloud
   //ros::Subscriber sub = nh.subscribe ("input", 1, cloud_cb);
   cameraMatrix camera_matrix;
@@ -107,9 +116,7 @@ main (int argc, char** argv)
   // Create a ROS publisher for the output point cloud
   //pub = nh.advertise<sensor_msgs::PointCloud2> ("output", 1);
   
-  SDF sdf(256, 1.0, 1.0, 1.0);
-  //sdf.create_circle(0.2, 0.5, 0.5, 0.5);
-  //sdf.visualize("/home/joel/o.vtk");
+  
   // Spin
   ros::spin ();
 }

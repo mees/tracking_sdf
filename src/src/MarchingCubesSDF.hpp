@@ -23,9 +23,10 @@ pcl::MarchingCubesSDF<PointNT>::~MarchingCubesSDF ()
 template <typename PointNT> void
 pcl::MarchingCubesSDF<PointNT>::voxelizeData ()
 {
-  for (int x = 0; x < res_x_; ++x){
-    for (int y = 0; y < res_y_; ++y){
-      for (int z = 0; z < res_z_; ++z){
+  std::cout <<  res_x_<<", " << res_y_ << ", "<< res_z_ << std::endl;
+  for (int x = 0; x < res_x_; x++){
+    for (int y = 0; y < res_y_; y++){
+      for (int z = 0; z < res_z_; z++){
         /*std::vector<int> nn_indices;
         std::vector<float> nn_sqr_dists;
 
@@ -38,7 +39,7 @@ pcl::MarchingCubesSDF<PointNT>::voxelizeData ()
         p.getVector3fMap () = point;
 
         tree_->nearestKSearch (p, 1, nn_indices, nn_sqr_dists);*/
-
+	//std::cout << input_->points[x * res_y_*res_z_ + y * res_z_ + z].intensity << "\n";
         grid_[x * res_y_*res_z_ + y * res_z_ + z] = input_->points[x * res_y_*res_z_ + y * res_z_ + z].intensity;
         //std::cout << input_->points[nn_indices[0]].getNormalVector3fMap ().dot (
         //    point - input_->points[nn_indices[0]].getVector3fMap ());
