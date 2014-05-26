@@ -1,5 +1,5 @@
-#include "sdf.h"
 #include "MarchingCubesSDF.h"
+#include "sdf.h"
 #include <iostream>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
@@ -56,13 +56,14 @@ void SDF::visualize(const std::string &file_name)
 	  cloud->points[i].intensity = D[get_array_index(gi)];
 	}
 	pcl::PolygonMesh output;
-	/*pcl::MarchingCubesSDF<pcl::PointXYZI> mc;
-	mc.setIsoLevel (0.0);
-	mc.setGridResolution (this->m, this->m, this->m);
-	mc.setPercentageExtendGrid (0.0f);
-	mc.setInputCloud (cloud);
-	mc.reconstruct (output);
+	pcl::MarchingCubes<pcl::PointXYZI> *mc;
+	mc = new pcl::MarchingCubesSDF<pcl::PointXYZI>();
+	mc->setIsoLevel (0.0f);
+	mc->setGridResolution (this->m, this->m, this->m);
+	mc->setPercentageExtendGrid (0.0f);
+	mc->setInputCloud (cloud);
+	mc->reconstruct (output);
 	
-	pcl::io::saveVTKFile(file_name, output);*/
+	pcl::io::saveVTKFile(file_name, output);
 	//pcl::io::savePCDFileASCII (file_name, cloud);
 }
