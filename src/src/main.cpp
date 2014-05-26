@@ -81,7 +81,7 @@ main (int argc, char** argv)
   ros::NodeHandle nh;
   std::cout<<"Hello World1"<<std::endl;
   
-  SDF sdf(256, 1.0, 1.0, 1.0);
+  SDF sdf(111, 1.0, 1.0, 1.0);
   sdf.create_circle(0.2, 0.5, 0.5, 0.5);
   std::cout<<"circle created ..." << std::endl;
   std::string visualeOutput;

@@ -31,13 +31,13 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 	float x, y, z, d;
 	for (int array_idx = 0; array_idx < this->m*this->m*this->m; array_idx++){
 		this -> get_grid_index(array_idx, gi);
-		x = (this->width/((float)m)) * gi.i;
-		y = (this->height/((float)m)) * gi.j;
-		z = (this->depth/((float)m)) * gi.k;
+		x = (this->width/((float)m)) * (gi.i+0.5);
+		y = (this->height/((float)m)) * (gi.j+0.5);
+		z = (this->depth/((float)m)) * (gi.k+0.5);
 		
 		d = (x - center_x)*(x - center_x) + (y - center_y)*(y - center_y)+(z-center_z)*(z-center_z);
 		//std::cout << radius << " - " << d << " = " << radius -d << std::endl;
-		D[array_idx] = radius - d;
+		D[array_idx] =  d-radius;
 		
 	}
 }
