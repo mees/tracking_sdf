@@ -1,33 +1,34 @@
-//#include "sdf_3d_reconstruction/sdf.h"
-#include "sdf.h"
-#include <Eigen/Dense>
-using namespace Eigen;
+#include "sdf_3d_reconstruction/sdf.h"
+//#include <Eigen/Dense>
+//using namespace Eigen;
+
+
 SDF::SDF(int m, float width, float height, float depth) {
 	this->m = m;
 	this->width = width;
 	this->height = height;
 	this->depth = depth;
-	// i = 1, j = 2, k = 1, m = 255
-	// => idx = k*255^2 + j*255 + i
-
-	// idx = 167045 =>
-	// i = (int) idx /(255*255)
-	// j = (idx % 255*255)/255
-	// k = idx % 255
-	this->D = new float[m * m * m];
-	this->W = new float[m * m * m];
+	this->D = new float[this->m * this->m * this->m];
+	this->W = new float[this->m * this->m * this->m];
 }
-
+inline int SDF::get_array_index(grid_index& gi){
+	return this->m*this->m*gi.k+this->m*gi.j+gi.i;
+}
+inline void SDF::get_grid_index(int array_idx, grid_index& gi){
+	gi.i = array_idx%this->m;
+	gi.j = (array_idx % (this->m*this->m))/this->m;
+	gi.k = (int) (array_idx/(this->m*this->m));
+}
 void SDF::create_circle(float radius, float center_x, float center_y,
 		float center_z) {
-// D ist das einzig wichtige was gefüllt werden muss.
-// durch den center point und den Radius wird eine Surface der Kugel impliziert.
-// für jeden Punkt im Grid wird ein Wert berechnet, der sich aus
-// <euklidischen Distanz zum Center> - <radius> berechnet
 
-// center_x, center_y, center_z sind in Weltkoordinaten
-// iteriere über D 3 Schleifen, jeweils über i, j, k
-// i, j, k -> x, y, z
-// bspw.: z=(depth/m)*k
-
+	grid_index gi;
+	for (int array_idx = 0; array_idx < this->m*this->m*this->m; array_idx++){
+		this -> get_grid_index(array_idx, gi);
+		int x = (this->width/m) * gi.i;
+		int y = (this->height/m) * gi.j;
+		int z = (this->depth/m) * gi.k;
+		float d = (x - center_x)*(x - center_x) + (y - center_y)*(y - center_y)+(z-center_z)*(z-center_z);
+		D[array_idx] = radius - d;
+	}
 }

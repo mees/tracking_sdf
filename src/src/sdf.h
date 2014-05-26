@@ -7,6 +7,11 @@
 
 #ifndef SDF_H_
 #define SDF_H_
+struct grid_index{
+	int i;
+	int j;
+	int k;
+};
 class SDF {
 private:
 	int m;
@@ -18,8 +23,8 @@ private:
 	 * - j: grid y index
 	 * - k: grid z index
 	 */
-	int get_grid_index(int i, int j, int k);
-
+	int get_array_index(grid_index& gi);
+	void get_grid_index(int array_idx, grid_index& gi);
 public:
 	/**
 	 *  standard constructor
