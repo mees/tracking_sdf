@@ -57,7 +57,7 @@ void SDF::visualize(const std::string &file_name)
 	}
 	pcl::PolygonMesh output;
 	pcl::MarchingCubes<pcl::PointXYZI> *mc;
-	mc = new pcl::MarchingCubesSDF<pcl::PointXYZI>();
+	mc = new pcl::MarchingCubesSDF<pcl::PointXYZI>;
 	mc->setIsoLevel (0.0f);
 	mc->setGridResolution (this->m, this->m, this->m);
 	mc->setPercentageExtendGrid (0.0f);

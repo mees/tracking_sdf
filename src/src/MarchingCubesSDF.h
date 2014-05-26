@@ -37,13 +37,13 @@ namespace pcl
       voxelizeData ();
 
 
-    //public:
-    //  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    public:
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
 
 #ifdef PCL_NO_PRECOMPILE
-//#include <pcl/surface/impl/marching_cubes_hoppe.hpp>
+#include "MarchingCubesSDF.hpp"
 #endif
 
 #endif // PCL_SURFACE_MARCHING_CUBES_SDF_H_

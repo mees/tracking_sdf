@@ -1,3 +1,7 @@
+#catkin
+devel/
+build/
+.catkin_workspace
 #vi
 *.swp
 *.swo
