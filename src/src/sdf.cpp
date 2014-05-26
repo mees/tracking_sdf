@@ -38,13 +38,18 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 		float center_z) {
 
 	grid_index gi;
+
+	float x, y, z, d;
 	for (int array_idx = 0; array_idx < numberOfVoxels; array_idx++){
 		this -> get_grid_index(array_idx, gi);
-		int x = (this->width/m) * gi.i;
-		int y = (this->height/m) * gi.j;
-		int z = (this->depth/m) * gi.k;
-		float d = (x - center_x)*(x - center_x) + (y - center_y)*(y - center_y)+(z-center_z)*(z-center_z);
-		D[array_idx] = radius - d;
+		x = (this->width/((float)m)) * (gi.i+0.5);
+		y = (this->height/((float)m)) * (gi.j+0.5);
+		z = (this->depth/((float)m)) * (gi.k+0.5);
+		
+		d = (x - center_x)*(x - center_x) + (y - center_y)*(y - center_y)+(z-center_z)*(z-center_z);
+		//std::cout << radius << " - " << d << " = " << radius -d << std::endl;
+		D[array_idx] =  d-radius;
+		
 	}
 }
 void SDF::visualize(const std::string &file_name)
@@ -52,17 +57,19 @@ void SDF::visualize(const std::string &file_name)
 	//pcl::PointCloud<pcl::PointXYZI> cloud;
         pcl::PointCloud<pcl::PointXYZI>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZI>);
 	// Fill in the cloud data
-	cloud->width    = this->width * this-> height * this->depth;
+	cloud->width    = m*m*m;
 	cloud->height   = 1;
 	cloud->is_dense = false;
 	cloud->points.resize (cloud->width * cloud->height);
 	grid_index gi;
-	for (size_t i = 0; i < cloud->points.size (); ++i)
+	
+	for (int i = 0; i < cloud->points.size (); i++)
 	{
 	  this->get_grid_index(i,gi);
 	  cloud->points[i].x = gi.i;
 	  cloud->points[i].y = gi.j;
 	  cloud->points[i].z = gi.k;
+	  //std::cout << get_array_index(gi) << ": "<< D[get_array_index(gi)] << std::endl;
 	  cloud->points[i].intensity = D[get_array_index(gi)];
 	}
 	pcl::PolygonMesh output;

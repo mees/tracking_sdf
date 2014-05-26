@@ -1,0 +1,5 @@
+<launch>
+	<node name="sdf_3d_reconstruction_node" pkg="sdf_3d_reconstruction" type="sdf_3d_reconstruction_node" clear_params="true" output="screen" launch-prefix="gdb -ex run --args">
+		<param name="groundTruthPath" value="$(find sdf_3d_reconstruction)/rgbd_dataset_freiburg1_plant-groundtruth.txt" type="str"/> 
+	</node>
+</launch>

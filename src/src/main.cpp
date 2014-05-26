@@ -129,8 +129,15 @@ main (int argc, char** argv)
   // Initialize ROS
   ros::init (argc, argv, "sdf_3d_reconstruction");
   ros::NodeHandle nh;
-  // Create a ROS subscriber for the input point cloud
-  //ros::Subscriber sub = nh.subscribe ("input", 1, cloud_cb);
+  SDF sdf(111, 1.0, 1.0, 1.0);
+  sdf.create_circle(0.2, 0.5, 0.5, 0.5);
+  std::cout<<"circle created ..." << std::endl;
+  std::string visualeOutput;
+  ros::param::get("~visualOutput", visualeOutput);
+  
+  sdf.visualize(visualeOutput);
+  std::cout<<"circle visualized ..." << std::endl;
+
   cameraMatrix camera_matrix;
   camera_matrix.isFilled = false;
   camera_matrix.K = Matrix<double,3,3>::Zero();
@@ -149,14 +156,13 @@ main (int argc, char** argv)
       cout << "Couldn't locate  ground Truth file" << endl;
       exit(0);
     }
-   SDF sdf(256, 2.0, 2.0, 2.0);
+   //SDF sdf(256, 2.0, 2.0, 2.0);
    //sdf.create_circle(0.2, 0.5, 0.5, 0.5);
    //fixme: forget txt file and take TF ground truth
   readGroundTruthAndUpdateSDF(camera_matrix, sdf, groundTruthFile);
 
   //cout<<"camera Matrix: "<<camera_matrix.K<<endl;
   //rgbd_camera_info.shutdown();
-
   // Spin
   ros::spin ();
 }

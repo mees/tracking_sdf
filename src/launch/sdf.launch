@@ -1,5 +1,6 @@
 <launch>
 	<node name="sdf_3d_reconstruction_node" pkg="sdf_3d_reconstruction" type="sdf_3d_reconstruction_node" clear_params="true" output="screen" >
 		<param name="groundTruthPath" value="$(find sdf_3d_reconstruction)/rgbd_dataset_freiburg1_plant-groundtruth.txt" type="str"/> 
+		<param name="visualOutput" value="$(find sdf_3d_reconstruction)/vo.vtk" type="str"/> 
 	</node>
 </launch>
