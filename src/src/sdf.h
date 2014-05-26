@@ -19,8 +19,8 @@ private:
 	float width, height, depth;
 	float *D;
 	float *W;
-	int get_array_index(grid_index& gi);
-	void get_grid_index(int array_idx, grid_index& gi);
+	int numberOfVoxels;
+
 public:
 	/**
 	 *  standard constructor
@@ -40,7 +40,9 @@ public:
 	 * 
 	 **/
 	void visualize(const std::string &file_name);
-
+	int getNumberOfVoxels();
+	int get_array_index(grid_index& gi);
+	void get_grid_index(int array_idx, grid_index& gi);
 };
 
 #endif /* SDF_H_ */

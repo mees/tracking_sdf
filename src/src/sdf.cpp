@@ -12,9 +12,19 @@
 SDF::SDF(int m, float width, float height, float depth): m(m), width(width),height(height), depth(depth){
 	D = new float[this->m * this->m * this->m];
 	W = new float[this->m * this->m * this->m];
+	numberOfVoxels = m * m * m;
+	for (int i = 0; i<numberOfVoxels; i++) {
+		D[i] = 0;
+		W[i] = 0;
+	}
+
 }
 SDF::~SDF(){
   
+}
+
+int SDF::getNumberOfVoxels() {
+	return numberOfVoxels;
 }
 inline int SDF::get_array_index(grid_index& gi){
 	return this->m*this->m*gi.k+this->m*gi.j+gi.i;
@@ -28,7 +38,7 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 		float center_z) {
 
 	grid_index gi;
-	for (int array_idx = 0; array_idx < this->m*this->m*this->m; array_idx++){
+	for (int array_idx = 0; array_idx < numberOfVoxels; array_idx++){
 		this -> get_grid_index(array_idx, gi);
 		int x = (this->width/m) * gi.i;
 		int y = (this->height/m) * gi.j;
