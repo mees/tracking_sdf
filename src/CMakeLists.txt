@@ -104,7 +104,7 @@ include_directories(
 # )
 
 ## Declare a cpp executable
- add_executable(sdf_3d_reconstruction_node src/main.cpp)
+ add_executable(sdf_3d_reconstruction_node src/MarchingCubesSDF.cpp src/main.cpp src/sdf.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes

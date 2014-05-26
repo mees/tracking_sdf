@@ -6,7 +6,7 @@
 #include <pcl/conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
-
+#include "sdf.h"
 
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
@@ -30,7 +30,10 @@ main (int argc, char** argv)
 
   // Create a ROS publisher for the output point cloud
   //pub = nh.advertise<sensor_msgs::PointCloud2> ("output", 1);
-
+  
+  SDF sdf(256, 1.0, 1.0, 1.0);
+  //sdf.create_circle(0.2, 0.5, 0.5, 0.5);
+  //sdf.visualize("/home/joel/o.vtk");
   // Spin
   ros::spin ();
 }
