@@ -9,7 +9,7 @@
 #eclipse
 .project
 .cproject
-
+.settings/
 #kdevelop
 /kdev4/
 *.kdev4
