@@ -1,7 +1,17 @@
 #include "sdf_3d_reconstruction/sdf_mapping.h"
 
-
-
+//todo: validate!
+Vector2i SDF_Mapping::project3DPointToImagePlane(Vector3i XYZPoint){
+	//Eq. 2
+	Vector2i ij;
+	float fx = camera_matrix.K(0,0);
+	float fy = camera_matrix.K(1,1);
+	float cx = camera_matrix.K(0,2);
+	float cy = camera_matrix.K(1,2);
+	ij(0) = fx*(XYZPoint(0)/XYZPoint(2)) + cx;
+	ij(1) = fy*(XYZPoint(1)/XYZPoint(2)) + cy;
+	return ij;
+}
 
 void SDF_Mapping::camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_camera_info)
 {
@@ -19,7 +29,28 @@ void SDF_Mapping::camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_cam
 	camInfo.shutdown();
 }
 
-void SDF_Mapping::updateSDF(Matrix<float, 3, 3> &CamRot,
+////incomplete!
+float SDF_Mapping::projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
+		Vector3d &CamTrans, grid_index &gi){
+//	/*transfer vertex global coordinates to the local
+//	coordinate frame of the camera, Eq. 24 */
+	Vector3i globalCoord;
+	globalCoord(0)=gi.i;
+	globalCoord(1)=gi.j;
+	globalCoord(2)=gi.k;
+	Vector3i localCoord;
+//	//fixme: make this work
+//	//Vector3i localCoord(CamRot*(globalCoord-CamTrans));
+//	//now project this point to the pixel Eq. 25
+	Vector2i ij = project3DPointToImagePlane(localCoord);
+//
+//	//compute difference of the depth of the voxel and the
+//	//observed depth at (i, j)
+//	//float distance = sdf.D[old_sdf.get_array_index(gi)] - ;
+	return 0;
+}
+
+void SDF_Mapping::updateSDF(Matrix<double, 3, 3> &CamRot,
 		Vector3d &CamTrans) {
 	if (!camera_matrix.isFilled) {
 		cout << "Camera Matrix not received. Start rosbag file!" << endl;
@@ -28,7 +59,7 @@ void SDF_Mapping::updateSDF(Matrix<float, 3, 3> &CamRot,
 		for (int i = 0; i < sdf->getNumberOfVoxels(); i++) {
 			grid_index gi;
 			sdf->get_grid_index(i,gi);
-			//float d_n = projectivePointToPointDistance(CamRot, CamTrans, gi);
+			float d_n = projectivePointToPointDistance(CamRot, CamTrans, gi);
 		}
 
 	}
@@ -37,7 +68,7 @@ void SDF_Mapping::updateSDF(Matrix<float, 3, 3> &CamRot,
 
 void SDF_Mapping::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
 		const sensor_msgs::ImageConstPtr& image_depth) {
-	//cout<<"kinect callback"<<endl;
+
 	tf::TransformListener listener;
 	tf::StampedTransform transform;
 	try {
@@ -49,18 +80,19 @@ void SDF_Mapping::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
 //		 std::cout.precision(3);
 //		 std::cout.setf(std::ios::fixed,std::ios::floatfield);
 //		 std::cout << "At time " << transform.stamp_.toSec() << std::endl;
-//	     tf::Quaternion q = transform.getRotation();
-//	     tf::Vector3 v = transform.getOrigin();
+
 		Vector3d trans;
 		Eigen::Quaterniond rot;
 		tf::vectorTFToEigen(transform.getOrigin(),trans);
 		tf::quaternionTFToEigen(transform.getRotation(), rot);
 
-	    // Matrix<float, 3, 3> rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
-//		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
+	     Matrix<double, 3, 3> rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
+	     //	     tf::Quaternion q = transform.getRotation();
+	     	     tf::Vector3 v = transform.getOrigin();
+		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
 //		cout << "- Rotation: in Quaternion [" << q.getX() << ", " << q.getY() << ", "
 //		                  << q.getZ() << ", " << q.getW() << "]" << endl;
-	     //updateSDF(rotMat, trans);
+	     updateSDF(rotMat, trans);
 
 	} catch (tf::TransformException ex) {
 		ROS_ERROR("%s", ex.what());
