@@ -36,7 +36,7 @@
 #ifndef MARCHING_CUBES_SDF_C
 #define MARCHING_CUBES_SDF_C
 
-#include "MarchingCubesSDF.h"
+#include "sdf_3d_reconstruction/MarchingCubesSDF.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 pcl::MarchingCubesSDF::MarchingCubesSDF () 

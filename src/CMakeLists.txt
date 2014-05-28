@@ -9,6 +9,9 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   pcl_ros
   sensor_msgs
+  tf
+  tf_conversions
+  message_filters
 )
 
 ## System dependencies are found with CMake's conventions
@@ -95,8 +98,10 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  ${PROJECT_SOURCE_DIR}/include
   ${catkin_INCLUDE_DIRS}
 )
+#MESSAGE(STATUS "INCLUDEDIRS: " ${CMAKE_C_FLAGS})
 
 ## Declare a cpp library
 # add_library(sdf_3d_reconstruction
@@ -104,7 +109,7 @@ include_directories(
 # )
 
 ## Declare a cpp executable
- add_executable(sdf_3d_reconstruction_node src/MarchingCubesSDF.cpp src/main.cpp src/sdf.cpp)
+ add_executable(sdf_3d_reconstruction_node src/MarchingCubesSDF.cpp src/main.cpp src/sdf.cpp src/sdf_mapping.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
