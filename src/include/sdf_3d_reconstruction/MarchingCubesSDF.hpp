@@ -1,4 +1,4 @@
-#include "MarchingCubesSDF.h"
+#include "sdf_3d_reconstruction/MarchingCubesSDF.h"
 #include <pcl/common/common.h>
 #include <pcl/common/vector_average.h>
 #include <pcl/Vertices.h>
