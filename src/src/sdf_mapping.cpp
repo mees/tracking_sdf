@@ -114,12 +114,12 @@ SDF_Mapping::SDF_Mapping() {
 	camInfo = nh.subscribe("/camera/rgb/camera_info", 1,
 			&SDF_Mapping::camera_info_cb, this);
 	sdf = new SDF(111, 1.0, 1.0, 1.0);
-//	sdf->create_circle(0.2, 0.5, 0.5, 0.5);
-//	std::cout<<"circle created ..." << std::endl;
-//	std::string visualeOutput;
-//	ros::param::get("~visualOutput", visualeOutput);
-//	sdf->visualize(visualeOutput);
-//	std::cout<<"circle visualized ..." << std::endl;
+	sdf->create_circle(0.2, 0.5, 0.5, 0.5);
+	std::cout<<"circle created ..." << std::endl;
+	std::string visualeOutput;
+	ros::param::get("~visualOutput", visualeOutput);
+	sdf->visualize(visualeOutput);
+	std::cout<<"circle visualized ..." << std::endl;
 
 	ros::spin();
 }
