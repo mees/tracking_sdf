@@ -5,8 +5,6 @@
 #include <pcl/point_types.h>
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/io/vtk_io.h>
-#include <pcl/point_types.h>
-#include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
 SDF::SDF(int m, float width, float height, float depth): m(m), width(width),height(height), depth(depth){
@@ -54,33 +52,12 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 }
 void SDF::visualize(const std::string &file_name)
 {
-	//pcl::PointCloud<pcl::PointXYZI> cloud;
-        pcl::PointCloud<pcl::PointXYZI>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZI>);
-	// Fill in the cloud data
-	cloud->width    = m*m*m;
-	cloud->height   = 1;
-	cloud->is_dense = false;
-	cloud->points.resize (cloud->width * cloud->height);
-	grid_index gi;
-	
-	for (int i = 0; i < cloud->points.size (); i++)
-	{
-	  this->get_grid_index(i,gi);
-	  cloud->points[i].x = gi.i;
-	  cloud->points[i].y = gi.j;
-	  cloud->points[i].z = gi.k;
-	  //std::cout << get_array_index(gi) << ": "<< D[get_array_index(gi)] << std::endl;
-	  cloud->points[i].intensity = D[get_array_index(gi)];
-	}
 	pcl::PolygonMesh output;
-	pcl::MarchingCubes<pcl::PointXYZI> *mc;
-	mc = new pcl::MarchingCubesSDF<pcl::PointXYZI>;
+	pcl::MarchingCubesSDF *mc;
+	mc = new pcl::MarchingCubesSDF;
 	mc->setIsoLevel (0.0f);
 	mc->setGridResolution (this->m, this->m, this->m);
-	mc->setPercentageExtendGrid (0.0f);
-	mc->setInputCloud (cloud);
-	mc->reconstruct (output);
-	
+	mc->setGrid(this->D);
+	mc->performReconstruction (output);	
 	pcl::io::saveVTKFile(file_name, output);
-	//pcl::io::savePCDFileASCII (file_name, cloud);
 }

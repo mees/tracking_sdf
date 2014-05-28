@@ -33,8 +33,23 @@
  *
  */
 
-#ifndef PCL_SURFACE_MARCHING_CUBES_H_
-#define PCL_SURFACE_MARCHING_CUBES_H_
+#ifndef MARCHING_CUBES_SDF_H_
+#define MARCHING_CUBES_SDF_H_
+#include<Eigen/Eigen>
+#include<vector>
+#include <pcl/common/common.h>
+#include <pcl/common/vector_average.h>
+#include <pcl/Vertices.h>
+#include <pcl/kdtree/kdtree_flann.h>
+
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl/PolygonMesh.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl/io/vtk_io.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/surface/gp3.h>
 
 namespace pcl
 {
@@ -357,14 +372,14 @@ namespace pcl
     * \ingroup surface
     */
 
-  class MarchingCubes
+  class MarchingCubesSDF
   {
     public:
       /** \brief Constructor. */
-      MarchingCubes ();
+      MarchingCubesSDF ();
 
       /** \brief Destructor. */
-      virtual ~MarchingCubes ();
+      virtual ~MarchingCubesSDF ();
 
 
       /** \brief Method that sets the iso level of the surface to be extracted.
@@ -398,26 +413,27 @@ namespace pcl
       getGridResolution (int &res_x, int &res_y, int &res_z)
       { res_x = res_x_; res_y = res_y_; res_z = res_z_; }
 
-      /** \brief Method that sets the parameter that defines how much free space should be left inside the grid between
-        * the bounding box of the point cloud and the grid limits. Does not affect the resolution of the grid, it just
-        * changes the voxel size accordingly.
-        * \param[in] percentage the percentage of the bounding box that should be left empty between the bounding box and
-        * the grid limits.
-        */
       inline void
-      setPercentageExtendGrid (float percentage)
-      { percentage_extend_grid_ = percentage; }
-
-      /** \brief Method that gets the parameter that defines how much free space should be left inside the grid between
-        * the bounding box of the point cloud and the grid limits, as a percentage of the bounding box.
+      setGrid(float *grid)
+      {
+	grid_ = grid;
+      }
+      /** \brief Extract the surface.
+        * \param[out] output the resultant polygonal mesh
         */
-      inline float
-      getPercentageExtendGrid ()
-      { return percentage_extend_grid_; }
+       virtual void
+       performReconstruction (pcl::PolygonMesh &output);
 
+       /** \brief Extract the surface.
+         * \param[out] points the points of the extracted mesh
+         * \param[out] polygons the connectivity between the point of the extracted mesh.
+         */
+       virtual void
+       performReconstruction (pcl::PointCloud<pcl::PointXYZ> &points,
+                              std::vector<pcl::Vertices> &polygons);
     protected:
       /** \brief The data structure storing the 3D grid */
-      std::vector<float> grid_;
+      float *grid_;
 
       /** \brief The grid resolution */
       int res_x_, res_y_, res_z_;
@@ -432,9 +448,6 @@ namespace pcl
       /** \brief The iso level to be extracted. */
       float iso_level_;
 
-      /** \brief Convert the point cloud into voxel data. */
-      virtual void
-      voxelizeData () = 0;
 
       /** \brief Interpolate along the voxel edge.
         * \param[in] p1 The first point on the edge
@@ -455,7 +468,7 @@ namespace pcl
       void
       createSurface (std::vector<float> &leaf_node,
                      Eigen::Vector3i &index_3d,
-                     pcl::PointCloud<PointXYZ> &cloud);
+                     pcl::PointCloud<pcl::PointXYZ> &cloud);
 
       /** \brief Get the bounding box for the input data points. */
       void
@@ -477,30 +490,14 @@ namespace pcl
                          Eigen::Vector3i &index3d);
 
       /** \brief Class get name method. */
-      std::string getClassName () const { return ("MarchingCubes"); }
+      std::string getClassName () const { return ("MarchingCubesSDF"); }
 
-      /** \brief Extract the surface.
-        * \param[out] output the resultant polygonal mesh
-        */
-       virtual void
-       performReconstruction (pcl::PolygonMesh &output);
-
-       /** \brief Extract the surface.
-         * \param[out] points the points of the extracted mesh
-         * \param[out] polygons the connectivity between the point of the extracted mesh.
-         */
-       virtual void
-       performReconstruction (pcl::PointCloud<PointXYZ> &points,
-                              std::vector<pcl::Vertices> &polygons);
+      
 
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
-
-#ifdef PCL_NO_PRECOMPILE
-#include <pcl/surface/impl/marching_cubes.hpp>
-#endif
 
 #endif  // PCL_SURFACE_MARCHING_CUBES_H_
 
