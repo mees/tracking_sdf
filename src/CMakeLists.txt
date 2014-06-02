@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   tf_conversions
   message_filters
+  pcl_conversions
 )
 
 ## System dependencies are found with CMake's conventions
@@ -100,7 +101,9 @@ catkin_package(
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${catkin_INCLUDE_DIRS}
+  /usr/include/vtk-5.8
 )
+
 #MESSAGE(STATUS "INCLUDEDIRS: " ${CMAKE_C_FLAGS})
 
 ## Declare a cpp library
@@ -117,7 +120,7 @@ include_directories(
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(sdf_3d_reconstruction_node
-   ${catkin_LIBRARIES}
+   ${catkin_LIBRARIES} libvtkCommon.so libvtkFiltering.so
  )
 
 #############
