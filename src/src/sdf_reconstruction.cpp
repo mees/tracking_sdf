@@ -80,6 +80,14 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 			new pcl::PointCloud<pcl::PointXYZRGB>);
 	pcl::fromPCLPointCloud2(pcl_pc2, *pcl_cloud);
 
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered(new pcl::PointCloud<pcl::PointXYZRGB>);
+	//fast bilateral filter for smoothing depth information in organized point clouds
+	pcl::FastBilateralFilter<pcl::PointXYZRGB> bFilter;
+	bFilter.setInputCloud(pcl_cloud);
+//	bFilter.setHalfSize(5.0f);
+//	bFilter.setStdDev(0.2f);
+	bFilter.applyFilter(*cloud_filtered);
+
 	// estimate normals
 	pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
 
@@ -87,10 +95,10 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	ne.setNormalEstimationMethod(ne.AVERAGE_3D_GRADIENT);
 	ne.setMaxDepthChangeFactor(0.02f);
 	ne.setNormalSmoothingSize(10.0f);
-	ne.setInputCloud(pcl_cloud);
+	ne.setInputCloud(cloud_filtered);
 	ne.compute(*normals);
 
-	//visualizeRGBCloudWithNormalsPCL(pcl_cloud, normals);
+	//visualizeRGBCloudWithNormalsPCL(cloud_filtered, normals);
 
 	tf::TransformListener listener;
 	tf::StampedTransform transform;

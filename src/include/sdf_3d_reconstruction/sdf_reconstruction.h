@@ -10,6 +10,8 @@
 #include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/filters/bilateral.h>
+#include <pcl/filters/fast_bilateral.h>
 
 #include "sdf_3d_reconstruction/sdf.h"
 #include <fstream>
