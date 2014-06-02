@@ -7,11 +7,19 @@
 #ifndef SDF_H_
 #define SDF_H_
 #include <string>
-struct grid_index{
-	int i;
-	int j;
-	int k;
-};
+#include <iostream>
+
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl/io/vtk_io.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/surface/gp3.h>
+#include<Eigen/Eigen>
+
+#include "sdf_3d_reconstruction/MarchingCubesSDF.h"
+
+using namespace Eigen;
 class SDF {
   
 private:
@@ -41,8 +49,8 @@ public:
 	 **/
 	void visualize(const std::string &file_name);
 	int getNumberOfVoxels();
-	int get_array_index(grid_index& gi);
-	void get_grid_index(int array_idx, grid_index& gi);
+	int get_array_index(Vector3i& gi);
+	void get_grid_index(int array_idx, Vector3i& gi);
 };
 
 #endif /* SDF_H_ */

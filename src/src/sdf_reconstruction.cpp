@@ -29,24 +29,10 @@ void SDF_Reconstruction::camera_info_cb(const sensor_msgs::CameraInfoConstPtr &r
 	camInfo.shutdown();
 }
 
-////incomplete!
+
 float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
-		Vector3d &CamTrans, grid_index &gi){
-//	/*transfer vertex global coordinates to the local
-//	coordinate frame of the camera, Eq. 24 */
-	Vector3i globalCoord;
-	globalCoord(0)=gi.i;
-	globalCoord(1)=gi.j;
-	globalCoord(2)=gi.k;
-	Vector3i localCoord;
-//	//fixme: make this work
-//	//Vector3i localCoord(CamRot*(globalCoord-CamTrans));
-//	//now project this point to the pixel Eq. 25
-	Vector2i ij = project3DPointToImagePlane(localCoord);
-//
-//	//compute difference of the depth of the voxel and the
-//	//observed depth at (i, j)
-//	//float distance = sdf.D[old_sdf.get_array_index(gi)] - ;
+		Vector3d &CamTrans, Vector3i &gi){
+
 	return 0;
 }
 
@@ -57,7 +43,7 @@ void SDF_Reconstruction::updateSDF(Matrix<double, 3, 3> &CamRot,
 		exit(0);
 	} else {
 		for (int i = 0; i < sdf->getNumberOfVoxels(); i++) {
-			grid_index gi;
+			Vector3i gi;
 			sdf->get_grid_index(i,gi);
 			float d_n = projectivePointToPointDistance(CamRot, CamTrans, gi);
 		}
