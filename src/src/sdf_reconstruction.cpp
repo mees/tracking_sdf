@@ -31,7 +31,7 @@ void SDF_Reconstruction::camera_info_cb(const sensor_msgs::CameraInfoConstPtr &r
 
 
 float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
-		Vector3d &CamTrans, Vector3i &gi){
+		Vector3d &CamTrans, Vector3i &voxel_coordinates){
 
 	return 0;
 }
@@ -43,9 +43,9 @@ void SDF_Reconstruction::updateSDF(Matrix<double, 3, 3> &CamRot,
 		exit(0);
 	} else {
 		for (int i = 0; i < sdf->getNumberOfVoxels(); i++) {
-			Vector3i gi;
-			sdf->get_grid_index(i,gi);
-			float d_n = projectivePointToPointDistance(CamRot, CamTrans, gi);
+			Vector3i voxel_coordinates;
+			sdf->get_voxel_coordinates(i,voxel_coordinates);
+			float d_n = projectivePointToPointDistance(CamRot, CamTrans, voxel_coordinates);
 		}
 
 	}

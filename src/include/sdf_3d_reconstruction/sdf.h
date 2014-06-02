@@ -45,12 +45,24 @@ public:
 	 */
 	void create_circle(float radius, float center_x, float center_y, float center_z);
 	/**
-	 * 
+	 *  
 	 **/
 	void visualize(const std::string &file_name);
 	int getNumberOfVoxels();
-	int get_array_index(Vector3i& gi);
-	void get_grid_index(int array_idx, Vector3i& gi);
+	/*
+	 *  input: i,j,k -> idx. Idx can be used for W and for D
+	 */
+	int get_array_index(Vector3i& voxel_coordinates);
+	/*
+	 *  input: array_idx
+	 *  output: voxel_coordinates -> i, j, k voxel grid coordinates. i represents x axes, j represents y axes, k represents z axes
+	 */
+	void get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinates);
+	/*
+	 *  input: globale coordinate x,y,z
+	 *  output: voxel_coordinates i,j,k
+	 */
+	void get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_coordinates);
 };
 
 #endif /* SDF_H_ */
