@@ -8,14 +8,20 @@
 #define SDF_H_
 #include <string>
 #include <iostream>
-
+#include <ros/ros.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/io/vtk_io.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
+
+#include <ros/ros.h>
+#include <visualization_msgs/Marker.h>
+#include "visualization_msgs/MarkerArray.h"
+
 #include<Eigen/Eigen>
+
 
 #include "sdf_3d_reconstruction/MarchingCubesSDF.h"
 
@@ -28,6 +34,10 @@ private:
 	float *D;
 	float *W;
 	int numberOfVoxels;
+	ros::Publisher marker_publisher;
+	uint32_t shape_type;
+	ros::Rate* r;
+	void register_visualization();
 
 public:
 	/**

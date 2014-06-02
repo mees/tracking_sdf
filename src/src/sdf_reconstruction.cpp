@@ -90,7 +90,6 @@ SDF_Reconstruction::SDF_Reconstruction() {
 
 	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image,
 			sensor_msgs::Image> MySyncPolicy;
-
 	kinect_rgb_sub.subscribe(nh, "/camera/rgb/image_color", 1);
 	kinect_depth_sub.subscribe(nh, "/camera/depth/image", 1);
 	message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1),
