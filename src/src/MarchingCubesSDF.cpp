@@ -42,11 +42,44 @@
 pcl::MarchingCubesSDF::MarchingCubesSDF () 
 : min_p_ (), max_p_ (),  iso_level_ ()
 {
+  
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 pcl::MarchingCubesSDF::~MarchingCubesSDF ()
 {
+}
+
+void
+pcl::MarchingCubesSDF::setBBox (float width, float height, float depth)
+{
+  //pcl::getMinMax3D (*input_, min_p_, max_p_);
+  min_p_[0] = 0;
+  min_p_[1] = 0;
+  min_p_[2] = 0;
+  min_p_[3] = 0;
+  max_p_[0] = width;
+  max_p_[1] = height;
+  max_p_[2] = depth;
+  max_p_[3] = 0;
+  /*min_p_ -= (max_p_ - min_p_) * percentage_extend_grid_/2;
+  max_p_ += (max_p_ - min_p_) * percentage_extend_grid_/2;
+
+  Eigen::Vector4f bounding_box_size = max_p_ - min_p_;
+
+  bounding_box_size = max_p_ - min_p_;
+  PCL_DEBUG ("[pcl::MarchingCubesHoppe::getBoundingBox] Size of Bounding Box is [%f, %f, %f]\n",
+             bounding_box_size.x (), bounding_box_size.y (), bounding_box_size.z ());
+  double max_size =
+      (std::max) ((std::max)(bounding_box_size.x (), bounding_box_size.y ()),
+          bounding_box_size.z ());
+  (void)max_size;
+  // ????
+  // data_size_ = static_cast<uint64_t> (max_size / leaf_size_);
+  PCL_DEBUG ("[pcl::MarchingCubesHoppe::getBoundingBox] Lower left point is [%f, %f, %f]\n",
+             min_p_.x (), min_p_.y (), min_p_.z ());
+  PCL_DEBUG ("[pcl::MarchingCubesHoppe::getBoundingBox] Upper left point is [%f, %f, %f]\n",
+             max_p_.x (), max_p_.y (), max_p_.z ());*/
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

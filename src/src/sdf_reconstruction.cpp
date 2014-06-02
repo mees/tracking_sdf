@@ -98,7 +98,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 			boost::bind(&SDF_Reconstruction::kinect_callback, this, _1, _2));
 	camInfo = nh.subscribe("/camera/rgb/camera_info", 1,
 			&SDF_Reconstruction::camera_info_cb, this);
-	sdf = new SDF(4, 1.0, 1.0, 1.0);
+	sdf = new SDF(101, 1.0, 1.0, 1.0);
 	sdf->create_circle(0.2, 0.5, 0.5, 0.5);
 	std::cout<<"circle created ..." << std::endl;
 	std::string visualeOutput;

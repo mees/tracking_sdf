@@ -35,6 +35,7 @@
 
 #ifndef MARCHING_CUBES_SDF_H_
 #define MARCHING_CUBES_SDF_H_
+#include <iostream>
 #include<Eigen/Eigen>
 #include<vector>
 #include <pcl/common/common.h>
@@ -416,6 +417,7 @@ namespace pcl
       inline void
       setGrid(float *grid)
       {
+	std::cout << "GRID" <<grid[0]<<std::endl;
 	grid_ = grid;
       }
       /** \brief Extract the surface.
@@ -431,6 +433,10 @@ namespace pcl
        virtual void
        performReconstruction (pcl::PointCloud<pcl::PointXYZ> &points,
                               std::vector<pcl::Vertices> &polygons);
+       
+       /** \brief Set the bounding box for the input data points. */
+      void
+      setBBox (float width, float height, float depth);
     protected:
       /** \brief The data structure storing the 3D grid */
       float *grid_;
@@ -470,9 +476,7 @@ namespace pcl
                      Eigen::Vector3i &index_3d,
                      pcl::PointCloud<pcl::PointXYZ> &cloud);
 
-      /** \brief Get the bounding box for the input data points. */
-      void
-      getBoundingBox ();
+      
 
 
       /** \brief Method that returns the scalar value at the given grid position.
