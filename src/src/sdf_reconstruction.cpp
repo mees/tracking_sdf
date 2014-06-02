@@ -52,8 +52,45 @@ void SDF_Reconstruction::updateSDF(Matrix<double, 3, 3> &CamRot,
 
 }
 
-void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
-		const sensor_msgs::ImageConstPtr& image_depth) {
+void SDF_Reconstruction::visualizeRGBCloudWithNormalsPCL(const PointCloud<PointXYZRGB>::Ptr &pcl_cloud,const PointCloud<Normal>::Ptr &normals) {
+	// visualize normals
+	pcl::visualization::PCLVisualizer viewer("PCL Viewer");
+	viewer.setBackgroundColor(0.0, 0.0, 0.0);
+	pcl::visualization::PointCloudColorHandlerRGBField<PointXYZRGB> rgb(pcl_cloud);
+	//viewer.addPointCloud<pcl::PointXYZRGB>(pcl_cloud);
+	 viewer.addPointCloud<PointXYZRGB> (pcl_cloud, rgb, "sample cloud");
+//	viewer.addPointCloudNormals<pcl::PointXYZRGB, pcl::Normal>(pcl_cloud,
+//			normals);
+	   viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
+	   viewer.addPointCloudNormals<PointXYZRGB, pcl::Normal> (pcl_cloud, normals, 10, 0.05, "normals");
+	   viewer.initCameraParameters ();
+
+	while (!viewer.wasStopped()) {
+		viewer.spinOnce();
+	}
+}
+
+//void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
+//		const sensor_msgs::ImageConstPtr& image_depth) {
+void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr& ros_cloud) {
+
+	pcl::PCLPointCloud2 pcl_pc2;
+	pcl_conversions::toPCL(*ros_cloud, pcl_pc2);
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr pcl_cloud(
+			new pcl::PointCloud<pcl::PointXYZRGB>);
+	pcl::fromPCLPointCloud2(pcl_pc2, *pcl_cloud);
+
+	// estimate normals
+	pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
+
+	pcl::IntegralImageNormalEstimation<pcl::PointXYZRGB, pcl::Normal> ne;
+	ne.setNormalEstimationMethod(ne.AVERAGE_3D_GRADIENT);
+	ne.setMaxDepthChangeFactor(0.02f);
+	ne.setNormalSmoothingSize(10.0f);
+	ne.setInputCloud(pcl_cloud);
+	ne.compute(*normals);
+
+	//visualizeRGBCloudWithNormalsPCL(pcl_cloud, normals);
 
 	tf::TransformListener listener;
 	tf::StampedTransform transform;
@@ -62,10 +99,6 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image
 				ros::Time(), ros::Duration(2.0));
 		listener.lookupTransform("/world", "/openni_rgb_optical_frame",
 				ros::Time(), transform);
-
-//		 std::cout.precision(3);
-//		 std::cout.setf(std::ios::fixed,std::ios::floatfield);
-//		 std::cout << "At time " << transform.stamp_.toSec() << std::endl;
 
 		Vector3d trans;
 		Eigen::Quaterniond rot;
@@ -88,15 +121,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image
 
 SDF_Reconstruction::SDF_Reconstruction() {
 
-	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image,
-			sensor_msgs::Image> MySyncPolicy;
-
-	kinect_rgb_sub.subscribe(nh, "/camera/rgb/image_color", 1);
-	kinect_depth_sub.subscribe(nh, "/camera/depth/image", 1);
-	message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1),
-			kinect_rgb_sub, kinect_depth_sub);
-	sync.registerCallback(
-			boost::bind(&SDF_Reconstruction::kinect_callback, this, _1, _2));
+	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	camInfo = nh.subscribe("/camera/rgb/camera_info", 1,
 			&SDF_Reconstruction::camera_info_cb, this);
 	sdf = new SDF(111, 1.0, 1.0, 1.0);
