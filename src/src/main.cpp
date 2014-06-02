@@ -10,7 +10,7 @@ main (int argc, char** argv)
 {
   // Initialize ROS
   ros::init (argc, argv, "sdf_3d_reconstruction");
-  SDF_Mapping *sdf_mapping = new SDF_Mapping();
+  SDF_Reconstruction *sdf_mapping = new SDF_Reconstruction();
   //ros::spin ();
 }
 

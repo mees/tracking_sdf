@@ -1,7 +1,7 @@
-#include "sdf_3d_reconstruction/sdf_mapping.h"
+#include "sdf_3d_reconstruction/sdf_reconstruction.h"
 
 //todo: validate!
-Vector2i SDF_Mapping::project3DPointToImagePlane(Vector3i XYZPoint){
+Vector2i SDF_Reconstruction::project3DPointToImagePlane(Vector3i XYZPoint){
 	//Eq. 2
 	Vector2i ij;
 	float fx = camera_matrix.K(0,0);
@@ -13,7 +13,7 @@ Vector2i SDF_Mapping::project3DPointToImagePlane(Vector3i XYZPoint){
 	return ij;
 }
 
-void SDF_Mapping::camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_camera_info)
+void SDF_Reconstruction::camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_camera_info)
 {
 	camera_matrix.K(0,0) = rgbd_camera_info->K[0];
 	camera_matrix.K(0,1) = rgbd_camera_info->K[1];
@@ -30,7 +30,7 @@ void SDF_Mapping::camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_cam
 }
 
 ////incomplete!
-float SDF_Mapping::projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
+float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
 		Vector3d &CamTrans, grid_index &gi){
 //	/*transfer vertex global coordinates to the local
 //	coordinate frame of the camera, Eq. 24 */
@@ -50,7 +50,7 @@ float SDF_Mapping::projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
 	return 0;
 }
 
-void SDF_Mapping::updateSDF(Matrix<double, 3, 3> &CamRot,
+void SDF_Reconstruction::updateSDF(Matrix<double, 3, 3> &CamRot,
 		Vector3d &CamTrans) {
 	if (!camera_matrix.isFilled) {
 		cout << "Camera Matrix not received. Start rosbag file!" << endl;
@@ -66,7 +66,7 @@ void SDF_Mapping::updateSDF(Matrix<double, 3, 3> &CamRot,
 
 }
 
-void SDF_Mapping::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
+void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
 		const sensor_msgs::ImageConstPtr& image_depth) {
 
 	tf::TransformListener listener;
@@ -100,7 +100,7 @@ void SDF_Mapping::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
 }
 
 
-SDF_Mapping::SDF_Mapping() {
+SDF_Reconstruction::SDF_Reconstruction() {
 
 	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image,
 			sensor_msgs::Image> MySyncPolicy;
@@ -110,9 +110,9 @@ SDF_Mapping::SDF_Mapping() {
 	message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1),
 			kinect_rgb_sub, kinect_depth_sub);
 	sync.registerCallback(
-			boost::bind(&SDF_Mapping::kinect_callback, this, _1, _2));
+			boost::bind(&SDF_Reconstruction::kinect_callback, this, _1, _2));
 	camInfo = nh.subscribe("/camera/rgb/camera_info", 1,
-			&SDF_Mapping::camera_info_cb, this);
+			&SDF_Reconstruction::camera_info_cb, this);
 	sdf = new SDF(111, 1.0, 1.0, 1.0);
 	sdf->create_circle(0.2, 0.5, 0.5, 0.5);
 	std::cout<<"circle created ..." << std::endl;

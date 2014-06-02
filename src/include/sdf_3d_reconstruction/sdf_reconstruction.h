@@ -33,7 +33,7 @@ struct cameraMatrix{
 	bool isFilled;
 };
 
-class SDF_Mapping {
+class SDF_Reconstruction {
 
 private:
 		ros::NodeHandle nh;
@@ -54,7 +54,7 @@ protected:
 		Vector2i project3DPointToImagePlane(Vector3i XYZPoint);
 
 public:
-		SDF_Mapping();
+		SDF_Reconstruction();
 
 
 
