@@ -6,10 +6,16 @@
 SDF::SDF(int m, float width, float height, float depth): m(m), width(width),height(height), depth(depth){
 	D = new float[this->m * this->m * this->m];
 	W = new float[this->m * this->m * this->m];
+	R = new float[this->m * this->m * this->m];
+	G = new float[this->m * this->m * this->m];
+	B = new float[this->m * this->m * this->m];
 	numberOfVoxels = m * m * m;
 	for (int i = 0; i<numberOfVoxels; i++) {
 		D[i] = 0;
 		W[i] = 0;
+		R[i] = 0;
+		G[i] = 0;
+		B[i] = 0;
 	}
 	this->register_visualization();
 }

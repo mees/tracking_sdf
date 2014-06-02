@@ -30,9 +30,18 @@ class SDF {
   
 private:
 	int m;
+	//width
 	float width, height, depth;
+	//Distance array
 	float *D;
+	//Weight array
 	float *W;
+	//Red Array
+	float *R;
+	//Green Array
+	float *G;
+	//Blue Array
+	float *B;
 	int numberOfVoxels;
 	ros::Publisher marker_publisher;
 	uint32_t shape_type;
