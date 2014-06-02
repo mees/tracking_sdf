@@ -56,9 +56,14 @@ public:
 	virtual ~SDF();
 	
 	/**
-	 * gets world coordinates, and returns the interpolated distance
+	 * gets interpolated distance with world coordinates.
 	 */
-	float interpolate_distance(float x, float y, float z);
+	float interpolate_distance(Vector3d& world_coordinates);
+	
+	/**
+	 * gets interpolated distance with world coordinates.
+	 */
+	float interpolate_color(Vector3d& world_coordinates, Vector3d& color);
 	/**
 	 * helper function for testing issues
 	 */
@@ -77,6 +82,11 @@ public:
 	 *  output: voxel_coordinates -> i, j, k voxel grid coordinates. i represents x axes, j represents y axes, k represents z axes
 	 */
 	void get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinates);
+	/*
+	 *  input: global_coordinates
+	 *  output: voxel_coordinates
+	 */
+	void get_voxel_coordinates(Vector3i& global_coordinates, Vector3d& voxel_coordinates);
 	/*
 	 *  input: globale coordinate x,y,z
 	 *  output: voxel_coordinates i,j,k
