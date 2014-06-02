@@ -42,14 +42,18 @@ inline void SDF::get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinate
 	voxel_coordinates(0) = (int) array_idx%this->m;
 	voxel_coordinates(1) = (int) (array_idx % (this->m*this->m))/this->m;
 	voxel_coordinates(2) = (int) (array_idx/(this->m*this->m));
-	//std::cout << array_idx << "voxel_coordinates: " << voxel_coordinates << std::endl;
 }
 void SDF::get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_coordinates){
   
-		global_coordinates(0) = (this->width/((float)m)) * (voxel_coordinates(0)+0.5);
-		global_coordinates(1) = (this->height/((float)m)) * (voxel_coordinates(1)+0.5);
-		global_coordinates(2) = (this->depth/((float)m)) * (voxel_coordinates(2)+0.5);
-		//std::cout << "voxel_coordinates: " << voxel_coordinates << "global" << global_coordinates <<std::endl;
+	global_coordinates(0) = (this->width/((float)m)) * (voxel_coordinates(0)+0.5);
+	global_coordinates(1) = (this->height/((float)m)) * (voxel_coordinates(1)+0.5);
+	global_coordinates(2) = (this->depth/((float)m)) * (voxel_coordinates(2)+0.5);
+}
+void SDF::get_voxel_coordinates(Vector3i& global_coordinates, Vector3d& voxel_coordinates){
+  
+	voxel_coordinates(0) = (int)((global_coordinates(0)/this->width)*m +0.5);
+	voxel_coordinates(1) = (int)((global_coordinates(1)/this->height)*m +0.5);
+	voxel_coordinates(2) = (int)((global_coordinates(2)/this->depth)*m +0.5);
 }
 void SDF::create_circle(float radius, float center_x, float center_y,
 		float center_z) {
@@ -63,12 +67,20 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 		z = (this->depth/((float)m)) * (voxel_coordinates(2)+0.5);
 		d = (x - center_x)*(x - center_x) + (y - center_y)*(y - center_y)+(z-center_z)*(z-center_z);
 		D[array_idx] =  d-radius;
-		//std::cout << "global_coordinates: " << x <<", "<<y<<", "<<z<<" " << "distance" << d-radius <<std::endl;
 		R[array_idx] = 1.0;
 		G[array_idx] = x/width;
 		B[array_idx] = y/width;
 	}
 }
+
+float SDF::interpolate_distance(Vector3i& world_coordinates){
+	//TODO
+	return -10000.0;
+}
+float SDF::interpolate_color(Vector3i& world_coordinates, Vector3d& color){
+	
+}
+
 void SDF::visualize(const std::string &file_name)
 {
 	pcl::PolygonMesh output;
