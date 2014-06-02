@@ -1,4 +1,4 @@
-#include "sdf_3d_reconstruction/sdf_mapping.h"
+#include "sdf_3d_reconstruction/sdf_reconstruction.h"
 
 using namespace std;
 using namespace Eigen;
