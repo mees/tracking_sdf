@@ -39,15 +39,17 @@ inline int SDF::get_array_index(Vector3i& voxel_coordinates){
 }
 
 inline void SDF::get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinates){
-	voxel_coordinates(0) = array_idx%this->m;
-	voxel_coordinates(1) = (array_idx % (this->m*this->m))/this->m;
+	voxel_coordinates(0) = (int) array_idx%this->m;
+	voxel_coordinates(1) = (int) (array_idx % (this->m*this->m))/this->m;
 	voxel_coordinates(2) = (int) (array_idx/(this->m*this->m));
+	std::cout << array_idx << "voxel_coordinates: " << voxel_coordinates << std::endl;
 }
 void SDF::get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_coordinates){
   
 		global_coordinates(0) = (this->width/((float)m)) * (voxel_coordinates(0)+0.5);
 		global_coordinates(1) = (this->height/((float)m)) * (voxel_coordinates(1)+0.5);
 		global_coordinates(2) = (this->depth/((float)m)) * (voxel_coordinates(2)+0.5);
+		std::cout << "voxel_coordinates: " << voxel_coordinates << "global" << global_coordinates <<std::endl;
 }
 void SDF::create_circle(float radius, float center_x, float center_y,
 		float center_z) {
@@ -61,21 +63,28 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 		z = (this->depth/((float)m)) * (voxel_coordinates(2)+0.5);
 		d = (x - center_x)*(x - center_x) + (y - center_y)*(y - center_y)+(z-center_z)*(z-center_z);
 		D[array_idx] =  d-radius;
+		std::cout << "global_coordinates: " << x <<", "<<y<<", "<<z<<" " << "distance" << d-radius <<std::endl;
+		R[array_idx] = 1.0;
+		G[array_idx] = x/width;
+		B[array_idx] = y/width;
 	}
 }
 void SDF::visualize(const std::string &file_name)
 {
 	pcl::PolygonMesh output;
+	std::vector<pcl::Vertices> polygons;
 	pcl::MarchingCubesSDF *mc;
 	mc = new pcl::MarchingCubesSDF;
 	mc->setIsoLevel (0.0f);
 	mc->setGridResolution (this->m, this->m, this->m);
 	mc->setGrid(this->D);
-	mc->performReconstruction (output);	
+	pcl::PointCloud<pcl::PointXYZ> cloud;
+	mc->performReconstruction(output);	
 	pcl::io::saveVTKFile(file_name, output);
+	mc->performReconstruction (cloud, polygons);
 	while (ros::ok())
 	{
-		std::cout << "H"<<std::endl;
+	  std::cout << "H"<<std::endl;
 
 		visualization_msgs::Marker marker;
 		marker.header.frame_id = "/map";
@@ -99,93 +108,44 @@ void SDF::visualize(const std::string &file_name)
 		marker.color.b = 1.0;
 		marker.color.r = 0.0;
 		marker.color.a = 1.0;
-		
-		geometry_msgs::Point p;
-		p.x = 0.0;
-		p.y = 0.0;
-		p.z = 0.0;
-      
-		geometry_msgs::Point p2 = p;
-		p2.x = p.x + 20.05;
-      
-		geometry_msgs::Point p3 = p;
-		p3.x = p2.x;
-		p3.z = p.z + 20.05;
-      
-		marker.points.push_back(p);
-		marker.points.push_back(p2);
-		marker.points.push_back(p3);
-      
-		std_msgs::ColorRGBA c;
-		c.r = 0.3;//x * 0.1;
-		c.g = 1.0;//y * 0.1;
-		c.b = 0.0;//z * 0.1;
-		c.a = 1.0;
-		marker.colors.push_back(c);
-		marker.colors.push_back(c);
-		marker.colors.push_back(c);
+		for(int i = 0; i < cloud.size()/3; i++){
+			std::cout << width << ", " << height << ", "<<depth<<std::endl;
+			geometry_msgs::Point p1;
+			p1.x = cloud.points[i*3].x/width;
+			p1.y = cloud.points[i*3].y/height;
+			p1.z = cloud.points[i*3].z/depth;
+			std::cout << p1.x << ", " << p1.y << ", "<<p1.z<<std::endl;
+	      
+			geometry_msgs::Point p2;
+			p2.x = cloud.points[i*3+1].x/width;
+			p2.y = cloud.points[i*3+1].y/height;
+			p2.z = cloud.points[i*3+1].z/depth;
+			std::cout << p2.x << ", " << p2.y << ", "<<p2.z<<std::endl;
+			
+			geometry_msgs::Point p3;
+			p3.x = cloud.points[i*3+2].x/width;
+			p3.y = cloud.points[i*3+2].y/height;
+			p3.z = cloud.points[i*3+2].z/depth;
+			std::cout << p3.x << ", " << p3.y << ", "<<p3.z<<std::endl;
+			
+			marker.points.push_back(p1);
+			marker.points.push_back(p2);
+			marker.points.push_back(p3);
+	      
+			std_msgs::ColorRGBA c;
+			c.r = 0.3;//x * 0.1;
+			c.g = 1.0;//y * 0.1;
+			c.b = 0.0;//z * 0.1;
+			c.a = 1.0;
+			marker.colors.push_back(c);
+			marker.colors.push_back(c);
+			marker.colors.push_back(c);
+		  
+		}
 				
 		// Publish the marker
 		this->marker_publisher.publish(marker);
 
-
-		visualization_msgs::Marker marker2;
-		// Set the frame ID and timestamp.  See the TF tutorials for information on these.
-		marker2.header.frame_id = "/map";
-		marker2.header.stamp = ros::Time::now();
-
-		// Set the namespace and id for this marker2.  This serves to create a unique ID
-		// Any marker2 sent with the same namespace and id will overwrite the old one
-		marker2.ns = "3dreconstruction2";
-		marker2.id = 0;
-
-		// Set the marker2 type.  Initially this is CUBE, and cycles between that and SPHERE, ARROW, and CYLINDER
-		marker2.type = shape_type;
-
-		// Set the marker2 action.  Options are ADD and DELETE
-		marker2.action = visualization_msgs::Marker::ADD;
-
-		// Set the pose of the marker2.  This is a full 6DOF pose relative to the frame/time specified in the header
-		marker2.pose.position.x = 0;
-		marker2.pose.position.y = 0;
-		marker2.pose.position.z = 0;
-		marker2.pose.orientation.x = 0.0;
-		marker2.pose.orientation.y = 0.0;
-		marker2.pose.orientation.z = 0.0;
-		marker2.pose.orientation.w = 1.0;
-
-		// Set the scale of the marker2 -- 1x1x1 here means 1m on a side
-		marker2.scale.x = 1.0;
-		marker2.scale.y = 1.0;
-		marker2.scale.z = 1.0;
-
-		// Set the color -- be sure to set alpha to something non-zero!
-		marker2.color.r = 0.0f;
-		marker2.color.g = 1.0f;
-		marker2.color.b = 0.0f;
-		marker2.color.a = 1.0;
-
-		marker2.lifetime = ros::Duration();
-
-
-		// Publish the marker
-		this->marker_publisher.publish(marker2);
-		// Cycle between different shapes
-		switch (shape_type)
-		{
-			case visualization_msgs::Marker::CUBE:
-			  shape_type = visualization_msgs::Marker::SPHERE;
-			  break;
-			case visualization_msgs::Marker::SPHERE:
-			  shape_type = visualization_msgs::Marker::ARROW;
-			  break;
-			case visualization_msgs::Marker::ARROW:
-			  shape_type = visualization_msgs::Marker::CYLINDER;
-			  break;
-			case visualization_msgs::Marker::CYLINDER:
-			  shape_type = visualization_msgs::Marker::CUBE;
-			  break;
-		}
 		
 		r->sleep();
 	}
