@@ -58,7 +58,7 @@ public:
 	/**
 	 * gets interpolated distance with world coordinates.
 	 */
-	float interpolate_distance(Vector3d& world_coordinates);
+	//float interpolate_distance(Vector3d& world_coordinates);
 	
 	/**
 	 * gets interpolated distance with world coordinates.
@@ -72,7 +72,7 @@ public:
 	 *  
 	 **/
 	void visualize(const std::string &file_name);
-	int getNumberOfVoxels();
+	int get_number_of_voxels();
 	/*
 	 *  input: i,j,k -> idx. Idx can be used for W and for D
 	 */

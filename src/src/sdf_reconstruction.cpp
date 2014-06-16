@@ -42,7 +42,7 @@ void SDF_Reconstruction::updateSDF(Matrix<double, 3, 3> &CamRot,
 		cout << "Camera Matrix not received. Start rosbag file!" << endl;
 		exit(0);
 	} else {
-		for (int i = 0; i < sdf->getNumberOfVoxels(); i++) {
+		for (int i = 0; i < sdf->get_number_of_voxels(); i++) {
 			Vector3i voxel_coordinates;
 			sdf->get_voxel_coordinates(i,voxel_coordinates);
 			float d_n = projectivePointToPointDistance(CamRot, CamTrans, voxel_coordinates);
@@ -52,7 +52,7 @@ void SDF_Reconstruction::updateSDF(Matrix<double, 3, 3> &CamRot,
 
 }
 
-void SDF_Reconstruction::visualizeRGBCloudWithNormalsPCL(const PointCloud<PointXYZRGB>::Ptr &pcl_cloud,const PointCloud<Normal>::Ptr &normals) {
+/*void SDF_Reconstruction::visualizeRGBCloudWithNormalsPCL(const PointCloud<PointXYZRGB>::Ptr &pcl_cloud,const PointCloud<Normal>::Ptr &normals) {
 	// visualize normals
 	pcl::visualization::PCLVisualizer viewer("PCL Viewer");
 	viewer.setBackgroundColor(0.0, 0.0, 0.0);
@@ -68,7 +68,7 @@ void SDF_Reconstruction::visualizeRGBCloudWithNormalsPCL(const PointCloud<PointX
 	while (!viewer.wasStopped()) {
 		viewer.spinOnce();
 	}
-}
+}*/
 
 //void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
 //		const sensor_msgs::ImageConstPtr& image_depth) {

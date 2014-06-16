@@ -1,5 +1,6 @@
 #include "sdf_3d_reconstruction/sdf.h"
 
+using namespace Eigen;
 /*
  * Constructror destructor 
  */
@@ -30,7 +31,7 @@ void SDF::register_visualization(){
 	shape_type = visualization_msgs::Marker::CUBE;
 }
 
-int SDF::getNumberOfVoxels() {
+int SDF::get_number_of_voxels() {
 	return numberOfVoxels;
 }
 
@@ -73,12 +74,13 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 	}
 }
 
-float SDF::interpolate_distance(Vector3i& world_coordinates){
+/*float SDF::interpolate_distance(Vector3i& world_coordinates){
 	//TODO
 	return -10000.0;
-}
-float SDF::interpolate_color(Vector3i& world_coordinates, Vector3d& color){
-	
+}**/
+float SDF::interpolate_color(Vector3d& world_coordinates, Vector3d& color){
+	//TODO
+	return -10000.0;
 }
 
 void SDF::visualize(const std::string &file_name)
