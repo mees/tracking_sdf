@@ -60,7 +60,7 @@ public:
 	/**
 	 * gets interpolated distance with world coordinates.
 	 */
-	//float interpolate_distance(Vector3d& world_coordinates);
+	float interpolate_distance(Vector3d& world_coordinates);
 	
 	/**
 	 * gets interpolated color with world coordinates.
