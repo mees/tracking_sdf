@@ -1,33 +1,8 @@
 #include "sdf_3d_reconstruction/sdf_reconstruction.h"
 
-//todo: validate!
-Vector2i SDF_Reconstruction::project3DPointToImagePlane(Vector3i XYZPoint){
-	//Eq. 2
-	Vector2i ij;
-	float fx = camera_matrix.K(0,0);
-	float fy = camera_matrix.K(1,1);
-	float cx = camera_matrix.K(0,2);
-	float cy = camera_matrix.K(1,2);
-	ij(0) = fx*(XYZPoint(0)/XYZPoint(2)) + cx;
-	ij(1) = fy*(XYZPoint(1)/XYZPoint(2)) + cy;
-	return ij;
-}
 
-void SDF_Reconstruction::camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_camera_info)
-{
-	camera_matrix.K(0,0) = rgbd_camera_info->K[0];
-	camera_matrix.K(0,1) = rgbd_camera_info->K[1];
-	camera_matrix.K(0,2) = rgbd_camera_info->K[2];
-	camera_matrix.K(1,0) = rgbd_camera_info->K[3];
-	camera_matrix.K(1,1) = rgbd_camera_info->K[4];
-	camera_matrix.K(1,2) = rgbd_camera_info->K[5];
-	camera_matrix.K(2,0) = rgbd_camera_info->K[6];
-	camera_matrix.K(2,1) = rgbd_camera_info->K[7];
-	camera_matrix.K(2,2) = rgbd_camera_info->K[8];
-	camera_matrix.isFilled = true;
-	cout<<"read Camera Matrix"<<endl;
-	camInfo.shutdown();
-}
+
+
 
 
 float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
@@ -38,7 +13,7 @@ float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &C
 
 void SDF_Reconstruction::updateSDF(Matrix<double, 3, 3> &CamRot,
 		Vector3d &CamTrans) {
-	if (!camera_matrix.isFilled) {
+	if (this->camera_tracking->isKFilled) {
 		cout << "Camera Matrix not received. Start rosbag file!" << endl;
 		exit(0);
 	} else {
@@ -114,8 +89,8 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 		tf::quaternionTFToEigen(transform.getRotation(), rot);
 
 	     Matrix<double, 3, 3> rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
-	     //	     tf::Quaternion q = transform.getRotation();
-	     	     tf::Vector3 v = transform.getOrigin();
+     //	     tf::Quaternion q = transform.getRotation();
+     	     tf::Vector3 v = transform.getOrigin();
 		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
 //		cout << "- Rotation: in Quaternion [" << q.getX() << ", " << q.getY() << ", "
 //		                  << q.getZ() << ", " << q.getW() << "]" << endl;
@@ -128,18 +103,12 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 
 
 SDF_Reconstruction::SDF_Reconstruction() {
-
+        this->camera_tracking = new CameraTracking();
 	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
-	camInfo = nh.subscribe("/camera/rgb/camera_info", 1,
-			&SDF_Reconstruction::camera_info_cb, this);
+	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
+			&CameraTracking::camera_info_cb, this->camera_tracking);
 	sdf = new SDF(102, 200.0, 200.0, 200.0);
 	sdf->create_circle(200, 0, 0.0, 0.0);
-	Vector3i voxel_coordinates;
-	Vector3d global_coordinates;
-	sdf->get_global_coordinates(voxel_coordinates, global_coordinates);
-	sdf->get_voxel_coordinates(global_coordinates, voxel_coordinates);
-	int idx = sdf->get_array_index(voxel_coordinates);
-	
 	std::string visualeOutput;
 	ros::param::get("~visualOutput", visualeOutput);
 	sdf->visualize(visualeOutput);
