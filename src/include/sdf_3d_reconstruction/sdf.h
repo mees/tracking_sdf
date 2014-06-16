@@ -24,7 +24,7 @@
 #include<Eigen/Eigen>
 
 
-#include "sdf_3d_reconstruction/MarchingCubesSDF.h"
+#include "sdf_3d_reconstruction/marching_cubes_sdf.h"
 
 using namespace Eigen;
 class SDF {
