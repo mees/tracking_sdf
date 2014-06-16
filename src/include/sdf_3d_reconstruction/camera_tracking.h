@@ -17,6 +17,14 @@ private:
 	 *	[ 0  0  1]
 	 */
 	Eigen::Matrix<double,3,3> K;
+	/*
+	 * current rotation matrix
+	 */
+	Eigen::Matrix<double,3,3> *rot;
+	/*
+	 * current translation
+	 */
+	Eigen::Vector3d *trans;
 public:
 	ros::Subscriber cam_info;
 	bool isKFilled;
@@ -32,7 +40,15 @@ public:
 	/*
 	 * projects a point from camera perspective to image plane
 	 */
-	void projectCamera3DPointToImagePlane(Vector3i& camera_point, Vector2i& image_point);
+	void project_camera_to_image_plane(Vector3d& camera_point, Vector2d& image_point);
+	/**
+	 * project a global point from world coordinates to camera coordinates
+	 */
+	void project_world_to_camera(Vector3d& world_point, Vector3d& image_point);
+	/**
+	 * set current transformation of the camera. 
+	 */
+	void set_camera_transformation(Eigen::Matrix<double,3,3> rot, Eigen::Vector3d trans);
 };
 
 #endif /* CAMERA_TRACKING_H_ */
