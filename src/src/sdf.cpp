@@ -89,7 +89,7 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 	}
 }
 
-float SDF::interpolate_distance(Vector3i& world_coordinates){
+float SDF::interpolate_distance(Vector3d& world_coordinates){
 	float i = ((world_coordinates(0)/this->width)*m -0.5);
 	float j = ((world_coordinates(1)/this->height)*m -0.5);
 	float k = ((world_coordinates(2)/this->depth)*m -0.5);
