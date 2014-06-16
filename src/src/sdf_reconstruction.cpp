@@ -132,13 +132,17 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	camInfo = nh.subscribe("/camera/rgb/camera_info", 1,
 			&SDF_Reconstruction::camera_info_cb, this);
-	sdf = new SDF(101, 1.0, 1.0, 1.0);
-	sdf->create_circle(0.2, 0.5, 0.5, 0.5);
-	std::cout<<"circle created ..." << std::endl;
+	sdf = new SDF(102, 200.0, 200.0, 200.0);
+	sdf->create_circle(200, 0, 0.0, 0.0);
+	Vector3i voxel_coordinates;
+	Vector3d global_coordinates;
+	sdf->get_global_coordinates(voxel_coordinates, global_coordinates);
+	sdf->get_voxel_coordinates(global_coordinates, voxel_coordinates);
+	int idx = sdf->get_array_index(voxel_coordinates);
+	
 	std::string visualeOutput;
 	ros::param::get("~visualOutput", visualeOutput);
 	sdf->visualize(visualeOutput);
-	std::cout<<"circle visualized ..." << std::endl;
 
 	ros::spin();
 }

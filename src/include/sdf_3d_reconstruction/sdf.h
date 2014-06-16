@@ -8,6 +8,7 @@
 #define SDF_H_
 #include <string>
 #include <iostream>
+#include <math.h>
 #include <ros/ros.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
@@ -42,11 +43,12 @@ private:
 	float *G;
 	//Blue Array
 	float *B;
-	int numberOfVoxels;
+	int number_of_voxels;
 	ros::Publisher marker_publisher;
 	uint32_t shape_type;
 	ros::Rate* r;
 	void register_visualization();
+
 
 public:
 	/**
@@ -61,9 +63,9 @@ public:
 	//float interpolate_distance(Vector3d& world_coordinates);
 	
 	/**
-	 * gets interpolated distance with world coordinates.
+	 * gets interpolated color with world coordinates.
 	 */
-	float interpolate_color(Vector3d& world_coordinates, Vector3d& color);
+	void interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& color);
 	/**
 	 * helper function for testing issues
 	 */
@@ -86,7 +88,7 @@ public:
 	 *  input: global_coordinates
 	 *  output: voxel_coordinates
 	 */
-	void get_voxel_coordinates(Vector3i& global_coordinates, Vector3d& voxel_coordinates);
+	void get_voxel_coordinates(Vector3d& global_coordinates, Vector3i& voxel_coordinates);
 	/*
 	 *  input: globale coordinate x,y,z
 	 *  output: voxel_coordinates i,j,k
