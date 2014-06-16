@@ -89,15 +89,36 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 	}
 }
 
-/*float SDF::interpolate_distance(Vector3i& world_coordinates){
-	//TODO
-	return -10000.0;
-}**/
+float SDF::interpolate_distance(Vector3i& world_coordinates){
+	float i = ((world_coordinates(0)/this->width)*m -0.5);
+	float j = ((world_coordinates(1)/this->height)*m -0.5);
+	float k = ((world_coordinates(2)/this->depth)*m -0.5);
+	float w_sum = 0.0;
+	float sum_d = 0.0;
+	Vector3i current_voxel;
+	for (int i_offset = 0; i_offset < 2; i_offset++){
+	  for (int j_offset = 0; j_offset < 2; j_offset++){
+	    for (int k_offset = 0; k_offset < 2; k_offset++){
+	      current_voxel(0) = ((int) i)+i_offset;
+	      current_voxel(1) = ((int) j)+j_offset;
+	      current_voxel(2) = ((int) k)+k_offset;
+	      float dist = (current_voxel(0)-i)*(current_voxel(0)-i) + (current_voxel(1)-j)*(current_voxel(1)-j)+ (current_voxel(2)-k)*(current_voxel(2)-k);
+	      int a_idx = get_array_index(current_voxel);
+	      if (dist < 0.001){
+		return this->D[a_idx];
+	      }
+	      float w = 1.0/dist;
+	      w_sum += w;
+	      sum_d +=  w*this->D[a_idx];
+	    }
+	  }
+	}
+	return sum_d / w_sum;
+}
 void SDF::interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& color){
 	float i = ((global_coords.x/this->width)*m -0.5);
 	float j = ((global_coords.y/this->height)*m -0.5);
 	float k = ((global_coords.z/this->depth)*m -0.5);
-	std::cout <<"Global "<<global_coords.x <<","<<global_coords.y  <<","<<global_coords.z  << std::endl;
 	float w_sum = 0.0;
 	Vector3d sum_c;
 	color.r = 0.0;
@@ -121,14 +142,12 @@ void SDF::interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& c
 	      }
 	      float w = 1.0/dist;
 	      w_sum += w;
-	      //std::cout <<current_voxel(0) <<","<<current_voxel(1)  <<","<<current_voxel(2) <<" - "<< this->B[a_idx] << std::endl;
 	      color.r +=  w*this->R[a_idx];
 	      color.g +=  w*this->G[a_idx];
 	      color.b +=  w*this->B[a_idx];
 	    }
 	  }
 	}
- 	//std::cout <<w_sum << " Color: "<< color.r<<", "<<color.g<<", "<< color.b << std::endl;
 	color.r /= w_sum;
 	color.g /= w_sum;
 	color.b /= w_sum;
