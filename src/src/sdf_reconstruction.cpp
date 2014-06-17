@@ -55,8 +55,8 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 		Eigen::Quaterniond rot;
 		tf::vectorTFToEigen(transform.getOrigin(),trans);
 		tf::quaternionTFToEigen(transform.getRotation(), rot);
-		Matrix<double, 3, 3> rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
-		//this->camera_tracking->set_camera_transformation(rotMat, trans);
+		Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
+		this->camera_tracking->set_camera_transformation(rotMat, trans);
 		//tf::Quaternion q = transform.getRotation();
 		tf::Vector3 v = transform.getOrigin();
 		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;

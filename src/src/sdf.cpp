@@ -210,7 +210,7 @@ void SDF::visualize(const std::string &file_name)
 			p3.x = cloud.points[i*3+2].x/width;
 			p3.y = cloud.points[i*3+2].y/height;
 			p3.z = cloud.points[i*3+2].z/depth;
-			std::cout << p3.x << ", " << p3.y << ", "<<p3.z<<std::endl;
+			//std::cout << p3.x << ", " << p3.y << ", "<<p3.z<<std::endl;
 			
 			marker.points.push_back(p1);
 			marker.points.push_back(p2);
