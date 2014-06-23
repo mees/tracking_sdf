@@ -33,14 +33,16 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	ne.compute(*normals);
 
 
-	cv::Mat depth_map(cloud_filtered->height, cloud_filtered->width, CV_16UC1);
-	for (int i = 0; i < cloud_filtered->width; ++i) {
-		for (int j = 0; j < cloud_filtered->height; ++j) {
-			depth_map.at<float>(j,i) = cloud_filtered->points[j*cloud_filtered->width+i].z;
-		}
+	//cv::Mat depth_map(cloud_filtered->height, cloud_filtered->width, CV_16UC1);
+	
+	for (int idx = 0; idx < cloud_filtered->size(); ++idx) {
+		int i = idx%cloud_filtered;
+		int j = int(idx/cloud_filtered->height);
+		float z = cloud_filtered->points[i].z;
+		
 	}
-	cv::imshow("foo", depth_map);
-	cv::waitKey(3);
+	//cv::imshow("foo", depth_map);
+	//cv::waitKey(3);
 
 
 //	tf::TransformListener listener;
