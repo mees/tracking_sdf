@@ -36,7 +36,7 @@ private:
 		//cameraMatrix camera_matrix;
 		CameraTracking *camera_tracking;
 		SDF *sdf;
-		message_filters::Subscriber<sensor_msgs::Image> kinect_rgb_sub;
+		message_filters::Subscriber<sensor_msgs::PointCloud2> kinect_rgb_sub;
 		message_filters::Subscriber<sensor_msgs::Image> kinect_depth_sub;
 		ros::Subscriber pcl;
 
