@@ -23,7 +23,7 @@ void SDF_Reconstruction::updateSDF(Matrix<double, 3, 3> &CamRot,
 
 //void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
 //		const sensor_msgs::ImageConstPtr& image_depth) {
-void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr& ros_cloud) {
+void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr& ros_cloud,const sensor_msgs::ImageConstPtr& image_depth) {
 	pcl::PCLPointCloud2 pcl_pc2;
 	pcl_conversions::toPCL(*ros_cloud, pcl_pc2);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr pcl_cloud(
@@ -67,8 +67,15 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 }
 
 SDF_Reconstruction::SDF_Reconstruction() {
+	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::Image> MySyncPolicy;
+	kinect_rgb_sub.subscribe(nh, "/camera/rgb/points", 1);
+    kinect_depth_sub.subscribe(nh, "/camera/depth/image", 1);
+    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1),kinect_rgb_sub, kinect_depth_sub);
+    sync.registerCallback(boost::bind(&SDF_Reconstruction::kinect_callback, this, _1, _2));
+
+
         this->camera_tracking = new CameraTracking();
-	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
+	//pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
 	sdf = new SDF(102, 200.0, 200.0, 200.0);

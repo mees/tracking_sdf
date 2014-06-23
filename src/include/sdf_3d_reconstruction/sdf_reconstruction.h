@@ -36,8 +36,8 @@ private:
 		//cameraMatrix camera_matrix;
 		CameraTracking *camera_tracking;
 		SDF *sdf;
-//		message_filters::Subscriber<sensor_msgs::Image> kinect_rgb_sub;
-//		message_filters::Subscriber<sensor_msgs::Image> kinect_depth_sub;
+		message_filters::Subscriber<sensor_msgs::Image> kinect_rgb_sub;
+		message_filters::Subscriber<sensor_msgs::Image> kinect_depth_sub;
 		ros::Subscriber pcl;
 
 
@@ -45,7 +45,7 @@ private:
 protected:
 		//void camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_camera_info);
 		//void kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb, const sensor_msgs::ImageConstPtr& image_depth);
-		void kinect_callback(const sensor_msgs::PointCloud2ConstPtr& pointCloud);
+		void kinect_callback(const sensor_msgs::PointCloud2ConstPtr& pointCloud, const sensor_msgs::ImageConstPtr& image_depth);
 
 		void updateSDF(Matrix<double, 3, 3> &CamRot, Vector3d &CamTrans);
 		float projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
