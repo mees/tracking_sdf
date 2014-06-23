@@ -45,7 +45,7 @@ private:
 protected:
 		//void camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_camera_info);
 		//void kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb, const sensor_msgs::ImageConstPtr& image_depth);
-		void kinect_callback(const sensor_msgs::PointCloud2ConstPtr& pointCloud, const sensor_msgs::ImageConstPtr& image_depth);
+		void kinect_callback(const sensor_msgs::PointCloud2ConstPtr& pointCloud);
 
 		float projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
 				Vector3d &CamTrans, Vector3i &gi);

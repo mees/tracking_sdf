@@ -9,7 +9,7 @@ float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &C
 
 //void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
 //		const sensor_msgs::ImageConstPtr& image_depth) {
-void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr& ros_cloud,const sensor_msgs::ImageConstPtr& image_depth) {
+void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr& ros_cloud) {
 	cout<<"callback!"<<endl;
 	pcl::PCLPointCloud2 pcl_pc2;
 	pcl_conversions::toPCL(*ros_cloud, pcl_pc2);
@@ -31,36 +31,48 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	ne.setNormalSmoothingSize(10.0f);
 	ne.setInputCloud(cloud_filtered);
 	ne.compute(*normals);
-	tf::TransformListener listener;
-	tf::StampedTransform transform;
-	try {
-		listener.waitForTransform("/world", "/openni_rgb_optical_frame",
-				ros::Time(), ros::Duration(2.0));
-		listener.lookupTransform("/world", "/openni_rgb_optical_frame",
-				ros::Time(), transform);
-		Vector3d trans;
-		Eigen::Quaterniond rot;
-		tf::vectorTFToEigen(transform.getOrigin(),trans);
-		tf::quaternionTFToEigen(transform.getRotation(), rot);
-		Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
-		this->camera_tracking->set_camera_transformation(rotMat, trans);
-		//tf::Quaternion q = transform.getRotation();
-		tf::Vector3 v = transform.getOrigin();
-		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
-		sdf->update(this->camera_tracking, image_depth);
-	} catch (tf::TransformException ex) {
-		ROS_ERROR("%s", ex.what());
+
+
+	cv::Mat depth_map(cloud_filtered->height, cloud_filtered->width, CV_16UC1);
+	for (int i = 0; i < cloud_filtered->width; ++i) {
+		for (int j = 0; j < cloud_filtered->height; ++j) {
+			depth_map.at<float>(j,i) = cloud_filtered->points[j*cloud_filtered->width+i].z;
+		}
 	}
+	cv::imshow("foo", depth_map);
+	cv::waitKey(3);
+
+
+//	tf::TransformListener listener;
+//	tf::StampedTransform transform;
+//	try {
+//		listener.waitForTransform("/world", "/openni_rgb_optical_frame",
+//				ros::Time(), ros::Duration(2.0));
+//		listener.lookupTransform("/world", "/openni_rgb_optical_frame",
+//				ros::Time(), transform);
+//		Vector3d trans;
+//		Eigen::Quaterniond rot;
+//		tf::vectorTFToEigen(transform.getOrigin(),trans);
+//		tf::quaternionTFToEigen(transform.getRotation(), rot);
+//		Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
+//		this->camera_tracking->set_camera_transformation(rotMat, trans);
+//		//tf::Quaternion q = transform.getRotation();
+//		tf::Vector3 v = transform.getOrigin();
+//		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
+//		sdf->update(this->camera_tracking, image_depth);
+//	} catch (tf::TransformException ex) {
+//		ROS_ERROR("%s", ex.what());
+//	}
 }
 
 SDF_Reconstruction::SDF_Reconstruction() {
-	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::Image> MySyncPolicy;
-	kinect_pcl_sub.subscribe(nh, "/camera/rgb/points", 1);
-    kinect_depth_sub.subscribe(nh, "/camera/depth/image", 1);
-    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1),kinect_pcl_sub, kinect_depth_sub);
-    sync.registerCallback(boost::bind(&SDF_Reconstruction::kinect_callback, this, _1, _2));
+//	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::Image> MySyncPolicy;
+//	kinect_pcl_sub.subscribe(nh, "/camera/rgb/points", 1);
+//    kinect_depth_sub.subscribe(nh, "/camera/depth/image", 1);
+//    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1),kinect_pcl_sub, kinect_depth_sub);
+//    sync.registerCallback(boost::bind(&SDF_Reconstruction::kinect_callback, this, _1, _2));
         this->camera_tracking = new CameraTracking();
-	//pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
+	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
 	sdf = new SDF(102, 200.0, 200.0, 200.0);
