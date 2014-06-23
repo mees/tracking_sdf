@@ -47,7 +47,6 @@ protected:
 		//void kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb, const sensor_msgs::ImageConstPtr& image_depth);
 		void kinect_callback(const sensor_msgs::PointCloud2ConstPtr& pointCloud, const sensor_msgs::ImageConstPtr& image_depth);
 
-		void updateSDF(Matrix<double, 3, 3> &CamRot, Vector3d &CamTrans);
 		float projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
 				Vector3d &CamTrans, Vector3i &gi);
 		Vector2i project3DPointToImagePlane(Vector3i XYZPoint);

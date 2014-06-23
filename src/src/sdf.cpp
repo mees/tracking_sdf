@@ -153,6 +153,30 @@ void SDF::interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& c
 	color.b /= w_sum;
 }
 
+void SDF::update(CameraTracking* camera_tracking, const sensor_msgs::ImageConstPtr& image_depth){
+    
+    if (!camera_tracking->isKFilled) {
+	    cout << "Camera Matrix not received. Start rosbag file!" << endl;
+	    exit(0);
+    } else {
+	    uint d_w = image_depth->width;
+	    uint d_h = image_depth->height;
+	    std::cout<< d_w <<std::endl;
+	    for (int i = 0; i < this->get_number_of_voxels(); i++) {
+		    Vector3i voxel_coordinates;
+		    Vector3d global_coordinates, camera_point;
+		    Vector2d image_point; 
+		    this->get_voxel_coordinates(i,voxel_coordinates);
+		    this->get_global_coordinates(voxel_coordinates, global_coordinates);
+		    camera_tracking->project_world_to_camera(global_coordinates, camera_point);
+		    camera_tracking->project_camera_to_image_plane(camera_point, image_point);
+		    //point to point
+		    float z = camera_point(3);
+		    
+	    }
+    }
+}
+
 void SDF::visualize(const std::string &file_name)
 {
 	ros::Time t0 = ros::Time::now();

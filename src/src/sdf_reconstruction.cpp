@@ -6,20 +6,6 @@ float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &C
 	return 0;
 }
 
-void SDF_Reconstruction::updateSDF(Matrix<double, 3, 3> &CamRot,
-		Vector3d &CamTrans) {
-	if (this->camera_tracking->isKFilled) {
-		cout << "Camera Matrix not received. Start rosbag file!" << endl;
-		exit(0);
-	} else {
-		for (int i = 0; i < sdf->get_number_of_voxels(); i++) {
-			Vector3i voxel_coordinates;
-			sdf->get_voxel_coordinates(i,voxel_coordinates);
-			float d_n = projectivePointToPointDistance(CamRot, CamTrans, voxel_coordinates);
-		}
-	}
-}
-
 
 //void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
 //		const sensor_msgs::ImageConstPtr& image_depth) {
@@ -60,7 +46,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 		//tf::Quaternion q = transform.getRotation();
 		tf::Vector3 v = transform.getOrigin();
 		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
-		updateSDF(rotMat, trans);
+		sdf->update(this->camera_tracking, image_depth);
 	} catch (tf::TransformException ex) {
 		ROS_ERROR("%s", ex.what());
 	}
@@ -72,17 +58,15 @@ SDF_Reconstruction::SDF_Reconstruction() {
     kinect_depth_sub.subscribe(nh, "/camera/depth/image", 1);
     message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1),kinect_rgb_sub, kinect_depth_sub);
     sync.registerCallback(boost::bind(&SDF_Reconstruction::kinect_callback, this, _1, _2));
-
-
         this->camera_tracking = new CameraTracking();
 	//pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
 	sdf = new SDF(102, 200.0, 200.0, 200.0);
-	sdf->create_circle(200, 0, 0.0, 0.0);
-	std::string visualeOutput;
-	ros::param::get("~visualOutput", visualeOutput);
-	sdf->visualize(visualeOutput);
+	//sdf->create_circle(200, 0, 0.0, 0.0);
+	//std::string visualeOutput;
+	//ros::param::get("~visualOutput", visualeOutput);
+	//sdf->visualize(visualeOutput);
 
 	ros::spin();
 }

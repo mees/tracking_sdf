@@ -16,6 +16,7 @@
 #include <pcl/io/vtk_io.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
+#include <sensor_msgs/Image.h>
 
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
@@ -25,6 +26,7 @@
 
 
 #include "sdf_3d_reconstruction/marching_cubes_sdf.h"
+#include "sdf_3d_reconstruction/camera_tracking.h"
 
 using namespace Eigen;
 class SDF {
@@ -94,6 +96,10 @@ public:
 	 *  output: voxel_coordinates i,j,k
 	 */
 	void get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_coordinates);
+	/*
+	 * 
+	 */
+	void update(CameraTracking* camera_tracking, const sensor_msgs::ImageConstPtr& image_depth);
 };
 
 #endif /* SDF_H_ */
