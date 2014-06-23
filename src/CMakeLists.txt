@@ -13,6 +13,8 @@ find_package(catkin REQUIRED COMPONENTS
   tf_conversions
   message_filters
   pcl_conversions
+  depth_image_proc
+  nodelet
 )
 
 ## System dependencies are found with CMake's conventions
