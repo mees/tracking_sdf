@@ -155,6 +155,7 @@ void SDF::interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& c
 
 void SDF::visualize(const std::string &file_name)
 {
+	ros::Time t0 = ros::Time::now();
 	pcl::PolygonMesh output;
 	std::vector<pcl::Vertices> polygons;
 	pcl::MarchingCubesSDF *mc;
@@ -176,6 +177,7 @@ void SDF::visualize(const std::string &file_name)
 		marker.id = 0;
 		marker.type = visualization_msgs::Marker::TRIANGLE_LIST;
 		marker.action = visualization_msgs::Marker::ADD;
+		marker.points.reserve(cloud.size());
 		marker.pose.position.x = 0;
 		marker.pose.position.y = 0;
 		marker.pose.position.z = 0;
@@ -210,7 +212,7 @@ void SDF::visualize(const std::string &file_name)
 			p3.x = cloud.points[i*3+2].x/width;
 			p3.y = cloud.points[i*3+2].y/height;
 			p3.z = cloud.points[i*3+2].z/depth;
-			std::cout << p3.x << ", " << p3.y << ", "<<p3.z<<std::endl;
+			//std::cout << p3.x << ", " << p3.y << ", "<<p3.z<<std::endl;
 			
 			marker.points.push_back(p1);
 			marker.points.push_back(p2);
@@ -232,4 +234,5 @@ void SDF::visualize(const std::string &file_name)
 		
 		//r->sleep();
 	}
+	std::cout << (ros::Time::now()-t0).toSec()<< std::endl;
 }

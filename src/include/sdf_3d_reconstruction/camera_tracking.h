@@ -16,15 +16,15 @@ private:
 	 *  K = [ 0 fy cy]
 	 *	[ 0  0  1]
 	 */
-	Eigen::Matrix<double,3,3> K;
+	Eigen::Matrix3d K;
 	/*
 	 * current rotation matrix
 	 */
-	Eigen::Matrix<double,3,3> *rot;
+	Eigen::Matrix3d rot;
 	/*
 	 * current translation
 	 */
-	Eigen::Vector3d *trans;
+	Eigen::Vector3d trans;
 public:
 	ros::Subscriber cam_info;
 	bool isKFilled;
