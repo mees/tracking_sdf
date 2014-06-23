@@ -1,0 +1,57 @@
+<launch>
+
+  <!--
+  To distinguish between the cases where the rgb image is
+  1280x1024 versus 640x480.  This affects the pipeline.
+  -->
+  <arg name="high_res_rgb" default="true"/>
+  <arg name="cloud_input_ns" value="camera/rgb_downsampled"
+       if="$(arg high_res_rgb)"/>
+  <arg name="cloud_input_ns" value="camera/rgb" unless="$(arg high_res_rgb)"/>
+
+  <!-- Nodelet manager for this pipeline -->
+  <node pkg="nodelet" type="nodelet" args="manager"
+        name="record_player_manager" output="screen"/>
+
+  <!-- Debayer and undistort the rgb image
+       TODO: this should be split into nodelets -->
+  <node 
+    pkg="image_proc" 
+    type="image_proc" 
+    name="ip_node1" 
+    ns="camera/rgb"
+    />
+
+  
+  <!-- The depth image is already rectified and registered
+       to the camera optical frame, but stored in mm; convert it
+       to meters -->
+  <node pkg="nodelet" type="nodelet" name="metric_rect" 
+        args="load depth_image_proc/convert_metric record_player_manager --no-bond">
+    <remap from="image_raw" to="camera/depth/image_raw"/>
+    <remap from="image" to="camera/depth/image"/>
+  </node>
+
+  <!-- Downsample and crop rgb image before converting to cloud, if it's high res -->
+  <node pkg="nodelet" type="nodelet" name="downsample_rgb"
+        args="load image_proc/crop_decimate record_player_manager --no-bond"
+        if="$(arg high_res_rgb)">
+    <param name="decimation_x" value="2"/>
+    <param name="decimation_y" value="2"/>
+    <param name="width" value="1280"/>
+    <param name="height" value="960"/>
+    <remap from="camera" to="camera/rgb"/>
+    <remap from="camera_out" to="$(arg cloud_input_ns)"/>
+    <remap from="camera/rgb/image_raw" to="camera/rgb/image_rect_color"/>
+    <remap from="$(arg cloud_input_ns)/image_raw" to="$(arg cloud_input_ns)/image_rect_color"/>
+  </node>
+
+  <!-- Convert it into a point cloud -->
+  <node pkg="nodelet" type="nodelet" name="cloudify"
+        args="load depth_image_proc/point_cloud_xyzrgb record_player_manager --no-bond">
+    <remap from="depth_registered/image_rect" to="camera/depth/image"/>
+    <remap from="depth_registered/points" to="camera/depth_registered/points"/>
+    <remap from="rgb/image_rect_color" to="$(arg cloud_input_ns)/image_rect_color"/>
+    <remap from="rgb/camera_info" to="$(arg cloud_input_ns)/camera_info"/>
+  </node>
+</launch>
