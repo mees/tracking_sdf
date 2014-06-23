@@ -54,9 +54,9 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 
 SDF_Reconstruction::SDF_Reconstruction() {
 	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::Image> MySyncPolicy;
-	kinect_rgb_sub.subscribe(nh, "/camera/rgb/points", 1);
+	kinect_pcl_sub.subscribe(nh, "/camera/rgb/points", 1);
     kinect_depth_sub.subscribe(nh, "/camera/depth/image", 1);
-    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1),kinect_rgb_sub, kinect_depth_sub);
+    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1),kinect_pcl_sub, kinect_depth_sub);
     sync.registerCallback(boost::bind(&SDF_Reconstruction::kinect_callback, this, _1, _2));
         this->camera_tracking = new CameraTracking();
 	//pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
