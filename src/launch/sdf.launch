@@ -2,8 +2,5 @@
 	<node name="sdf_3d_reconstruction_node" pkg="sdf_3d_reconstruction" type="sdf_3d_reconstruction_node" clear_params="true" output="screen" >
 		<param name="groundTruthPath" value="$(find sdf_3d_reconstruction)/rgbd_dataset_freiburg1_plant-groundtruth.txt" type="str"/> 
 		<param name="visualOutput" value="$(find sdf_3d_reconstruction)/vo.vtk" type="str"/> 
-		<remap from="camera/depth_registered/points" to="camera/rgb/points"/> <!-- to match name if using kinect.launch, maybe find a less hacky way  -->
-	</node>
-        <node name="rviz" pkg="rviz" type="rviz" output="screen" >
 	</node>
 </launch>

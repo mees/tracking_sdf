@@ -21,6 +21,9 @@
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 #include "visualization_msgs/MarkerArray.h"
+#include "cv_bridge/cv_bridge.h"
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
 
 #include<Eigen/Eigen>
 

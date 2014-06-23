@@ -15,8 +15,10 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_conversions
   depth_image_proc
   nodelet
+  cv_bridge
+  #OpenCV
 )
-
+find_package(OpenCV)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -103,6 +105,7 @@ catkin_package(
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
   /usr/include/vtk-5.8
 )
 
@@ -122,7 +125,7 @@ include_directories(
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(sdf_3d_reconstruction_node
-   ${catkin_LIBRARIES} libvtkCommon.so libvtkFiltering.so
+   ${catkin_LIBRARIES}  ${OpenCV_LIBRARIES} libvtkCommon.so libvtkFiltering.so
  )
 
 #############

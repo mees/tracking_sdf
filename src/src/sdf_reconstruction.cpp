@@ -10,6 +10,7 @@ float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &C
 //void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
 //		const sensor_msgs::ImageConstPtr& image_depth) {
 void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr& ros_cloud,const sensor_msgs::ImageConstPtr& image_depth) {
+	cout<<"callback!"<<endl;
 	pcl::PCLPointCloud2 pcl_pc2;
 	pcl_conversions::toPCL(*ros_cloud, pcl_pc2);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr pcl_cloud(

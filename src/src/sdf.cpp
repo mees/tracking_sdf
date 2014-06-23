@@ -162,24 +162,38 @@ void SDF::update(CameraTracking* camera_tracking, const sensor_msgs::ImageConstP
 	    uint d_w = image_depth->width;
 	    uint d_h = image_depth->height;
 	    std::cout<< d_w << "," << d_h << std::endl;
-	    for (int i = 0; i < this->get_number_of_voxels(); i++) {
-		    Vector3i voxel_coordinates;
-		    Vector3d global_coordinates, camera_point;
-		    Vector2d image_point; 
-		    this->get_voxel_coordinates(i,voxel_coordinates);
-		    
-		    this->get_global_coordinates(voxel_coordinates, global_coordinates);
-		    
-		    camera_tracking->project_world_to_camera(global_coordinates, camera_point);
-		    
-		    camera_tracking->project_camera_to_image_plane(camera_point, image_point);
-		    
-		    //point to point
-		    float z = camera_point(2);
-		    if (image_point(0) < d_w && image_point(1) < d_h){
-		      std::cout << reinterpret_cast<float*>(image_depth->data[int(image_point(0))+int(d_h * image_point(1))])<< std::endl;
-		    }
-	    }
+	    cv_bridge::CvImagePtr cv_ptr;
+	    	try
+	        {
+	          cv_ptr = cv_bridge::toCvCopy(image_depth, image_depth->encoding.c_str());
+	          float dist_val = cv_ptr->image.at<float>( 10, 10 );
+	          cout<<"dist: "<<dist_val<<endl;
+	          cv::imshow("foo", cv_ptr->image);
+	          cv::waitKey(3);
+	        }
+	        catch (cv_bridge::Exception& e)
+	        {
+	          ROS_ERROR("cv_bridge exception: %s", e.what());
+	          return;
+	        }
+//	    for (int i = 0; i < this->get_number_of_voxels(); i++) {
+//		    Vector3i voxel_coordinates;
+//		    Vector3d global_coordinates, camera_point;
+//		    Vector2d image_point;
+//		    this->get_voxel_coordinates(i,voxel_coordinates);
+//
+//		    this->get_global_coordinates(voxel_coordinates, global_coordinates);
+//
+//		    camera_tracking->project_world_to_camera(global_coordinates, camera_point);
+//
+//		    camera_tracking->project_camera_to_image_plane(camera_point, image_point);
+//
+//		    //point to point
+//		    float z = camera_point(2);
+//		    if (image_point(0) < d_w && image_point(1) < d_h){
+//		      std::cout << reinterpret_cast<float*>(image_depth->data[int(image_point(0))+int(d_h * image_point(1))])<< std::endl;
+//		    }
+//	    }
     }
 }
 
