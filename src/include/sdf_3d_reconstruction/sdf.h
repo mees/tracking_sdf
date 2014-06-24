@@ -102,7 +102,7 @@ public:
 	/*
 	 * 
 	 */
-	void update(CameraTracking* camera_tracking, const sensor_msgs::ImageConstPtr& image_depth);
+	void update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals);
 };
 
 #endif /* SDF_H_ */

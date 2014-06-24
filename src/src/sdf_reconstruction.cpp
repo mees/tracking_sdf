@@ -1,4 +1,5 @@
 #include "sdf_3d_reconstruction/sdf_reconstruction.h"
+#include <stdlib.h>
 
 //todo: implement
 float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
@@ -35,36 +36,32 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 
 	//cv::Mat depth_map(cloud_filtered->height, cloud_filtered->width, CV_16UC1);
 	
-	for (int idx = 0; idx < cloud_filtered->size(); ++idx) {
-		int i = idx%cloud_filtered;
-		int j = int(idx/cloud_filtered->height);
-		float z = cloud_filtered->points[i].z;
-		
-	}
 	//cv::imshow("foo", depth_map);
 	//cv::waitKey(3);
 
 
-//	tf::TransformListener listener;
-//	tf::StampedTransform transform;
-//	try {
-//		listener.waitForTransform("/world", "/openni_rgb_optical_frame",
-//				ros::Time(), ros::Duration(2.0));
-//		listener.lookupTransform("/world", "/openni_rgb_optical_frame",
-//				ros::Time(), transform);
-//		Vector3d trans;
-//		Eigen::Quaterniond rot;
-//		tf::vectorTFToEigen(transform.getOrigin(),trans);
-//		tf::quaternionTFToEigen(transform.getRotation(), rot);
-//		Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
-//		this->camera_tracking->set_camera_transformation(rotMat, trans);
-//		//tf::Quaternion q = transform.getRotation();
-//		tf::Vector3 v = transform.getOrigin();
-//		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
-//		sdf->update(this->camera_tracking, image_depth);
-//	} catch (tf::TransformException ex) {
-//		ROS_ERROR("%s", ex.what());
-//	}
+	
+	tf::TransformListener listener;
+	tf::StampedTransform transform;
+	try {
+		listener.waitForTransform("/world", "/openni_rgb_optical_frame",
+				ros::Time(), ros::Duration(2.0));
+		listener.lookupTransform("/world", "/openni_rgb_optical_frame",
+				ros::Time(), transform);
+		Vector3d trans;
+		Eigen::Quaterniond rot;
+		tf::vectorTFToEigen(transform.getOrigin(),trans);
+		tf::quaternionTFToEigen(transform.getRotation(), rot);
+		Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
+		this->camera_tracking->set_camera_transformation(rotMat, trans);
+		//tf::Quaternion q = transform.getRotation();
+		tf::Vector3 v = transform.getOrigin();
+		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
+		sdf->update(this->camera_tracking, cloud_filtered, normals);
+	} catch (tf::TransformException ex) {
+		ROS_ERROR("%s", ex.what());
+	}
+	
 }
 
 SDF_Reconstruction::SDF_Reconstruction() {
@@ -77,7 +74,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
-	sdf = new SDF(102, 200.0, 200.0, 200.0);
+	sdf = new SDF(102, 20.0, 20.0, 20.0);
 	//sdf->create_circle(200, 0, 0.0, 0.0);
 	//std::string visualeOutput;
 	//ros::param::get("~visualOutput", visualeOutput);

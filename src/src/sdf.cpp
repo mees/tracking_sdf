@@ -153,48 +153,61 @@ void SDF::interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& c
 	color.b /= w_sum;
 }
 
-void SDF::update(CameraTracking* camera_tracking, const sensor_msgs::ImageConstPtr& image_depth){
+void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals){
     
     if (!camera_tracking->isKFilled) {
 	    cout << "Camera Matrix not received. Start rosbag file!" << endl;
 	    exit(0);
     } else {
-	    uint d_w = image_depth->width;
-	    uint d_h = image_depth->height;
-	    std::cout<< d_w << "," << d_h << std::endl;
-	    cv_bridge::CvImagePtr cv_ptr;
-	    	try
-	        {
-	          cv_ptr = cv_bridge::toCvCopy(image_depth, image_depth->encoding.c_str());
-	          float dist_val = cv_ptr->image.at<float>( 10, 10 );
-	          cout<<"dist: "<<dist_val<<endl;
-	          cv::imshow("foo", cv_ptr->image);
-	          cv::waitKey(3);
-	        }
-	        catch (cv_bridge::Exception& e)
-	        {
-	          ROS_ERROR("cv_bridge exception: %s", e.what());
-	          return;
-	        }
-//	    for (int i = 0; i < this->get_number_of_voxels(); i++) {
-//		    Vector3i voxel_coordinates;
-//		    Vector3d global_coordinates, camera_point;
-//		    Vector2d image_point;
-//		    this->get_voxel_coordinates(i,voxel_coordinates);
-//
-//		    this->get_global_coordinates(voxel_coordinates, global_coordinates);
-//
-//		    camera_tracking->project_world_to_camera(global_coordinates, camera_point);
-//
-//		    camera_tracking->project_camera_to_image_plane(camera_point, image_point);
-//
-//		    //point to point
-//		    float z = camera_point(2);
-//		    if (image_point(0) < d_w && image_point(1) < d_h){
-//		      std::cout << reinterpret_cast<float*>(image_depth->data[int(image_point(0))+int(d_h * image_point(1))])<< std::endl;
-//		    }
-//	    }
-    }
+	    //std::cout<< d_w << "," << d_h << std::endl;
+		/*for (int idx = 0; idx < cloud_filtered->size(); ++idx) {
+			int i = idx%cloud_filtered->height;
+			int j = int(idx/cloud_filtered->height);
+			float z = cloud_filtered->points[idx].z;
+			Vector3d  camera_point;
+			camera_point(0) =  cloud_filtered->points[idx].x;
+			camera_point(1) =  cloud_filtered->points[idx].y;
+			camera_point(2) =  cloud_filtered->points[idx].z;
+			Vector3d a = camera_tracking->K * camera_point;
+			cout << "--------------------------------------------_"<<endl;
+			cout << cloud_filtered->points[i] << endl;
+			cout << camera_point <<endl ;
+			cout <<a <<endl;
+			cout << i<< ", "<<j <<endl;
+			
+			Vector2d image_point;
+			camera_tracking->project_camera_to_image_plane(camera_point, image_point);    
+		}*/
+		for (int idx = 0; idx < this->get_number_of_voxels(); idx++) {
+			Vector3i voxel_coordinates;
+			Vector3d global_coordinates, camera_point;
+			Vector2d image_point;
+			this->get_voxel_coordinates(idx,voxel_coordinates);
+			this->get_global_coordinates(voxel_coordinates, global_coordinates);
+			camera_tracking->project_world_to_camera(global_coordinates, camera_point);
+			camera_tracking->project_camera_to_image_plane(camera_point, image_point);
+			//cout<< global_coordinates<<endl;
+			//cout << camera_point<<endl;
+			//cout <<image_point <<endl;
+			//point to point
+			float z_voxel = camera_point(2);
+			int i = image_point(0);
+			
+			int j = image_point(1);
+			
+			if (i < cloud_filtered->width && j < cloud_filtered->height && i> 0 && j > 0){
+				int cloud_idx = j*cloud_filtered->height + i;
+				cout << i<< ", "<<j <<", " << cloud_idx <<endl;
+				if (!isnan(cloud_filtered->points[cloud_idx].x) && !isnan(cloud_filtered->points[cloud_idx].y)){
+					float z_img =  cloud_filtered->points[cloud_idx].z;
+					cout << z_img << " " << z_voxel<<endl;
+ 					//print point-to-point
+					cout <<z_voxel-z_img<<endl;
+				}
+			}
+			
+		}
+	}
 }
 
 void SDF::visualize(const std::string &file_name)

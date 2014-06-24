@@ -18,7 +18,7 @@ void CameraTracking::camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_
 	this->K(2,1) = rgbd_camera_info->K[7];
 	this->K(2,2) = rgbd_camera_info->K[8];
 	this->isKFilled = true;
-	cout<<"read Camera Matrix"<<endl;
+	cout<<"read Camera Matrix"<<this->K<<endl;
 	this->cam_info.shutdown();
 }
 //todo: validate!
@@ -29,7 +29,7 @@ void CameraTracking::project_camera_to_image_plane(Vector3d& camera_point, Vecto
 	float fy = this->K(1,1);
 	float cx = this->K(0,2);
 	float cy = this->K(1,2);*/
-	ij = K * camera_point;
+	ij = this->K * camera_point;
 	image_point(0) = ij(0)/ij(2); //fx*(camera_point(0)/camera_point(2)) + cx;
 	image_point(1) = ij(1)/ij(2); //fy*(camera_point(1)/camera_point(2)) + cy;
 }
