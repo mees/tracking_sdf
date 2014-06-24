@@ -202,9 +202,11 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
  					//print point-to-point
 					//cout <<z_voxel-z_img<<endl;
 					float w_old = W[idx];
-					float d_old = D[idx];
 					W[idx] = w_old + 1.0;
-					D[idx] = w_old/W[idx] * d_old + 1.0/W[idx] * (z_voxel-z_img);
+					D[idx] = w_old/W[idx] * D[idx] + 1.0/W[idx] * (z_voxel-z_img);
+					R[idx] = w_old/W[idx] * R[idx] + 1.0/W[idx] * cloud_filtered->points[cloud_idx].r;
+					G[idx] = w_old/W[idx] * G[idx] + 1.0/W[idx] * cloud_filtered->points[cloud_idx].g;
+					B[idx] = w_old/W[idx] * B[idx] + 1.0/W[idx] * cloud_filtered->points[cloud_idx].b;
 				}
 			}
 		}
@@ -231,7 +233,7 @@ void SDF::visualize()
 		//std::cout << "H"<<std::endl;
 
 		visualization_msgs::Marker marker;
-		marker.header.frame_id = "/map";
+		marker.header.frame_id = "/world";
 		marker.header.stamp = ros::Time();
 		marker.ns = "3dreconstruction";
 		marker.id = 0;
@@ -257,21 +259,21 @@ void SDF::visualize()
 			//std::cout << width << ", " << height << ", "<<depth<<": "<<std::endl;
 			//std::cout <<cloud.points[i*3].x<<", "<<cloud.points[i*3].y<<", "<<cloud.points[i*3].z<<std::endl;
 			geometry_msgs::Point p1;
-			p1.x = cloud.points[i*3].x/width;
-			p1.y = cloud.points[i*3].y/height;
-			p1.z = cloud.points[i*3].z/depth;
+			p1.x = cloud.points[i*3].x;
+			p1.y = cloud.points[i*3].y;
+			p1.z = cloud.points[i*3].z;
 			//std::cout << p1.x << ", " << p1.y << ", "<<p1.z<<std::endl;
 	      
 			geometry_msgs::Point p2;
-			p2.x = cloud.points[i*3+1].x/width;
-			p2.y = cloud.points[i*3+1].y/height;
-			p2.z = cloud.points[i*3+1].z/depth;
+			p2.x = cloud.points[i*3+1].x;
+			p2.y = cloud.points[i*3+1].y;
+			p2.z = cloud.points[i*3+1].z;
 			//std::cout << p2.x << ", " << p2.y << ", "<<p2.z<<std::endl;
 			
 			geometry_msgs::Point p3;
-			p3.x = cloud.points[i*3+2].x/width;
-			p3.y = cloud.points[i*3+2].y/height;
-			p3.z = cloud.points[i*3+2].z/depth;
+			p3.x = cloud.points[i*3+2].x;
+			p3.y = cloud.points[i*3+2].y;
+			p3.z = cloud.points[i*3+2].z;
 			//std::cout << p3.x << ", " << p3.y << ", "<<p3.z<<std::endl;
 			
 			marker.points.push_back(p1);

@@ -3,4 +3,7 @@
 		<param name="groundTruthPath" value="$(find sdf_3d_reconstruction)/rgbd_dataset_freiburg1_plant-groundtruth.txt" type="str"/> 
 		<param name="visualOutput" value="$(find sdf_3d_reconstruction)/vo.vtk" type="str"/> 
 	</node>
+        <node name="rviz" pkg="rviz" type="rviz" output="screen" >
+        </node>
+
 </launch>
