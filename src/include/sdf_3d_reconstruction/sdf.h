@@ -37,7 +37,7 @@ class SDF {
 private:
 	int m;
 	//width
-	float width, height, depth;
+	float width, height, depth, distance_delta;
 	//Distance array
 	float *D;
 	//Weight array
@@ -59,7 +59,7 @@ public:
 	/**
 	 *  standard constructor
 	 */
-	SDF(int m, float width, float height, float depth);
+	SDF(int m, float width, float height, float depth, float distance_delta);
 	virtual ~SDF();
 	
 	/**

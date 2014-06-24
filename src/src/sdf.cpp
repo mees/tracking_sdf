@@ -4,7 +4,7 @@ using namespace Eigen;
 /*
  * Constructror destructor 
  */
-SDF::SDF(int m, float width, float height, float depth): m(m), width(width),height(height), depth(depth){
+SDF::SDF(int m, float width, float height, float depth, float distance_delta): m(m), width(width),height(height), depth(depth), distance_delta(distance_delta){
 	D = new float[this->m * this->m * this->m];
 	W = new float[this->m * this->m * this->m];
 	R = new float[this->m * this->m * this->m];
@@ -12,7 +12,7 @@ SDF::SDF(int m, float width, float height, float depth): m(m), width(width),heig
 	B = new float[this->m * this->m * this->m];
 	number_of_voxels = m * m * m;
 	for (int i = 0; i<number_of_voxels; i++) {
-		D[i] = 0;
+		D[i] = width+height+depth;
 		W[i] = 0;
 		R[i] = 0;
 		G[i] = 0;
@@ -39,6 +39,7 @@ inline int SDF::get_array_index(Vector3i& voxel_coordinates){
 	int _idx = this->m*this->m*voxel_coordinates(2)+this->m*voxel_coordinates(1)+voxel_coordinates(0);
 	if (_idx < 0 || _idx >= this->m*this->m*this->m){
 	  std::cout << "ooo"<<std::endl;
+	  _idx = -1;
 	}
 	  
 	return _idx;
@@ -104,12 +105,14 @@ float SDF::interpolate_distance(Vector3d& world_coordinates){
 	      current_voxel(2) = ((int) k)+k_offset;
 	      float dist = (current_voxel(0)-i)*(current_voxel(0)-i) + (current_voxel(1)-j)*(current_voxel(1)-j)+ (current_voxel(2)-k)*(current_voxel(2)-k);
 	      int a_idx = get_array_index(current_voxel);
-	      if (dist < 0.001){
-		return this->D[a_idx];
+	      if (a_idx != -1){
+			if (dist < 0.001){
+				return this->D[a_idx];
+			}
+			float w = 1.0/dist;
+			w_sum += w;
+			sum_d +=  w*this->D[a_idx];
 	      }
-	      float w = 1.0/dist;
-	      w_sum += w;
-	      sum_d +=  w*this->D[a_idx];
 	    }
 	  }
 	}
@@ -134,17 +137,19 @@ void SDF::interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& c
 	      current_voxel(2) = ((int) k)+k_offset;
 	      float dist = (current_voxel(0)-i)*(current_voxel(0)-i) + (current_voxel(1)-j)*(current_voxel(1)-j)+ (current_voxel(2)-k)*(current_voxel(2)-k);
 	      int a_idx = get_array_index(current_voxel);
-	      if (dist < 0.001){
-		color.r =  this->R[a_idx];
-		color.g =  this->G[a_idx];
-		color.b =  this->B[a_idx];
-		return;
+	      if (a_idx != -1){
+		  if (dist < 0.001){
+		    color.r =  this->R[a_idx];
+		    color.g =  this->G[a_idx];
+		    color.b =  this->B[a_idx];
+		    return;
+		  }
+		  float w = 1.0/dist;
+		  w_sum += w;
+		  color.r +=  w*this->R[a_idx];
+		  color.g +=  w*this->G[a_idx];
+		  color.b +=  w*this->B[a_idx];
 	      }
-	      float w = 1.0/dist;
-	      w_sum += w;
-	      color.r +=  w*this->R[a_idx];
-	      color.g +=  w*this->G[a_idx];
-	      color.b +=  w*this->B[a_idx];
 	    }
 	  }
 	}
@@ -160,24 +165,6 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 	    cout << "Camera Matrix not received. Start rosbag file!" << endl;
 	    exit(0);
     } else {
-		//std::cout<< d_w << "," << d_h << std::endl;
-		/*for (int idx = 0; idx < cloud_filtered->size(); ++idx) {
-			int i = idx%cloud_filtered->height;
-			int j = int(idx/cloud_filtered->height);
-			float z = cloud_filtered->points[idx].z;
-			Vector3d  camera_point;
-			camera_point(0) =  cloud_filtered->points[idx].x;
-			camera_point(1) =  cloud_filtered->points[idx].y;
-			camera_point(2) =  cloud_filtered->points[idx].z;
-			Vector3d a = camera_tracking->K * camera_point;
-			cout << "--------------------------------------------_"<<endl;
-			cout << cloud_filtered->points[i] << endl;
-			cout << camera_point <<endl ;
-			cout <<a <<endl;
-			cout << i<< ", "<<j <<endl;
-			Vector2d image_point;
-			camera_tracking->project_camera_to_image_plane(camera_point, image_point);    
-		}*/
 		for (int idx = 0; idx < this->get_number_of_voxels(); idx++) {
 			Vector3i voxel_coordinates;
 			Vector3d global_coordinates, camera_point;
@@ -186,27 +173,29 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 			this->get_global_coordinates(voxel_coordinates, global_coordinates);
 			camera_tracking->project_world_to_camera(global_coordinates, camera_point);
 			camera_tracking->project_camera_to_image_plane(camera_point, image_point);
-			//cout<< global_coordinates<<endl;
-			//cout << camera_point<<endl;
-			//cout <<image_point <<endl;
-			//point to point
 			float z_voxel = camera_point(2);
 			int i = image_point(0);
 			int j = image_point(1);
 			if (i < cloud_filtered->width && j < cloud_filtered->height && i> 0 && j > 0){
-				int cloud_idx = j*cloud_filtered->height + i;
+				int cloud_idx = j*cloud_filtered->width + i;
 				if (!isnan(cloud_filtered->points[cloud_idx].x) && !isnan(cloud_filtered->points[cloud_idx].y)){
-					//cout << i<< ", "<<j <<", " << cloud_idx <<endl;
 					float z_img =  cloud_filtered->points[cloud_idx].z;
-					//cout << z_img << " " << z_voxel<<endl;
- 					//print point-to-point
-					//cout <<z_voxel-z_img<<endl;
 					float w_old = W[idx];
-					W[idx] = w_old + 1.0;
-					D[idx] = w_old/W[idx] * D[idx] + 1.0/W[idx] * (z_voxel-z_img);
-					R[idx] = w_old/W[idx] * R[idx] + 1.0/W[idx] * cloud_filtered->points[cloud_idx].r;
-					G[idx] = w_old/W[idx] * G[idx] + 1.0/W[idx] * cloud_filtered->points[cloud_idx].g;
-					B[idx] = w_old/W[idx] * B[idx] + 1.0/W[idx] * cloud_filtered->points[cloud_idx].b;
+					float d_new = (z_voxel-z_img);
+					float w_new = 1.0;
+					if (d_new > distance_delta){
+						d_new = distance_delta;
+						w_new = 0.1;
+					}
+					if (d_new < -distance_delta){
+						d_new = -distance_delta;
+						w_new = 0.1;
+					}
+					W[idx] = w_old + w_new;
+					D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
+					R[idx] = w_old/W[idx] * R[idx] + w_new/W[idx] * cloud_filtered->points[cloud_idx].r;
+					G[idx] = w_old/W[idx] * G[idx] + w_new/W[idx] * cloud_filtered->points[cloud_idx].g;
+					B[idx] = w_old/W[idx] * B[idx] + w_new/W[idx] * cloud_filtered->points[cloud_idx].b;
 				}
 			}
 		}

@@ -35,7 +35,9 @@ void CameraTracking::project_camera_to_image_plane(Vector3d& camera_point, Vecto
 }
 //todo: validate
 void CameraTracking::project_world_to_camera(Vector3d& world_point, Vector3d& camera_point){
-	camera_point = (this->rot * world_point) + this->trans;
+	camera_point(0) = this->rot(0,0) * world_point(0) + this->rot(0,1) * world_point(1) + this->rot(0,2) * world_point(2) + this->trans(0);
+	camera_point(1) = this->rot(1,0) * world_point(0) + this->rot(1,1) * world_point(1) + this->rot(1,2) * world_point(2) + this->trans(1);
+	camera_point(2) = this->rot(2,0) * world_point(0) + this->rot(2,1) * world_point(1) + this->rot(2,2) * world_point(2) + this->trans(2);
 }
 //todo validate
 void CameraTracking::set_camera_transformation(Eigen::Matrix3d rot, Eigen::Vector3d trans){

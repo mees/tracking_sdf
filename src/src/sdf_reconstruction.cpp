@@ -57,7 +57,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 		//tf::Quaternion q = transform.getRotation();
 		tf::Vector3 v = transform.getOrigin();
 		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
-		sdf->update(this->camera_tracking, cloud_filtered, normals);
+		sdf->update(this->camera_tracking, pcl_cloud, normals);
 	} catch (tf::TransformException ex) {
 		ROS_ERROR("%s", ex.what());
 	}
@@ -74,7 +74,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
-	sdf = new SDF(22, 1.0, 1.0, 1.0);
+	sdf = new SDF(33, 4.0, 4.0, 4.0, 0.3);
 	//sdf->create_circle(200, 0, 0.0, 0.0);
 	//std::string visualeOutput;
 	//ros::param::get("~visualOutput", visualeOutput);
