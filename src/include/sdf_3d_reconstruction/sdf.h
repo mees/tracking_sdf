@@ -78,7 +78,7 @@ public:
 	/**
 	 *  
 	 **/
-	void visualize(const std::string &file_name);
+	void visualize();
 	int get_number_of_voxels();
 	/*
 	 *  input: i,j,k -> idx. Idx can be used for W and for D

@@ -154,12 +154,13 @@ void SDF::interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& c
 }
 
 void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals){
+		ros::Time t0 = ros::Time::now();
     
     if (!camera_tracking->isKFilled) {
 	    cout << "Camera Matrix not received. Start rosbag file!" << endl;
 	    exit(0);
     } else {
-	    //std::cout<< d_w << "," << d_h << std::endl;
+		//std::cout<< d_w << "," << d_h << std::endl;
 		/*for (int idx = 0; idx < cloud_filtered->size(); ++idx) {
 			int i = idx%cloud_filtered->height;
 			int j = int(idx/cloud_filtered->height);
@@ -174,7 +175,6 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 			cout << camera_point <<endl ;
 			cout <<a <<endl;
 			cout << i<< ", "<<j <<endl;
-			
 			Vector2d image_point;
 			camera_tracking->project_camera_to_image_plane(camera_point, image_point);    
 		}*/
@@ -192,25 +192,28 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 			//point to point
 			float z_voxel = camera_point(2);
 			int i = image_point(0);
-			
 			int j = image_point(1);
-			
 			if (i < cloud_filtered->width && j < cloud_filtered->height && i> 0 && j > 0){
 				int cloud_idx = j*cloud_filtered->height + i;
-				cout << i<< ", "<<j <<", " << cloud_idx <<endl;
 				if (!isnan(cloud_filtered->points[cloud_idx].x) && !isnan(cloud_filtered->points[cloud_idx].y)){
+					//cout << i<< ", "<<j <<", " << cloud_idx <<endl;
 					float z_img =  cloud_filtered->points[cloud_idx].z;
-					cout << z_img << " " << z_voxel<<endl;
+					//cout << z_img << " " << z_voxel<<endl;
  					//print point-to-point
-					cout <<z_voxel-z_img<<endl;
+					//cout <<z_voxel-z_img<<endl;
+					float w_old = W[idx];
+					float d_old = D[idx];
+					W[idx] = w_old + 1.0;
+					D[idx] = w_old/W[idx] * d_old + 1.0/W[idx] * (z_voxel-z_img);
 				}
 			}
-			
 		}
+		std::cout << (ros::Time::now()-t0).toSec()<< std::endl;
+		this->visualize();
 	}
 }
 
-void SDF::visualize(const std::string &file_name)
+void SDF::visualize()
 {
 	ros::Time t0 = ros::Time::now();
 	pcl::PolygonMesh output;
@@ -284,11 +287,8 @@ void SDF::visualize(const std::string &file_name)
 			marker.colors.push_back(c);
 		  
 		}
-				
 		// Publish the marker
 		this->marker_publisher.publish(marker);
-
-		
 		//r->sleep();
 	}
 	std::cout << (ros::Time::now()-t0).toSec()<< std::endl;

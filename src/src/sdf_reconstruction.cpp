@@ -45,7 +45,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	tf::StampedTransform transform;
 	try {
 		listener.waitForTransform("/world", "/openni_rgb_optical_frame",
-				ros::Time(), ros::Duration(2.0));
+				ros::Time(), ros::Duration(12.0));
 		listener.lookupTransform("/world", "/openni_rgb_optical_frame",
 				ros::Time(), transform);
 		Vector3d trans;
@@ -57,7 +57,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 		//tf::Quaternion q = transform.getRotation();
 		tf::Vector3 v = transform.getOrigin();
 		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
-		sdf->update(this->camera_tracking, cloud_filtered, normals);
+		//sdf->update(this->camera_tracking, cloud_filtered, normals);
 	} catch (tf::TransformException ex) {
 		ROS_ERROR("%s", ex.what());
 	}
@@ -78,7 +78,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	//sdf->create_circle(200, 0, 0.0, 0.0);
 	//std::string visualeOutput;
 	//ros::param::get("~visualOutput", visualeOutput);
-	//sdf->visualize(visualeOutput);
+	//sdf->visualize();
 
 	ros::spin();
 }
