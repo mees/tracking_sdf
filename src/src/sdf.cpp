@@ -188,7 +188,7 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 			float z_voxel = camera_point(2);
 			int i_image = image_point(0);
 			int j_image = image_point(1);
-			if (i < cloud_filtered->width && j_image < cloud_filtered->height && i_image> 0 && j_image > 0){
+			if (i_image < cloud_filtered->width && j_image < cloud_filtered->height && i_image> 0 && j_image > 0){
 				int cloud_idx = j_image*cloud_filtered->width + i_image;
 				if (!isnan(cloud_filtered->points[cloud_idx].x) && !isnan(cloud_filtered->points[cloud_idx].y)){
 					cout <<" image point: \n"<< image_point << endl;
