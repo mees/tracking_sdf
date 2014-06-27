@@ -45,21 +45,23 @@ inline int SDF::get_array_index(Vector3i& voxel_coordinates){
 	return _idx;
 }
 
+// auf dem Blatt verifiziert durch Oier und Joel
 inline void SDF::get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinates){
 	voxel_coordinates(0) = (int) array_idx%this->m;
 	voxel_coordinates(1) = (int) (array_idx % (this->m*this->m))/this->m;
 	voxel_coordinates(2) = (int) (array_idx/(this->m*this->m));
 }
+// auf dem Blatt verifiziert durch Oier und Joel
 void SDF::get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_coordinates){
-  
 	global_coordinates(0) = (this->width/((float)m)) * (voxel_coordinates(0)+0.5);
 	global_coordinates(1) = (this->height/((float)m)) * (voxel_coordinates(1)+0.5);
 	global_coordinates(2) = (this->depth/((float)m)) * (voxel_coordinates(2)+0.5);
 }
-void SDF::get_voxel_coordinates(Vector3d& global_coordinates, Vector3i& voxel_coordinates){
-	voxel_coordinates(0) = (int)((global_coordinates(0)/this->width)*m -0.5);
-	voxel_coordinates(1) = (int)((global_coordinates(1)/this->height)*m -0.5);
-	voxel_coordinates(2) = (int)((global_coordinates(2)/this->depth)*m -0.5);
+
+void SDF::get_voxel_coordinates(Vector3d& global_coordinates, Vector3d& voxel_coordinates){
+	voxel_coordinates(0) = ((global_coordinates(0)/this->width)*m -0.5);
+	voxel_coordinates(1) = ((global_coordinates(1)/this->height)*m -0.5);
+	voxel_coordinates(2) = ((global_coordinates(2)/this->depth)*m -0.5);
 }
 
 void SDF::create_circle(float radius, float center_x, float center_y,
@@ -91,9 +93,11 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 }
 
 float SDF::interpolate_distance(Vector3d& world_coordinates){
-	float i = ((world_coordinates(0)/this->width)*m -0.5);
-	float j = ((world_coordinates(1)/this->height)*m -0.5);
-	float k = ((world_coordinates(2)/this->depth)*m -0.5);
+	Vector3d voxel_coordinates;
+	get_voxel_coordinates(world_coordinates, voxel_coordinates);
+	float i = voxel_coordinates(0);
+	float j = voxel_coordinates(1);
+	float k = voxel_coordinates(2);
 	float w_sum = 0.0;
 	float sum_d = 0.0;
 	Vector3i current_voxel;
@@ -103,13 +107,13 @@ float SDF::interpolate_distance(Vector3d& world_coordinates){
 	      current_voxel(0) = ((int) i)+i_offset;
 	      current_voxel(1) = ((int) j)+j_offset;
 	      current_voxel(2) = ((int) k)+k_offset;
-	      float dist = (current_voxel(0)-i)*(current_voxel(0)-i) + (current_voxel(1)-j)*(current_voxel(1)-j)+ (current_voxel(2)-k)*(current_voxel(2)-k);
+	      float volume = fabs(current_voxel(0)-i) + fabs(current_voxel(1)-j)+ fabs(current_voxel(2)-k);
 	      int a_idx = get_array_index(current_voxel);
 	      if (a_idx != -1){
-			if (dist < 0.001){
+			if (volume < 0.00001){
 				return this->D[a_idx];
 			}
-			float w = 1.0/dist;
+			float w = 1.0/volume;
 			w_sum += w;
 			sum_d +=  w*this->D[a_idx];
 	      }
@@ -119,9 +123,15 @@ float SDF::interpolate_distance(Vector3d& world_coordinates){
 	return sum_d / w_sum;
 }
 void SDF::interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& color){
-	float i = ((global_coords.x/this->width)*m -0.5);
-	float j = ((global_coords.y/this->height)*m -0.5);
-	float k = ((global_coords.z/this->depth)*m -0.5);
+	Vector3d global_coordinates;
+	Vector3d voxel_coordinates;
+	global_coordinates(0) = global_coords.x;
+	global_coordinates(1) = global_coords.y;
+	global_coordinates(2) = global_coords.z;
+	get_voxel_coordinates(global_coordinates, voxel_coordinates);
+	float i = voxel_coordinates(0);
+	float j = voxel_coordinates(1);
+	float k = voxel_coordinates(2);
 	float w_sum = 0.0;
 	Vector3d sum_c;
 	color.r = 0.0;
@@ -135,16 +145,16 @@ void SDF::interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& c
 	      current_voxel(0) = ((int) i)+i_offset;
 	      current_voxel(1) = ((int) j)+j_offset;
 	      current_voxel(2) = ((int) k)+k_offset;
-	      float dist = (current_voxel(0)-i)*(current_voxel(0)-i) + (current_voxel(1)-j)*(current_voxel(1)-j)+ (current_voxel(2)-k)*(current_voxel(2)-k);
+	      float volume = fabs(current_voxel(0)-i) + fabs(current_voxel(1)-j)+ fabs(current_voxel(2)-k);
 	      int a_idx = get_array_index(current_voxel);
 	      if (a_idx != -1){
-		  if (dist < 0.001){
+		  if (volume < 0.00001){
 		    color.r =  this->R[a_idx];
 		    color.g =  this->G[a_idx];
 		    color.b =  this->B[a_idx];
 		    return;
 		  }
-		  float w = 1.0/dist;
+		  float w = 1.0/volume;
 		  w_sum += w;
 		  color.r +=  w*this->R[a_idx];
 		  color.g +=  w*this->G[a_idx];
@@ -171,15 +181,23 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 			Vector2d image_point;
 			this->get_voxel_coordinates(idx,voxel_coordinates);
 			this->get_global_coordinates(voxel_coordinates, global_coordinates);
+			
 			camera_tracking->project_world_to_camera(global_coordinates, camera_point);
 			camera_tracking->project_camera_to_image_plane(camera_point, image_point);
+			
 			float z_voxel = camera_point(2);
-			int i = image_point(0);
-			int j = image_point(1);
-			if (i < cloud_filtered->width && j < cloud_filtered->height && i> 0 && j > 0){
-				int cloud_idx = j*cloud_filtered->width + i;
+			int i_image = image_point(0);
+			int j_image = image_point(1);
+			if (i < cloud_filtered->width && j_image < cloud_filtered->height && i_image> 0 && j_image > 0){
+				int cloud_idx = j_image*cloud_filtered->width + i_image;
 				if (!isnan(cloud_filtered->points[cloud_idx].x) && !isnan(cloud_filtered->points[cloud_idx].y)){
-					float z_img =  cloud_filtered->points[cloud_idx].z;
+					cout <<" image point: \n"<< image_point << endl;
+					Vector3d global_coordinates_img, camera_point_img;
+					global_coordinates_img(0) =  cloud_filtered->points[cloud_idx].x;
+					global_coordinates_img(1) =  cloud_filtered->points[cloud_idx].y;
+					global_coordinates_img(2) =  cloud_filtered->points[cloud_idx].z;
+					camera_tracking->project_world_to_camera(global_coordinates_img, camera_point_img);
+					float z_img = camera_point_img(2);
 					float w_old = W[idx];
 					float d_new = (z_voxel-z_img);
 					float w_new = 1.0;

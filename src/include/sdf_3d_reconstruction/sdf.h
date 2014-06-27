@@ -93,7 +93,7 @@ public:
 	 *  input: global_coordinates
 	 *  output: voxel_coordinates
 	 */
-	void get_voxel_coordinates(Vector3d& global_coordinates, Vector3i& voxel_coordinates);
+	void get_voxel_coordinates(Vector3d& global_coordinates, Vector3d& voxel_coordinates);
 	/*
 	 *  input: globale coordinate x,y,z
 	 *  output: voxel_coordinates i,j,k
