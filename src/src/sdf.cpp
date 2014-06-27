@@ -189,31 +189,38 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 			int i_image = image_point(0);
 			int j_image = image_point(1);
 			if (i_image < cloud_filtered->width && j_image < cloud_filtered->height && i_image> 0 && j_image > 0){
-				int cloud_idx = j_image*cloud_filtered->width + i_image;
-				if (!isnan(cloud_filtered->points[cloud_idx].x) && !isnan(cloud_filtered->points[cloud_idx].y)){
-					cout <<" image point: \n"<< image_point << endl;
+				//int cloud_idx = j_image*cloud_filtered->width + i_image;
+				pcl::PointXYZRGB point = cloud_filtered->at(i_image, j_image);
+				if (!isnan(point.x) && !isnan(point.y)){
+					
 					Vector3d global_coordinates_img, camera_point_img;
-					global_coordinates_img(0) =  cloud_filtered->points[cloud_idx].x;
-					global_coordinates_img(1) =  cloud_filtered->points[cloud_idx].y;
-					global_coordinates_img(2) =  cloud_filtered->points[cloud_idx].z;
+					global_coordinates_img(0) =  point.x;
+					global_coordinates_img(1) =  point.y;
+					global_coordinates_img(2) =  point.z;
 					camera_tracking->project_world_to_camera(global_coordinates_img, camera_point_img);
-					float z_img = camera_point_img(2);
-					float w_old = W[idx];
-					float d_new = (z_voxel-z_img);
+					
+					
+					Vector3d d_vect = (camera_point - camera_point_img);
+					float d_new = d_vect.norm();
+					if (d_vect(2) > 0){
+					  d_new = -1*d_new;
+					}
+					//cout << d_new << endl;
 					float w_new = 1.0;
-					if (d_new > distance_delta){
+					/*if (d_new > distance_delta){
 						d_new = distance_delta;
 						w_new = 0.1;
 					}
 					if (d_new < -distance_delta){
 						d_new = -distance_delta;
 						w_new = 0.1;
-					}
+					}*/
+					float w_old = W[idx];
 					W[idx] = w_old + w_new;
 					D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
-					R[idx] = w_old/W[idx] * R[idx] + w_new/W[idx] * cloud_filtered->points[cloud_idx].r;
-					G[idx] = w_old/W[idx] * G[idx] + w_new/W[idx] * cloud_filtered->points[cloud_idx].g;
-					B[idx] = w_old/W[idx] * B[idx] + w_new/W[idx] * cloud_filtered->points[cloud_idx].b;
+					R[idx] = w_old/W[idx] * R[idx] + w_new/W[idx] * point.r;
+					G[idx] = w_old/W[idx] * G[idx] + w_new/W[idx] * point.g;
+					B[idx] = w_old/W[idx] * B[idx] + w_new/W[idx] * point.b;
 				}
 			}
 		}

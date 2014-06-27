@@ -74,7 +74,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
-	sdf = new SDF(33, 4.0, 4.0, 4.0, 0.3);
+	sdf = new SDF(200, 4.0, 4.0, 4.0, 0.3);
 	//sdf->create_circle(200, 0, 0.0, 0.0);
 	//std::string visualeOutput;
 	//ros::param::get("~visualOutput", visualeOutput);
