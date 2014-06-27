@@ -39,7 +39,7 @@ private:
 		message_filters::Subscriber<sensor_msgs::PointCloud2> kinect_pcl_sub;
 		message_filters::Subscriber<sensor_msgs::Image> kinect_depth_sub;
 		ros::Subscriber pcl;
-
+		
 
 
 protected:

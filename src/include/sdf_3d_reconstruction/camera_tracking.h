@@ -21,14 +21,14 @@ private:
 	 */
 	Eigen::Matrix3d rot;
 	Eigen::Matrix3d rot_inv;
-	/*
-	 * current translation
-	 */
-	Eigen::Vector3d trans;
 	Eigen::Vector3d rot_inv_trans;
 public:
 	Eigen::Matrix3d K;
 	ros::Subscriber cam_info;
+	/*
+	 * current translation
+	 */
+	Eigen::Vector3d trans;
 	bool isKFilled;
 	/**
 	 *  standard constructor

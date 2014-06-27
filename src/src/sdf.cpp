@@ -1,10 +1,11 @@
 #include "sdf_3d_reconstruction/sdf.h"
+#include "../include/sdf_3d_reconstruction/camera_tracking.h"
 
 using namespace Eigen;
 /*
  * Constructror destructor 
  */
-SDF::SDF(int m, float width, float height, float depth, float distance_delta): m(m), width(width),height(height), depth(depth), distance_delta(distance_delta){
+SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, float distance_delta, float distance_epsilon): m(m), width(width),height(height), depth(depth),sdf_origin(sdf_origin), distance_delta(distance_delta), distance_epsilon(distance_epsilon){
 	D = new float[this->m * this->m * this->m];
 	W = new float[this->m * this->m * this->m];
 	R = new float[this->m * this->m * this->m];
@@ -38,7 +39,7 @@ int SDF::get_number_of_voxels() {
 inline int SDF::get_array_index(Vector3i& voxel_coordinates){
 	int _idx = this->m*this->m*voxel_coordinates(2)+this->m*voxel_coordinates(1)+voxel_coordinates(0);
 	if (_idx < 0 || _idx >= this->m*this->m*this->m){
-	  std::cout << "ooo"<<std::endl;
+	  std::cout << "ooo \n"<< voxel_coordinates << std::endl;
 	  _idx = -1;
 	}
 	  
@@ -53,15 +54,15 @@ inline void SDF::get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinate
 }
 // auf dem Blatt verifiziert durch Oier und Joel
 void SDF::get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_coordinates){
-	global_coordinates(0) = (this->width/((float)m)) * (voxel_coordinates(0)+0.5);
-	global_coordinates(1) = (this->height/((float)m)) * (voxel_coordinates(1)+0.5);
-	global_coordinates(2) = (this->depth/((float)m)) * (voxel_coordinates(2)+0.5);
+	global_coordinates(0) = (this->width/((float)m)) * (voxel_coordinates(0)+0.5)+this->sdf_origin(0);
+	global_coordinates(1) = (this->height/((float)m)) * (voxel_coordinates(1)+0.5)+this->sdf_origin(1);
+	global_coordinates(2) = (this->depth/((float)m)) * (voxel_coordinates(2)+0.5)+this->sdf_origin(2);
 }
 
 void SDF::get_voxel_coordinates(Vector3d& global_coordinates, Vector3d& voxel_coordinates){
-	voxel_coordinates(0) = ((global_coordinates(0)/this->width)*m -0.5);
-	voxel_coordinates(1) = ((global_coordinates(1)/this->height)*m -0.5);
-	voxel_coordinates(2) = ((global_coordinates(2)/this->depth)*m -0.5);
+	voxel_coordinates(0) = (((global_coordinates(0)-this->sdf_origin(0))/this->width)*m -0.5);
+	voxel_coordinates(1) = (((global_coordinates(1)-this->sdf_origin(1))/this->height)*m -0.5);
+	voxel_coordinates(2) = (((global_coordinates(2)-this->sdf_origin(2))/this->depth)*m -0.5);
 }
 
 void SDF::create_circle(float radius, float center_x, float center_y,
@@ -122,7 +123,7 @@ float SDF::interpolate_distance(Vector3d& world_coordinates){
 	}
 	return sum_d / w_sum;
 }
-void SDF::interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& color){
+void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::ColorRGBA& color){
 	Vector3d global_coordinates;
 	Vector3d voxel_coordinates;
 	global_coordinates(0) = global_coords.x;
@@ -189,8 +190,9 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 			int i_image = image_point(0);
 			int j_image = image_point(1);
 			if (i_image < cloud_filtered->width && j_image < cloud_filtered->height && i_image> 0 && j_image > 0){
-				//int cloud_idx = j_image*cloud_filtered->width + i_image;
+				
 				pcl::PointXYZRGB point = cloud_filtered->at(i_image, j_image);
+				pcl::Normal normal = normals->at(i_image, j_image);
 				if (!isnan(point.x) && !isnan(point.y)){
 					
 					Vector3d global_coordinates_img, camera_point_img;
@@ -198,7 +200,8 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 					global_coordinates_img(1) =  point.y;
 					global_coordinates_img(2) =  point.z;
 					camera_tracking->project_world_to_camera(global_coordinates_img, camera_point_img);
-					
+					Vector3d normal_eigen(normal.normal_x,normal.normal_y,normal.normal_z);
+					std::cout <<(global_coordinates_img - camera_tracking->trans).dot(normal_eigen) << std::endl;;
 					
 					Vector3d d_vect = (camera_point - camera_point_img);
 					float d_new = d_vect.norm();
@@ -207,20 +210,20 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 					}
 					//cout << d_new << endl;
 					float w_new = 1.0;
-					/*if (d_new > distance_delta){
-						d_new = distance_delta;
-						w_new = 0.1;
+					if (d_new >= this->distance_epsilon && d_new <= this->distance_delta){
+					   w_new = exp(-0.5*(d_new - this->distance_epsilon)*(d_new - this->distance_epsilon));
 					}
-					if (d_new < -distance_delta){
-						d_new = -distance_delta;
-						w_new = 0.1;
-					}*/
+					if (d_new> distance_delta){
+					  w_new = 0.0;
+					}
 					float w_old = W[idx];
 					W[idx] = w_old + w_new;
-					D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
-					R[idx] = w_old/W[idx] * R[idx] + w_new/W[idx] * point.r;
-					G[idx] = w_old/W[idx] * G[idx] + w_new/W[idx] * point.g;
-					B[idx] = w_old/W[idx] * B[idx] + w_new/W[idx] * point.b;
+					if (W[idx] > 0){
+						D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
+						R[idx] = w_old/W[idx] * R[idx] + w_new/W[idx] * point.r;	
+						G[idx] = w_old/W[idx] * G[idx] + w_new/W[idx] * point.g;
+						B[idx] = w_old/W[idx] * B[idx] + w_new/W[idx] * point.b;
+					}
 				}
 			}
 		}
@@ -244,8 +247,13 @@ void SDF::visualize()
 	mc->performReconstruction (cloud, polygons);
 	if (ros::ok())
 	{
-		//std::cout << "H"<<std::endl;
-
+		/*for (int i = 0; i < polygons.size (); i++)
+		{
+		    std::cout << "  " << polygons[i] << std::endl;
+		}*/
+	
+		//std::cout << polygons<<std::endl;
+		
 		visualization_msgs::Marker marker;
 		marker.header.frame_id = "/world";
 		marker.header.stamp = ros::Time();
@@ -273,21 +281,21 @@ void SDF::visualize()
 			//std::cout << width << ", " << height << ", "<<depth<<": "<<std::endl;
 			//std::cout <<cloud.points[i*3].x<<", "<<cloud.points[i*3].y<<", "<<cloud.points[i*3].z<<std::endl;
 			geometry_msgs::Point p1;
-			p1.x = cloud.points[i*3].x;
-			p1.y = cloud.points[i*3].y;
-			p1.z = cloud.points[i*3].z;
+			p1.x = cloud.points[i*3].x+this->sdf_origin(0);
+			p1.y = cloud.points[i*3].y+this->sdf_origin(1);
+			p1.z = cloud.points[i*3].z+this->sdf_origin(2);
 			//std::cout << p1.x << ", " << p1.y << ", "<<p1.z<<std::endl;
 	      
 			geometry_msgs::Point p2;
-			p2.x = cloud.points[i*3+1].x;
-			p2.y = cloud.points[i*3+1].y;
-			p2.z = cloud.points[i*3+1].z;
+			p2.x = cloud.points[i*3+1].x+this->sdf_origin(0);
+			p2.y = cloud.points[i*3+1].y+this->sdf_origin(1);
+			p2.z = cloud.points[i*3+1].z+this->sdf_origin(2);
 			//std::cout << p2.x << ", " << p2.y << ", "<<p2.z<<std::endl;
 			
 			geometry_msgs::Point p3;
-			p3.x = cloud.points[i*3+2].x;
-			p3.y = cloud.points[i*3+2].y;
-			p3.z = cloud.points[i*3+2].z;
+			p3.x = cloud.points[i*3+2].x+this->sdf_origin(0);
+			p3.y = cloud.points[i*3+2].y+this->sdf_origin(1);
+			p3.z = cloud.points[i*3+2].z+this->sdf_origin(2);
 			//std::cout << p3.x << ", " << p3.y << ", "<<p3.z<<std::endl;
 			
 			marker.points.push_back(p1);
@@ -295,11 +303,11 @@ void SDF::visualize()
 			marker.points.push_back(p3);
 	      
 			std_msgs::ColorRGBA c;
-			this->interpolate_color(cloud.points[i*3],c);
+			this->interpolate_color(p1,c);
 			marker.colors.push_back(c);
-			this->interpolate_color(cloud.points[i*3+1],c);
+			this->interpolate_color(p2,c);
 			marker.colors.push_back(c);
-			this->interpolate_color(cloud.points[i*3+2],c);
+			this->interpolate_color(p3,c);
 			marker.colors.push_back(c);
 		  
 		}

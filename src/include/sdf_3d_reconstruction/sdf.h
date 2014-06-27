@@ -37,7 +37,7 @@ class SDF {
 private:
 	int m;
 	//width
-	float width, height, depth, distance_delta;
+	float width, height, depth, distance_delta,distance_epsilon;
 	//Distance array
 	float *D;
 	//Weight array
@@ -53,13 +53,14 @@ private:
 	uint32_t shape_type;
 	ros::Rate* r;
 	void register_visualization();
+	Vector3d sdf_origin;
 
 
 public:
 	/**
 	 *  standard constructor
 	 */
-	SDF(int m, float width, float height, float depth, float distance_delta);
+	SDF(int m, float width, float height, float depth, Vector3d& sdf_origin, float distance_delta, float distance_epsilon);
 	virtual ~SDF();
 	
 	/**
@@ -70,7 +71,7 @@ public:
 	/**
 	 * gets interpolated color with world coordinates.
 	 */
-	void interpolate_color(pcl::PointXYZ& global_coords, std_msgs::ColorRGBA& color);
+	void interpolate_color(geometry_msgs::Point& global_coords, std_msgs::ColorRGBA& color);
 	/**
 	 * helper function for testing issues
 	 */
