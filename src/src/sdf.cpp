@@ -15,9 +15,9 @@ SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, flo
 	for (int i = 0; i<number_of_voxels; i++) {
 		D[i] = width+height+depth;
 		W[i] = 0;
-		R[i] = 0;
-		G[i] = 0;
-		B[i] = 0;
+		R[i] = 0.4;
+		G[i] = 0.4;
+		B[i] = 0.4;
 	}
 	this->register_visualization();
 }
@@ -37,7 +37,7 @@ int SDF::get_number_of_voxels() {
 }
 
 inline int SDF::get_array_index(Vector3i& voxel_coordinates){
-	int _idx = this->m*this->m*voxel_coordinates(2)+this->m*voxel_coordinates(1)+voxel_coordinates(0);
+	int _idx = this->m*this->m*voxel_coordinates(0)+this->m*voxel_coordinates(1)+voxel_coordinates(2);
 	if (_idx < 0 || _idx >= this->m*this->m*this->m){
 	  std::cout << "ooo \n"<< voxel_coordinates << std::endl;
 	  _idx = -1;
@@ -47,10 +47,12 @@ inline int SDF::get_array_index(Vector3i& voxel_coordinates){
 }
 
 // auf dem Blatt verifiziert durch Oier und Joel
+// boost multidimensionales array
+// TODO umtausche 2 -> 0
 inline void SDF::get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinates){
-	voxel_coordinates(0) = (int) array_idx%this->m;
+	voxel_coordinates(2) = (int) array_idx%this->m;
 	voxel_coordinates(1) = (int) (array_idx % (this->m*this->m))/this->m;
-	voxel_coordinates(2) = (int) (array_idx/(this->m*this->m));
+	voxel_coordinates(0) = (int) (array_idx/(this->m*this->m));
 }
 // auf dem Blatt verifiziert durch Oier und Joel
 void SDF::get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_coordinates){
@@ -182,7 +184,6 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 			Vector2d image_point;
 			this->get_voxel_coordinates(idx,voxel_coordinates);
 			this->get_global_coordinates(voxel_coordinates, global_coordinates);
-			
 			camera_tracking->project_world_to_camera(global_coordinates, camera_point);
 			camera_tracking->project_camera_to_image_plane(camera_point, image_point);
 			
@@ -193,15 +194,24 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 				
 				pcl::PointXYZRGB point = cloud_filtered->at(i_image, j_image);
 				pcl::Normal normal = normals->at(i_image, j_image);
-				if (!isnan(point.x) && !isnan(point.y)){
+				//TODO z >~ 0.3, z <~ 4
+				if (!isnan(point.x) && !isnan(point.y) && !isnan(normal.normal_x) && !isnan(normal.normal_y) && !isnan(normal.normal_z)){
 					
-					Vector3d global_coordinates_img, camera_point_img;
-					global_coordinates_img(0) =  point.x;
-					global_coordinates_img(1) =  point.y;
-					global_coordinates_img(2) =  point.z;
-					camera_tracking->project_world_to_camera(global_coordinates_img, camera_point_img);
-					Vector3d normal_eigen(normal.normal_x,normal.normal_y,normal.normal_z);
-					std::cout <<(global_coordinates_img - camera_tracking->trans).dot(normal_eigen) << std::endl;;
+					Vector3d camera_point_img;
+					camera_point_img(0) =  point.x;
+					camera_point_img(1) =  point.y;
+					camera_point_img(2) =  point.z;
+					std::cout << "------------------------------"<<std::endl;
+					std::cout << "voxel:\n"<<  voxel_coordinates<<std::endl;
+					std::cout << "camera_point:\n"<<  camera_point<<std::endl;
+					std::cout << "camera_point_img:\n"<<camera_point_img<<std::endl;
+					std::cout << "idx:\n"<<idx<<std::endl;
+					std::cout << "idx-calc:\n"<<get_array_index(voxel_coordinates)<<std::endl;
+					std::cout << "trans:\n"<<camera_tracking->trans<<std::endl;
+					std::cout << "------------------------------"<<std::endl;
+					//TODO ist schon im camera frame
+					//camera_tracking->project_world_to_camera(global_coordinates_img, camera_point_img);
+					
 					
 					Vector3d d_vect = (camera_point - camera_point_img);
 					float d_new = d_vect.norm();
@@ -215,15 +225,24 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 					}
 					if (d_new> distance_delta){
 					  w_new = 0.0;
+					  continue;
+					}
+					if (d_new < -distance_delta){
+					  d_new = -distance_delta;
 					}
 					float w_old = W[idx];
 					W[idx] = w_old + w_new;
-					if (W[idx] > 0){
-						D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
-						R[idx] = w_old/W[idx] * R[idx] + w_new/W[idx] * point.r;	
-						G[idx] = w_old/W[idx] * G[idx] + w_new/W[idx] * point.g;
-						B[idx] = w_old/W[idx] * B[idx] + w_new/W[idx] * point.b;
-					}
+					
+					D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
+					
+					Vector3d normal_eigen(normal.normal_x,normal.normal_y,normal.normal_z);
+					Vector3d cam_vect(0,0,1);
+					float scalar = (cam_vect - camera_tracking->trans).dot(normal_eigen);
+					std::cout <<scalar << std::endl;;
+					
+					R[idx] = w_old/W[idx] * R[idx] + w_new/W[idx] * point.r ;	
+					G[idx] = w_old/W[idx] * G[idx] + w_new/W[idx] * point.g;
+					B[idx] = w_old/W[idx] * B[idx] + w_new/W[idx] * point.b;
 				}
 			}
 		}

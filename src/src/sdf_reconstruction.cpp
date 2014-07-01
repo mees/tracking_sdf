@@ -40,9 +40,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	//cv::waitKey(3);
 
 
-	
-	tf::TransformListener listener;
-	tf::StampedTransform transform;
+	//TODO als member variable erzeugen
 	
 	try {
 		listener.waitForTransform("/world", "/openni_rgb_optical_frame",
@@ -51,6 +49,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 				ros::Time(), transform);
 		Vector3d trans;
 		Eigen::Quaterniond rot;
+		//TODO: als tf belassen?
 		tf::vectorTFToEigen(transform.getOrigin(),trans);
 		tf::quaternionTFToEigen(transform.getRotation(), rot);
 		Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
@@ -73,11 +72,12 @@ SDF_Reconstruction::SDF_Reconstruction() {
 //    kinect_depth_sub.subscribe(nh, "/camera/depth/image", 1);
 //    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1),kinect_pcl_sub, kinect_depth_sub);
 //    sync.registerCallback(boost::bind(&SDF_Reconstruction::kinect_callback, this, _1, _2));
+  
         this->camera_tracking = new CameraTracking();
 	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
-	
+	//Ros::Publisher(topic n)
 	Vector3d sdf_origin(-1, -1, -1);
 	
 		     //m , width, height, depth, treshold

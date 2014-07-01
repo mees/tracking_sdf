@@ -39,8 +39,8 @@ private:
 		message_filters::Subscriber<sensor_msgs::PointCloud2> kinect_pcl_sub;
 		message_filters::Subscriber<sensor_msgs::Image> kinect_depth_sub;
 		ros::Subscriber pcl;
-		
-
+		tf::TransformListener listener;
+		tf::StampedTransform transform;
 
 protected:
 		//void camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_camera_info);

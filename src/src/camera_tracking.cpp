@@ -43,7 +43,7 @@ void CameraTracking::project_world_to_camera(Vector3d& world_point, Vector3d& ca
 //todo validate
 void CameraTracking::set_camera_transformation(Eigen::Matrix3d rot, Eigen::Vector3d trans){
 	this->rot = rot;
-	this->rot_inv = rot.inverse();
+	this->rot_inv = rot.transpose();
 	this->trans= trans;
 	this->rot_inv_trans = -1* (rot_inv * trans);
 }

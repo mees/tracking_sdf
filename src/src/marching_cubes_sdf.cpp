@@ -192,15 +192,42 @@ pcl::MarchingCubesSDF::getNeighborList1D (std::vector<float> &leaf,
                                                 Eigen::Vector3i &index3d)
 {
   leaf = std::vector<float> (8, 0.0f);
-
-  leaf[0] = getGridValue (index3d);
-  leaf[1] = getGridValue (index3d + Eigen::Vector3i (1, 0, 0));
-  leaf[2] = getGridValue (index3d + Eigen::Vector3i (1, 0, 1));
-  leaf[3] = getGridValue (index3d + Eigen::Vector3i (0, 0, 1));
-  leaf[4] = getGridValue (index3d + Eigen::Vector3i (0, 1, 0));
-  leaf[5] = getGridValue (index3d + Eigen::Vector3i (1, 1, 0));
-  leaf[6] = getGridValue (index3d + Eigen::Vector3i (1, 1, 1));
-  leaf[7] = getGridValue (index3d + Eigen::Vector3i (0, 1, 1));
+  Eigen::Vector3i pos = index3d;
+  int g0 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
+  pos = index3d + Eigen::Vector3i (1, 0, 0);
+  int g1 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
+  pos = index3d + Eigen::Vector3i (1, 0, 1);
+  int g2 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
+  pos = index3d + Eigen::Vector3i (0, 0, 1);
+  int g3 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
+  pos = index3d + Eigen::Vector3i (0, 1, 0);
+  int g4 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
+  pos = index3d + Eigen::Vector3i (1, 1, 0);
+  int g5 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
+  pos = index3d + Eigen::Vector3i (1, 1, 1);
+  int g6 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
+  pos = index3d + Eigen::Vector3i (0, 1, 1);
+  int g7 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
+  if (W_[g0] >0 &&W_[g1] >0 &&W_[g2] >0 &&W_[g3] >0 &&W_[g4] >0 &&W_[g5] >0 &&W_[g6] >0 &&W_[g7] >0 ){
+	leaf[0] = grid_[g0];
+	leaf[1] = grid_[g1];
+	leaf[2] = grid_[g2];
+	leaf[3] = grid_[g3];
+	leaf[4] = grid_[g4];
+	leaf[5] = grid_[g5];
+	leaf[6] = grid_[g6];
+	leaf[7] = grid_[g7];
+  }
+  else{
+    	leaf[0] = 1.0;
+	leaf[1] = 1.0;
+	leaf[2] = 1.0;
+	leaf[3] = 1.0;
+	leaf[4] = 1.0;
+	leaf[5] = 1.0;
+	leaf[6] = 1.0;
+	leaf[7] = 1.0;
+  }
 }
 
 
@@ -215,7 +242,6 @@ pcl::MarchingCubesSDF::getGridValue (Eigen::Vector3i pos)
     return -1.0f;
   if (pos[2] < 0 || pos[2] >= res_z_)
     return -1.0f;
-
   return grid_[pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2]];
 }
 

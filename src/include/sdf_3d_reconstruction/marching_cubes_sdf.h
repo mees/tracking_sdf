@@ -417,8 +417,12 @@ namespace pcl
       inline void
       setGrid(float *grid)
       {
-	std::cout << "GRID" <<grid[0]<<std::endl;
 	grid_ = grid;
+      }
+      inline void
+      setW(float *W)
+      {
+	W_ = W;
       }
       /** \brief Extract the surface.
         * \param[out] output the resultant polygonal mesh
@@ -440,6 +444,7 @@ namespace pcl
     protected:
       /** \brief The data structure storing the 3D grid */
       float *grid_;
+      float *W_;
 
       /** \brief The grid resolution */
       int res_x_, res_y_, res_z_;
