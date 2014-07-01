@@ -208,7 +208,7 @@ pcl::MarchingCubesSDF::getNeighborList1D (std::vector<float> &leaf,
   int g6 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
   pos = index3d + Eigen::Vector3i (0, 1, 1);
   int g7 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
-  if (W_[g0] >0 &&W_[g1] >0 &&W_[g2] >0 &&W_[g3] >0 &&W_[g4] >0 &&W_[g5] >0 &&W_[g6] >0 &&W_[g7] >0 ){
+  if (W_[g0] > 0 && W_[g1] > 0 && W_[g2] > 0 && W_[g3] > 0 && W_[g4] > 0 && W_[g5] > 0 && W_[g6] > 0 && W_[g7] >0 ){
 	leaf[0] = grid_[g0];
 	leaf[1] = grid_[g1];
 	leaf[2] = grid_[g2];
@@ -219,14 +219,14 @@ pcl::MarchingCubesSDF::getNeighborList1D (std::vector<float> &leaf,
 	leaf[7] = grid_[g7];
   }
   else{
-    	leaf[0] = 1.0;
-	leaf[1] = 1.0;
-	leaf[2] = 1.0;
-	leaf[3] = 1.0;
-	leaf[4] = 1.0;
-	leaf[5] = 1.0;
-	leaf[6] = 1.0;
-	leaf[7] = 1.0;
+    	leaf[0] =  grid_[g0];
+	leaf[1] =  grid_[g0];
+	leaf[2] =  grid_[g0];
+	leaf[3] =  grid_[g0];
+	leaf[4] =  grid_[g0];
+	leaf[5] =  grid_[g0];
+	leaf[6] =  grid_[g0];
+	leaf[7] =  grid_[g0];
   }
 }
 

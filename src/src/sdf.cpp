@@ -8,16 +8,20 @@ using namespace Eigen;
 SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, float distance_delta, float distance_epsilon): m(m), width(width),height(height), depth(depth),sdf_origin(sdf_origin), distance_delta(distance_delta), distance_epsilon(distance_epsilon){
 	D = new float[this->m * this->m * this->m];
 	W = new float[this->m * this->m * this->m];
+	Color_W = new float[this->m * this->m * this->m];
 	R = new float[this->m * this->m * this->m];
 	G = new float[this->m * this->m * this->m];
 	B = new float[this->m * this->m * this->m];
+	
 	number_of_voxels = m * m * m;
 	for (int i = 0; i<number_of_voxels; i++) {
 		D[i] = width+height+depth;
+		Color_W[i] = 0;
 		W[i] = 0;
 		R[i] = 0.4;
 		G[i] = 0.4;
 		B[i] = 0.4;
+		
 	}
 	this->register_visualization();
 }
@@ -48,11 +52,11 @@ inline int SDF::get_array_index(Vector3i& voxel_coordinates){
 
 // auf dem Blatt verifiziert durch Oier und Joel
 // boost multidimensionales array
-// TODO umtausche 2 -> 0
+
 inline void SDF::get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinates){
-	voxel_coordinates(2) = (int) array_idx%this->m;
 	voxel_coordinates(1) = (int) (array_idx % (this->m*this->m))/this->m;
 	voxel_coordinates(0) = (int) (array_idx/(this->m*this->m));
+	voxel_coordinates(2) = (int) array_idx%this->m;
 }
 // auf dem Blatt verifiziert durch Oier und Joel
 void SDF::get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_coordinates){
@@ -110,7 +114,7 @@ float SDF::interpolate_distance(Vector3d& world_coordinates){
 	      current_voxel(0) = ((int) i)+i_offset;
 	      current_voxel(1) = ((int) j)+j_offset;
 	      current_voxel(2) = ((int) k)+k_offset;
-	      float volume = fabs(current_voxel(0)-i) + fabs(current_voxel(1)-j)+ fabs(current_voxel(2)-k);
+	      float volume = fabs(current_voxel(0)-i) * fabs(current_voxel(1)-j)* fabs(current_voxel(2)-k);
 	      int a_idx = get_array_index(current_voxel);
 	      if (a_idx != -1){
 			if (volume < 0.00001){
@@ -148,7 +152,7 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
 	      current_voxel(0) = ((int) i)+i_offset;
 	      current_voxel(1) = ((int) j)+j_offset;
 	      current_voxel(2) = ((int) k)+k_offset;
-	      float volume = fabs(current_voxel(0)-i) + fabs(current_voxel(1)-j)+ fabs(current_voxel(2)-k);
+	      float volume = fabs(current_voxel(0)-i) * fabs(current_voxel(1)-j)* fabs(current_voxel(2)-k);
 	      int a_idx = get_array_index(current_voxel);
 	      if (a_idx != -1){
 		  if (volume < 0.00001){
@@ -201,21 +205,25 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 					camera_point_img(0) =  point.x;
 					camera_point_img(1) =  point.y;
 					camera_point_img(2) =  point.z;
-					std::cout << "------------------------------"<<std::endl;
+					/*std::cout << "------------------------------"<<std::endl;
 					std::cout << "voxel:\n"<<  voxel_coordinates<<std::endl;
 					std::cout << "camera_point:\n"<<  camera_point<<std::endl;
 					std::cout << "camera_point_img:\n"<<camera_point_img<<std::endl;
+					std::cout << "ind_ratios:\n"<<  camera_point(0)/camera_point_img(0)<<std::endl;
+					std::cout << "ind_ratios:\n"<<  camera_point(1)/camera_point_img(1)<<std::endl;
+					std::cout << "ind_ratios:\n"<<  camera_point(2)/camera_point_img(2)<<std::endl;
 					std::cout << "idx:\n"<<idx<<std::endl;
 					std::cout << "idx-calc:\n"<<get_array_index(voxel_coordinates)<<std::endl;
+					
 					std::cout << "trans:\n"<<camera_tracking->trans<<std::endl;
-					std::cout << "------------------------------"<<std::endl;
+					std::cout << "------------------------------"<<std::endl;*/
 					//TODO ist schon im camera frame
 					//camera_tracking->project_world_to_camera(global_coordinates_img, camera_point_img);
 					
 					
 					Vector3d d_vect = (camera_point - camera_point_img);
 					float d_new = d_vect.norm();
-					if (d_vect(2) > 0){
+					if (d_vect(2) < 0){
 					  d_new = -1*d_new;
 					}
 					//cout << d_new << endl;
@@ -223,7 +231,7 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 					if (d_new >= this->distance_epsilon && d_new <= this->distance_delta){
 					   w_new = exp(-0.5*(d_new - this->distance_epsilon)*(d_new - this->distance_epsilon));
 					}
-					if (d_new> distance_delta){
+					if (d_new > distance_delta){
 					  w_new = 0.0;
 					  continue;
 					}
@@ -238,11 +246,13 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 					Vector3d normal_eigen(normal.normal_x,normal.normal_y,normal.normal_z);
 					Vector3d cam_vect(0,0,1);
 					float scalar = (cam_vect - camera_tracking->trans).dot(normal_eigen);
-					std::cout <<scalar << std::endl;;
-					
-					R[idx] = w_old/W[idx] * R[idx] + w_new/W[idx] * point.r ;	
-					G[idx] = w_old/W[idx] * G[idx] + w_new/W[idx] * point.g;
-					B[idx] = w_old/W[idx] * B[idx] + w_new/W[idx] * point.b;
+					//std::cout <<scalar << std::endl;;
+					w_old = Color_W[idx];
+					w_new = w_new * scalar;
+					Color_W[idx] = w_old + w_new;
+					R[idx] = w_old/Color_W[idx] * R[idx] + w_new/Color_W[idx] * point.r ;	
+					G[idx] = w_old/Color_W[idx] * G[idx] + w_new/Color_W[idx] * point.g;
+					B[idx] = w_old/Color_W[idx] * B[idx] + w_new/Color_W[idx] * point.b;
 				}
 			}
 		}
@@ -262,6 +272,7 @@ void SDF::visualize()
 	mc->setGridResolution (this->m, this->m, this->m);
 	mc->setBBox(this->width, this->height, this->depth);
 	mc->setGrid(this->D);
+	mc->setW(this->W);
 	pcl::PointCloud<pcl::PointXYZ> cloud;
 	mc->performReconstruction (cloud, polygons);
 	if (ros::ok())

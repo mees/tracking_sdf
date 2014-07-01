@@ -12,6 +12,27 @@ float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &C
 //		const sensor_msgs::ImageConstPtr& image_depth) {
 void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr& ros_cloud) {
 	cout<<"callback!"<<endl;
+	try {
+		//listener.waitForTransform("/world", "/openni_rgb_optical_frame",
+		//		ros::Time(), ros::Duration(12.0));
+		listener.lookupTransform("/world", "/openni_rgb_optical_frame",
+				ros::Time(), transform);
+	} catch (tf::TransformException ex) {
+		ROS_ERROR("%s", ex.what());
+		return;
+	}
+	
+	Vector3d trans;
+	Eigen::Quaterniond rot;
+	//TODO: als tf belassen?
+	tf::vectorTFToEigen(transform.getOrigin(),trans);
+	tf::quaternionTFToEigen(transform.getRotation(), rot);
+	Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
+	this->camera_tracking->set_camera_transformation(rotMat, trans);
+	//tf::Quaternion q = transform.getRotation();
+	tf::Vector3 v = transform.getOrigin();
+	cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
+	
 	pcl::PCLPointCloud2 pcl_pc2;
 	pcl_conversions::toPCL(*ros_cloud, pcl_pc2);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr pcl_cloud(
@@ -40,29 +61,14 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	//cv::waitKey(3);
 
 
-	//TODO als member variable erzeugen
 	
-	try {
-		listener.waitForTransform("/world", "/openni_rgb_optical_frame",
-				ros::Time(), ros::Duration(12.0));
-		listener.lookupTransform("/world", "/openni_rgb_optical_frame",
-				ros::Time(), transform);
-		Vector3d trans;
-		Eigen::Quaterniond rot;
-		//TODO: als tf belassen?
-		tf::vectorTFToEigen(transform.getOrigin(),trans);
-		tf::quaternionTFToEigen(transform.getRotation(), rot);
-		Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
-		this->camera_tracking->set_camera_transformation(rotMat, trans);
-		//tf::Quaternion q = transform.getRotation();
-		tf::Vector3 v = transform.getOrigin();
-		cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
+	
+	
+		
 		
 		  sdf->update(this->camera_tracking, cloud_filtered, normals);
 		
-	} catch (tf::TransformException ex) {
-		ROS_ERROR("%s", ex.what());
-	}
+	
 	
 }
 
@@ -78,10 +84,10 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
 	//Ros::Publisher(topic n)
-	Vector3d sdf_origin(-1, -1, -1);
+	Vector3d sdf_origin(-4, -4, -0.2);
 	
 		     //m , width, height, depth, treshold
-	sdf = new SDF(40, 2.0, 2.0, 2.0, sdf_origin,0.3, 0.05);
+	sdf = new SDF(140, 8.0, 8.0, 2.0, sdf_origin,0.3, 0.05);
 	//sdf->create_circle(200, 0, 0.0, 0.0);
 	//std::string visualeOutput;
 	//ros::param::get("~visualOutput", visualeOutput);

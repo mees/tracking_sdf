@@ -42,6 +42,7 @@ private:
 	float *D;
 	//Weight array
 	float *W;
+	float *Color_W;
 	//Red Array
 	float *R;
 	//Green Array

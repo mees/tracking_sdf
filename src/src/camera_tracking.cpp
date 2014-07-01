@@ -35,15 +35,15 @@ void CameraTracking::project_camera_to_image_plane(Vector3d& camera_point, Vecto
 }
 //todo: validate
 void CameraTracking::project_world_to_camera(Vector3d& world_point, Vector3d& camera_point){
-  
-	camera_point(0) = this->rot_inv(0,0) * world_point(0) + this->rot_inv(0,1) * world_point(1) + this->rot_inv(0,2) * world_point(2) + this->rot_inv_trans(0);
-	camera_point(1) = this->rot_inv(1,0) * world_point(0) + this->rot_inv(1,1) * world_point(1) + this->rot_inv(1,2) * world_point(2) + this->rot_inv_trans(1);
-	camera_point(2) = this->rot_inv(2,0) * world_point(0) + this->rot_inv(2,1) * world_point(1) + this->rot_inv(2,2) * world_point(2) + this->rot_inv_trans(2);
+      camera_point = this->rot*world_point + this->rot_inv_trans;
+	//camera_point(0) = this->rot_inv(0,0) * world_point(0) + this->rot_inv(0,1) * world_point(1) + this->rot_inv(0,2) * world_point(2) + this->rot_inv_trans(0);
+	//camera_point(1) = this->rot_inv(1,0) * world_point(0) + this->rot_inv(1,1) * world_point(1) + this->rot_inv(1,2) * world_point(2) + this->rot_inv_trans(1);
+	//camera_point(2) = this->rot_inv(2,0) * world_point(0) + this->rot_inv(2,1) * world_point(1) + this->rot_inv(2,2) * world_point(2) + this->rot_inv_trans(2);
 }
 //todo validate
 void CameraTracking::set_camera_transformation(Eigen::Matrix3d rot, Eigen::Vector3d trans){
 	this->rot = rot;
-	this->rot_inv = rot.transpose();
+	this->rot_inv = rot.inverse();
 	this->trans= trans;
 	this->rot_inv_trans = -1* (rot_inv * trans);
 }
