@@ -198,7 +198,7 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
 		    color.b =  this->B[a_idx];
 		    return;
 		  }
-		  float w = W[a_idx]/volume;
+		  float w = Color_W[a_idx]/volume;
 		  w_sum += w;
 		  color.r +=  w*this->R[a_idx];
 		  color.g +=  w*this->G[a_idx];
@@ -207,9 +207,9 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
 	    }
 	  }
 	}
-	color.r /= w_sum;
-	color.g /= w_sum;
-	color.b /= w_sum;
+	color.r /= w_sum*255.0;
+	color.g /= w_sum*255.0;
+	color.b /= w_sum*255.0;
 }
 
 void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals){
@@ -282,12 +282,14 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 					
 					Vector3d normal_eigen(normal.normal_x,normal.normal_y,normal.normal_z);
 					Vector3d cam_vect(0,0,1);
-					float scalar = (cam_vect - camera_tracking->trans).dot(normal_eigen);
+					float scalar = fabs((cam_vect - camera_tracking->trans).dot(normal_eigen));
+					
 					//std::cout <<scalar << std::endl;;
 					w_old = Color_W[idx];
 					w_new = w_new * scalar;
 					Color_W[idx] = w_old + w_new;
-					R[idx] = w_old/Color_W[idx] * R[idx] + w_new/Color_W[idx] * point.r ;	
+					
+					R[idx] = w_old/Color_W[idx] * R[idx] + w_new/Color_W[idx] * point.r;	
 					G[idx] = w_old/Color_W[idx] * G[idx] + w_new/Color_W[idx] * point.g;
 					B[idx] = w_old/Color_W[idx] * B[idx] + w_new/Color_W[idx] * point.b;
 				}
