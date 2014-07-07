@@ -402,7 +402,7 @@ namespace pcl
         */
       inline void
       setGridResolution (int res_x, int res_y, int res_z)
-      { res_x_ = res_x; res_y_ = res_y; res_z_ = res_z; }
+      { res_x_ = res_x; res_y_ = res_y; res_z_ = res_z; zy_index_offset = res_z* res_y; }
 
 
       /** \brief Method to get the marching cubes grid resolution.
@@ -448,7 +448,7 @@ namespace pcl
 
       /** \brief The grid resolution */
       int res_x_, res_y_, res_z_;
-
+      int zy_index_offset;
       /** \brief Min and max data points. */
       Eigen::Vector4f min_p_, max_p_;
 

@@ -193,21 +193,21 @@ pcl::MarchingCubesSDF::getNeighborList1D (std::vector<float> &leaf,
 {
   leaf = std::vector<float> (8, 0.0f);
   Eigen::Vector3i pos = index3d;
-  int g0 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
-  pos = index3d + Eigen::Vector3i (1, 0, 0);
-  int g1 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
-  pos = index3d + Eigen::Vector3i (1, 0, 1);
-  int g2 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
-  pos = index3d + Eigen::Vector3i (0, 0, 1);
-  int g3 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
-  pos = index3d + Eigen::Vector3i (0, 1, 0);
-  int g4 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
-  pos = index3d + Eigen::Vector3i (1, 1, 0);
-  int g5 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
-  pos = index3d + Eigen::Vector3i (1, 1, 1);
-  int g6 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
-  pos = index3d + Eigen::Vector3i (0, 1, 1);
-  int g7 = pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2];
+  int g0 = pos[0]*zy_index_offset + pos[1]*res_z_ + pos[2];
+  //pos = index3d + Eigen::Vector3i (1, 0, 0);
+  int g1 = g0 + zy_index_offset;
+  //pos = index3d + Eigen::Vector3i (1, 0, 1);
+  int g2 = g1 + 1;
+  //pos = index3d + Eigen::Vector3i (0, 0, 1);
+  int g3 = g0 + 1;
+  //pos = index3d + Eigen::Vector3i (0, 1, 0);
+  int g4 = g0 + res_z_;
+  //pos = index3d + Eigen::Vector3i (1, 1, 0);
+  int g5 = g4 + zy_index_offset;
+  //pos = index3d + Eigen::Vector3i (1, 1, 1);
+  int g6 = g5+1;
+  //pos = index3d + Eigen::Vector3i (0, 1, 1);
+  int g7 = g4+1;
   if (W_[g0] > 0 && W_[g1] > 0 && W_[g2] > 0 && W_[g3] > 0 && W_[g4] > 0 && W_[g5] > 0 && W_[g6] > 0 && W_[g7] >0 ){
 	leaf[0] = grid_[g0];
 	leaf[1] = grid_[g1];
