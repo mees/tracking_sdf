@@ -8,12 +8,17 @@ using namespace Eigen;
 SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, float distance_delta, float distance_epsilon): m(m), width(width),height(height), depth(depth),sdf_origin(sdf_origin), distance_delta(distance_delta), distance_epsilon(distance_epsilon){
 	number_of_voxels = m * m * m;
 	D = new float[number_of_voxels];
-	coords = new Vector3d[number_of_voxels];
+	global_coords = new Vector3d[number_of_voxels];
+	voxel_coords = new Vector3i[number_of_voxels];
 	W = new float[number_of_voxels];
 	Color_W = new float[number_of_voxels];
 	R = new float[number_of_voxels];
 	G = new float[number_of_voxels];
 	B = new float[number_of_voxels];
+	m_squared = m*m;
+	m_div_height = m/height;
+	m_div_width = m/width;
+	m_div_depth = m/depth;
 
 	Vector3i voxel_coordinates;
 	Vector3d global_coordinates;
@@ -26,7 +31,7 @@ SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, flo
 		B[i] = 0.4;
 		get_voxel_coordinates(i, voxel_coordinates);
 		get_global_coordinates(voxel_coordinates, global_coordinates);
-		coords[i] = global_coordinates;
+		global_coords[i] = global_coordinates;
 	}
 	mc = new pcl::MarchingCubesSDF;
 	mc->setIsoLevel (0.0f);
@@ -52,8 +57,8 @@ int SDF::get_number_of_voxels() {
 }
 
 inline int SDF::get_array_index(Vector3i& voxel_coordinates){
-	int _idx = this->m*this->m*voxel_coordinates(0)+this->m*voxel_coordinates(1)+voxel_coordinates(2);
-	if (_idx < 0 || _idx >= this->m*this->m*this->m){
+	int _idx = m_squared*voxel_coordinates(0)+this->m*voxel_coordinates(1)+voxel_coordinates(2);
+	if (_idx < 0 || _idx >= number_of_voxels){
 	  std::cout << "Error in get_array_index \n"<< voxel_coordinates << std::endl;
 	  _idx = -1;
 	}
@@ -77,9 +82,9 @@ void SDF::get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_c
 }
 
 void SDF::get_voxel_coordinates(Vector3d& global_coordinates, Vector3d& voxel_coordinates){
-	voxel_coordinates(0) = (((global_coordinates(0)-this->sdf_origin(0))/this->width)*m -0.5);
-	voxel_coordinates(1) = (((global_coordinates(1)-this->sdf_origin(1))/this->height)*m -0.5);
-	voxel_coordinates(2) = (((global_coordinates(2)-this->sdf_origin(2))/this->depth)*m -0.5);
+	voxel_coordinates(0) = ((global_coordinates(0)-this->sdf_origin(0))*m_div_width -0.5);
+	voxel_coordinates(1) = ((global_coordinates(1)-this->sdf_origin(1))*m_div_height -0.5);
+	voxel_coordinates(2) = ((global_coordinates(2)-this->sdf_origin(2))*m_div_depth -0.5);
 }
 void SDF::create_cuboid(float min_x, float max_x, float min_y, float max_y, float min_z, float max_z){
 	Vector3i voxel_coordinates;
@@ -183,6 +188,7 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
 	global_coordinates(1) = global_coords.y;
 	global_coordinates(2) = global_coords.z;
 	get_voxel_coordinates(global_coordinates, voxel_coordinates);
+
 	float i = voxel_coordinates(0);
 	float j = voxel_coordinates(1);
 	float k = voxel_coordinates(2);
@@ -239,7 +245,7 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 	pcl::PointXYZRGB point;
 	pcl::Normal normal;
 	for (int idx=0;idx<number_of_voxels;idx++){
-				global_coordinates = coords[idx];
+				global_coordinates = global_coords[idx];
 				camera_tracking->project_world_to_camera(global_coordinates, camera_point);
 				camera_tracking->project_camera_to_image_plane(camera_point, image_point);
 				

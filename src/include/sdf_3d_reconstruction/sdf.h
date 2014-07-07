@@ -43,7 +43,7 @@ private:
 	//Weight array
 	float *W;
 
-	Vector3d *coords;
+	Vector3d *global_coords;
 
 	float *Color_W;
 	//Red Array
@@ -59,6 +59,11 @@ private:
 	void register_visualization();
 	Vector3d sdf_origin;
 	pcl::MarchingCubesSDF *mc;
+
+	int m_squared;
+	float m_div_height;
+	float m_div_width;
+	float m_div_depth;
 
 
 public:
