@@ -11,14 +11,12 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   tf
   tf_conversions
-  message_filters
   pcl_conversions
   depth_image_proc
   nodelet
   cv_bridge
-  #OpenCV
 )
-find_package(OpenCV)
+#find_package(OpenCV)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 

@@ -9,7 +9,6 @@ SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, flo
 	number_of_voxels = m * m * m;
 	D = new float[number_of_voxels];
 	global_coords = new Vector3d[number_of_voxels];
-	voxel_coords = new Vector3i[number_of_voxels];
 	W = new float[number_of_voxels];
 	Color_W = new float[number_of_voxels];
 	R = new float[number_of_voxels];
@@ -193,12 +192,14 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
 	float j = voxel_coordinates(1);
 	float k = voxel_coordinates(2);
 	float w_sum = 0.0;
+	float aux = 0;
 	Vector3d sum_c;
 	color.r = 0.0;
 	color.g = 0.0;
 	color.b = 0.0;
 	color.a = 1.0;
 	Vector3i current_voxel;
+	float w = 0;
 	for (int i_offset = 0; i_offset < 2; i_offset++){
 	  for (int j_offset = 0; j_offset < 2; j_offset++){
 	    for (int k_offset = 0; k_offset < 2; k_offset++){
@@ -214,7 +215,7 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
 		    color.b =  this->B[a_idx];
 		    return;
 		  }
-		  float w = Color_W[a_idx]/volume;
+		  w = Color_W[a_idx]/volume;
 		  w_sum += w;
 		  color.r +=  w*this->R[a_idx];
 		  color.g +=  w*this->G[a_idx];
@@ -223,9 +224,10 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
 	    }
 	  }
 	}
-	color.r /= w_sum*255.0;
-	color.g /= w_sum*255.0;
-	color.b /= w_sum*255.0;
+	aux = w_sum*255.0;
+	color.r /= aux;
+	color.g /= aux;
+	color.b /= aux;
 }
 
 void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals){

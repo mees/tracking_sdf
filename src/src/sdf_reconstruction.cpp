@@ -66,9 +66,6 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	ne.setNormalSmoothingSize(10.0f);
 	ne.setInputCloud(cloud_filtered);
 	ne.compute(*normals);
-//	cv::Mat depth_map(cloud_filtered->height, cloud_filtered->width, CV_16UC1);
-//	cv::imshow("foo", depth_map);
-//	cv::waitKey(3);
 
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
 	cout<<"finished updating"<<endl;
@@ -77,23 +74,18 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 }
 
 SDF_Reconstruction::SDF_Reconstruction() {
-//	typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::Image> MySyncPolicy;
-//	kinect_pcl_sub.subscribe(nh, "/camera/rgb/points", 1);
-//    kinect_depth_sub.subscribe(nh, "/camera/depth/image", 1);
-//    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1),kinect_pcl_sub, kinect_depth_sub);
-//    sync.registerCallback(boost::bind(&SDF_Reconstruction::kinect_callback, this, _1, _2));
-  
-        this->camera_tracking = new CameraTracking();
+
+     this->camera_tracking = new CameraTracking();
 	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
 	
-	pub = nh.advertise<sensor_msgs::PointCloud2> ("/our_output/", 1);
+	//pub = nh.advertise<sensor_msgs::PointCloud2> ("/our_output/", 1);
 	//Ros::Publisher(topic n)
 	Vector3d sdf_origin(-5.0, -5.0, 0.0);
 	
 		     //m , width, height, depth, treshold
-	sdf = new SDF(130, 8.0, 8.0, 4.0, sdf_origin,0.3, 0.05);
+	sdf = new SDF(100, 8.0, 8.0, 4.0, sdf_origin,0.3, 0.05);
 	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
 	
 	//sdf->create_circle(2.0, 0, 0.0, 0.0);

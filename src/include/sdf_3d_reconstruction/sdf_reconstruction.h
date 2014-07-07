@@ -21,9 +21,6 @@
 #include <string>
 #include <tf/transform_listener.h>
 #include <sensor_msgs/Image.h>
-#include <message_filters/subscriber.h>
-#include <message_filters/synchronizer.h>
-#include <message_filters/sync_policies/approximate_time.h>
 #include "tf_conversions/tf_eigen.h"
 #include <valgrind/callgrind.h>
 
@@ -35,19 +32,15 @@ class SDF_Reconstruction {
 
 private:
 		ros::NodeHandle nh;
-		//cameraMatrix camera_matrix;
 		CameraTracking *camera_tracking;
 		SDF *sdf;
-		message_filters::Subscriber<sensor_msgs::PointCloud2> kinect_pcl_sub;
-		message_filters::Subscriber<sensor_msgs::Image> kinect_depth_sub;
 		ros::Subscriber pcl;
 		tf::TransformListener listener;
 		tf::StampedTransform transform;
 		ros::Publisher pub;
 
 protected:
-		//void camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_camera_info);
-		//void kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb, const sensor_msgs::ImageConstPtr& image_depth);
+
 		void kinect_callback(const sensor_msgs::PointCloud2ConstPtr& pointCloud);
 
 		float projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
