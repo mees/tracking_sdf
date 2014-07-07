@@ -158,6 +158,7 @@ include_directories(
 
 install(FILES
    launch/sdf.launch
+   launch/sdf.launch.debug
    launch/kinect.launch
    rgbd_dataset_freiburg1_plant-groundtruth.txt
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

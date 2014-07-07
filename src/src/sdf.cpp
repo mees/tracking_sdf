@@ -6,14 +6,17 @@ using namespace Eigen;
  * Constructror destructor 
  */
 SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, float distance_delta, float distance_epsilon): m(m), width(width),height(height), depth(depth),sdf_origin(sdf_origin), distance_delta(distance_delta), distance_epsilon(distance_epsilon){
-	D = new float[this->m * this->m * this->m];
-	W = new float[this->m * this->m * this->m];
-	Color_W = new float[this->m * this->m * this->m];
-	R = new float[this->m * this->m * this->m];
-	G = new float[this->m * this->m * this->m];
-	B = new float[this->m * this->m * this->m];
-	
 	number_of_voxels = m * m * m;
+	D = new float[number_of_voxels];
+	coords = new Vector3d[number_of_voxels];
+	W = new float[number_of_voxels];
+	Color_W = new float[number_of_voxels];
+	R = new float[number_of_voxels];
+	G = new float[number_of_voxels];
+	B = new float[number_of_voxels];
+
+	Vector3i voxel_coordinates;
+	Vector3d global_coordinates;
 	for (int i = 0; i<number_of_voxels; i++) {
 		D[i] = width+height+depth;
 		Color_W[i] = 0;
@@ -21,7 +24,9 @@ SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, flo
 		R[i] = 0.4;
 		G[i] = 0.4;
 		B[i] = 0.4;
-		
+		get_voxel_coordinates(i, voxel_coordinates);
+		get_global_coordinates(voxel_coordinates, global_coordinates);
+		coords[i] = global_coordinates;
 	}
 	this->register_visualization();
 }
@@ -43,7 +48,7 @@ int SDF::get_number_of_voxels() {
 inline int SDF::get_array_index(Vector3i& voxel_coordinates){
 	int _idx = this->m*this->m*voxel_coordinates(0)+this->m*voxel_coordinates(1)+voxel_coordinates(2);
 	if (_idx < 0 || _idx >= this->m*this->m*this->m){
-	  std::cout << "ooo \n"<< voxel_coordinates << std::endl;
+	  std::cout << "Error in get_array_index \n"<< voxel_coordinates << std::endl;
 	  _idx = -1;
 	}
 	  
@@ -219,34 +224,32 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 	    exit(0);
     } else {
 	int idx = -1;
-	for (int i = 0; i < m; i++){
-		for (int j = 0; j < m; j++){
-			for (int k = 0; k < m; k++){
-				idx+=1;
-				Vector3i voxel_coordinates;
-				voxel_coordinates(0) = i;
-				voxel_coordinates(1) = j;
-				voxel_coordinates(2) = k;
-				Vector3d global_coordinates, camera_point;
-				Vector2d image_point;
-				this->get_global_coordinates(voxel_coordinates, global_coordinates);
+	Vector3i voxel_coordinates;
+	Vector3d cam_vect(0,0,1);
+	Vector3d global_coordinates, camera_point, camera_point_img, d_vect,normal_eigen;
+	Vector2d image_point;
+	float d_new, scalar = 0;
+	float w_new, w_old;
+	int i_image, j_image;
+	pcl::PointXYZRGB point;
+	pcl::Normal normal;
+	for (int idx=0;idx<number_of_voxels;idx++){
+				global_coordinates = coords[idx];
 				camera_tracking->project_world_to_camera(global_coordinates, camera_point);
 				camera_tracking->project_camera_to_image_plane(camera_point, image_point);
 				
-				float z_voxel = camera_point(2);
-				int i_image = image_point(0);
-				int j_image = image_point(1);
+				i_image = image_point(0);
+				j_image = image_point(1);
 				if (i_image < cloud_filtered->width && j_image < cloud_filtered->height && i_image> 0 && j_image > 0){
 					
-					pcl::PointXYZRGB point = cloud_filtered->at(i_image, j_image);
-					pcl::Normal normal = normals->at(i_image, j_image);
+					point = cloud_filtered->at(i_image, j_image);
+					normal = normals->at(i_image, j_image);
 					//TODO z >~ 0.3, z <~ 4
 					if (!isnan(point.x) && !isnan(point.y) && !isnan(normal.normal_x) && !isnan(normal.normal_y) && !isnan(normal.normal_z)){
-					      
-						Vector3d camera_point_img;
 						camera_point_img(0) =  point.x;
 						camera_point_img(1) =  point.y;
 						camera_point_img(2) =  point.z;
+						//std::cout << "voxel:\n"<<  voxel_coordinates<<std::endl;
 						/*std::cout << "------------------------------"<<std::endl;
 						std::cout << "voxel:\n"<<  voxel_coordinates<<std::endl;
 						std::cout << "camera_point:\n"<<  camera_point<<std::endl;
@@ -263,13 +266,13 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 						//camera_tracking->project_world_to_camera(global_coordinates_img, camera_point_img);
 						
 						
-						Vector3d d_vect = (camera_point - camera_point_img);
-						float d_new = d_vect.norm();
+						d_vect = (camera_point - camera_point_img);
+						d_new = d_vect.norm();
 						if (d_vect(2) < 0){
 						  d_new = -1*d_new;
 						}
 						//cout << d_new << endl;
-						float w_new = 1.0;
+						w_new = 1.0;
 						if (d_new >= this->distance_epsilon && d_new <= this->distance_delta){
 						  w_new = exp(-0.5*(d_new - this->distance_epsilon)*(d_new - this->distance_epsilon));
 						}
@@ -280,15 +283,18 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 						if (d_new < -distance_delta){
 						  d_new = -distance_delta;
 						}
-						float w_old = W[idx];
+						w_old = W[idx];
 						W[idx] = w_old + w_new;
 						
 						D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
 						
-						Vector3d normal_eigen(normal.normal_x,normal.normal_y,normal.normal_z);
-						Vector3d cam_vect(0,0,1);
-						float scalar = fabs((cam_vect - camera_tracking->trans).dot(normal_eigen));
+
+						normal_eigen(0) = normal.normal_x;
+						normal_eigen(1) = normal.normal_y;
+						normal_eigen(2) = normal.normal_z;
 						
+						scalar = fabs((cam_vect - camera_tracking->trans).dot(normal_eigen));
+
 						//std::cout <<scalar << std::endl;;
 						w_old = Color_W[idx];
 						w_new = w_new * scalar;
@@ -299,10 +305,8 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 						B[idx] = w_old/Color_W[idx] * B[idx] + w_new/Color_W[idx] * point.b;
 					}
 				}
-			}
-		}
 	}
-	std::cout << (ros::Time::now()-t0).toSec()<< std::endl;
+	std::cout << "update method: "<<(ros::Time::now()-t0).toSec()<< std::endl;
 	this->visualize();
 	}
 }
@@ -391,5 +395,5 @@ void SDF::visualize()
 		this->marker_publisher.publish(marker);
 		//r->sleep();
 	}
-	std::cout << (ros::Time::now()-t0).toSec()<< std::endl;
+	std::cout << "visualize method: "<<(ros::Time::now()-t0).toSec()<< std::endl;
 }

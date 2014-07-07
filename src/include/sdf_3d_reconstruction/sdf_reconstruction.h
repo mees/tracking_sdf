@@ -25,7 +25,7 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include "tf_conversions/tf_eigen.h"
-//#include "ros/ros.h"
+#include <valgrind/callgrind.h>
 
 using namespace Eigen;
 using namespace pcl;

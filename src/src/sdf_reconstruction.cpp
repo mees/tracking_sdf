@@ -21,12 +21,13 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 		ROS_ERROR("%s", ex.what());
 		return;
 	}
-	Matrix4f trans_matrix;
-	sensor_msgs::PointCloud2 test_cloud;
-	pcl_ros::transformAsMatrix(transform, trans_matrix);
-	//cout<<"Transform Matrix: "<<trans_matrix<<endl;
-	pcl_ros::transformPointCloud(trans_matrix, *ros_cloud, test_cloud);
-	test_cloud.header.frame_id = "/world";
+	CALLGRIND_START_INSTRUMENTATION;
+//	Matrix4f trans_matrix;
+//	sensor_msgs::PointCloud2 test_cloud;
+//	pcl_ros::transformAsMatrix(transform, trans_matrix);
+//	//cout<<"Transform Matrix: "<<trans_matrix<<endl;
+//	pcl_ros::transformPointCloud(trans_matrix, *ros_cloud, test_cloud);
+//	test_cloud.header.frame_id = "/world";
 	
 	Vector3d trans;
 	Eigen::Quaterniond rot;
@@ -42,9 +43,8 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	//cout<<"Transform Matrix: "<<trans_matrix<<endl;
 	cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
 	cout << "- Quat Rotation: [" << q.getX() << ", " << q.getY() << ", " << q.getZ() << ", " << q.getW() <<"]" << endl;
-	pub.publish(test_cloud);
-	//ros::Duration(1).sleep();
-	//cout << "- Rotation Matrix: "<<rotMat<<endl;
+	//pub.publish(test_cloud);
+
 
 	pcl::PCLPointCloud2 pcl_pc2;
 	pcl_conversions::toPCL(*ros_cloud, pcl_pc2);
@@ -69,8 +69,11 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 //	cv::Mat depth_map(cloud_filtered->height, cloud_filtered->width, CV_16UC1);
 //	cv::imshow("foo", depth_map);
 //	cv::waitKey(3);
-	
+
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
+	cout<<"finished updating"<<endl;
+	CALLGRIND_STOP_INSTRUMENTATION;
+	CALLGRIND_DUMP_STATS;
 }
 
 SDF_Reconstruction::SDF_Reconstruction() {
@@ -90,7 +93,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	Vector3d sdf_origin(-5.0, -5.0, 0.0);
 	
 		     //m , width, height, depth, treshold
-	sdf = new SDF(140, 8.0, 8.0, 4.0, sdf_origin,0.3, 0.05);
+	sdf = new SDF(130, 8.0, 8.0, 4.0, sdf_origin,0.3, 0.05);
 	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
 	
 	//sdf->create_circle(2.0, 0, 0.0, 0.0);

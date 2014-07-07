@@ -42,6 +42,9 @@ private:
 	float *D;
 	//Weight array
 	float *W;
+
+	Vector3d *coords;
+
 	float *Color_W;
 	//Red Array
 	float *R;
