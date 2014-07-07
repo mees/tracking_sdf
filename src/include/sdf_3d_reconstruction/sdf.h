@@ -58,6 +58,7 @@ private:
 	ros::Rate* r;
 	void register_visualization();
 	Vector3d sdf_origin;
+	pcl::MarchingCubesSDF *mc;
 
 
 public:

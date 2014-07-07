@@ -28,6 +28,12 @@ SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, flo
 		get_global_coordinates(voxel_coordinates, global_coordinates);
 		coords[i] = global_coordinates;
 	}
+	mc = new pcl::MarchingCubesSDF;
+	mc->setIsoLevel (0.0f);
+	mc->setGridResolution (this->m, this->m, this->m);
+	mc->setBBox(this->width, this->height, this->depth);
+	mc->setGrid(this->D);
+	mc->setW(this->W);
 	this->register_visualization();
 }
 SDF::~SDF(){
@@ -315,13 +321,8 @@ void SDF::visualize()
 	ros::Time t0 = ros::Time::now();
 	pcl::PolygonMesh output;
 	std::vector<pcl::Vertices> polygons;
-	pcl::MarchingCubesSDF *mc;
-	mc = new pcl::MarchingCubesSDF;
-	mc->setIsoLevel (0.0f);
-	mc->setGridResolution (this->m, this->m, this->m);
-	mc->setBBox(this->width, this->height, this->depth);
-	mc->setGrid(this->D);
-	mc->setW(this->W);
+	
+	
 	pcl::PointCloud<pcl::PointXYZ> cloud;
 	mc->performReconstruction (cloud, polygons);
 	if (ros::ok())
