@@ -338,4 +338,33 @@ pcl::MarchingCubesSDF::performReconstruction (pcl::PointCloud<pcl::PointXYZ> &po
   }
 }
 
+ void
+ pcl::MarchingCubesSDF::performReconstruction (pcl::PointCloud<pcl::PointXYZ> &points)
+ {
+   if (!(iso_level_ >= 0 && iso_level_ < 1))
+   {
+     PCL_ERROR ("[pcl::%s::performReconstruction] Invalid iso level %f! Please use a number between 0 and 1.\n", getClassName ().c_str (), iso_level_);
+     points.width = points.height = 0;
+     points.points.clear ();
+     return;
+   }
+
+   // Create grid
+   //grid_ = std::vector<float> (res_x_*res_y_*res_z_, 0.0f);
+
+
+   // Run the actual marching cubes algorithm, store it into a point cloud,
+   // and copy the point cloud + connectivity into output
+   points.clear ();
+   for (int x = 1; x < res_x_-1; ++x)
+     for (int y = 1; y < res_y_-1; ++y)
+       for (int z = 1; z < res_z_-1; ++z)
+       {
+         Eigen::Vector3i index_3d (x, y, z);
+         std::vector<float> leaf_node;
+         getNeighborList1D (leaf_node, index_3d);
+         createSurface (leaf_node, index_3d, points);
+       }
+ }
+
 #endif

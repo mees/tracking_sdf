@@ -38,6 +38,7 @@ private:
 		tf::TransformListener listener;
 		tf::StampedTransform transform;
 		ros::Publisher pub;
+		int frame_num;
 
 protected:
 

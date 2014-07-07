@@ -438,6 +438,9 @@ namespace pcl
        performReconstruction (pcl::PointCloud<pcl::PointXYZ> &points,
                               std::vector<pcl::Vertices> &polygons);
        
+       virtual void
+              performReconstruction (pcl::PointCloud<pcl::PointXYZ> &points);
+
        /** \brief Set the bounding box for the input data points. */
       void
       setBBox (float width, float height, float depth);

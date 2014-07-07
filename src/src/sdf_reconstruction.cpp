@@ -12,6 +12,7 @@ float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &C
 //		const sensor_msgs::ImageConstPtr& image_depth) {
 void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr& ros_cloud) {
 	cout<<"callback!"<<endl;
+	frame_num++;
 	try {
 		//listener.waitForTransform("/world", "/openni_rgb_optical_frame",
 		//		ros::Time(), ros::Duration(12.0));
@@ -69,6 +70,10 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
 	cout<<"finished updating"<<endl;
+//	if(frame_num==5){
+//		sdf->visualize();
+//		frame_num = 0;
+//	}
 	CALLGRIND_STOP_INSTRUMENTATION;
 	CALLGRIND_DUMP_STATS;
 }
@@ -79,13 +84,13 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
-	
+	frame_num = 0;
 	//pub = nh.advertise<sensor_msgs::PointCloud2> ("/our_output/", 1);
 	//Ros::Publisher(topic n)
 	Vector3d sdf_origin(-5.0, -5.0, 0.0);
 	
 		     //m , width, height, depth, treshold
-	sdf = new SDF(100, 8.0, 8.0, 4.0, sdf_origin,0.3, 0.05);
+	sdf = new SDF(180, 8.0, 8.0, 4.0, sdf_origin,0.3, 0.05);
 	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
 	
 	//sdf->create_circle(2.0, 0, 0.0, 0.0);

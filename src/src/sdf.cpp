@@ -328,11 +328,10 @@ void SDF::visualize()
 {
 	ros::Time t0 = ros::Time::now();
 	pcl::PolygonMesh output;
-	std::vector<pcl::Vertices> polygons;
 	
 	
 	pcl::PointCloud<pcl::PointXYZ> cloud;
-	mc->performReconstruction (cloud, polygons);
+	mc->performReconstruction (cloud);
 	if (ros::ok())
 	{
 		/*for (int i = 0; i < polygons.size (); i++)
