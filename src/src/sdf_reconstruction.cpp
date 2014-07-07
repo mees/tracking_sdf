@@ -71,7 +71,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 //	cv::waitKey(3);
 	
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
-	ros::Duration(120).sleep();
+
 }
 
 SDF_Reconstruction::SDF_Reconstruction() {
