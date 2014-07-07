@@ -223,7 +223,6 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 	    cout << "Camera Matrix not received. Start rosbag file!" << endl;
 	    exit(0);
     } else {
-	int idx = -1;
 	Vector3i voxel_coordinates;
 	Vector3d cam_vect(0,0,1);
 	Vector3d global_coordinates, camera_point, camera_point_img, d_vect,normal_eigen;
