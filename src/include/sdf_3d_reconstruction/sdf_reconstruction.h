@@ -24,6 +24,7 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include "tf_conversions/tf_eigen.h"
+#include "ros/ros.h"
 
 using namespace Eigen;
 using namespace pcl;
@@ -41,6 +42,7 @@ private:
 		ros::Subscriber pcl;
 		tf::TransformListener listener;
 		tf::StampedTransform transform;
+		ros::Publisher pub;
 
 protected:
 		//void camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_camera_info);

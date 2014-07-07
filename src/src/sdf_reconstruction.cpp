@@ -53,23 +53,11 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	ne.setNormalSmoothingSize(10.0f);
 	ne.setInputCloud(cloud_filtered);
 	ne.compute(*normals);
-
-
 	//cv::Mat depth_map(cloud_filtered->height, cloud_filtered->width, CV_16UC1);
-	
 	//cv::imshow("foo", depth_map);
 	//cv::waitKey(3);
-
-
 	
-	
-	
-		
-		
-		  sdf->update(this->camera_tracking, cloud_filtered, normals);
-		
-	
-	
+	sdf->update(this->camera_tracking, cloud_filtered, normals);
 }
 
 SDF_Reconstruction::SDF_Reconstruction() {
@@ -83,6 +71,8 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
+	
+	pub = nh.advertise<sensor_msgs::PointCloud2> ("/our_output/", 1);
 	//Ros::Publisher(topic n)
 	Vector3d sdf_origin(-4, -4, -0.2);
 	
