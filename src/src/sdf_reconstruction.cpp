@@ -71,6 +71,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 //	cv::waitKey(3);
 	
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
+	ros::Duration(120).sleep();
 }
 
 SDF_Reconstruction::SDF_Reconstruction() {
@@ -96,7 +97,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	//sdf->create_circle(2.0, 0, 0.0, 0.0);
 	//std::string visualeOutput;
 	//ros::param::get("~visualOutput", visualeOutput);
-	sdf->visualize();
+	//sdf->visualize();
 
 	ros::spin();
 }
