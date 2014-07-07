@@ -78,6 +78,10 @@ public:
 	 */
 	void create_circle(float radius, float center_x, float center_y, float center_z);
 	/**
+	 * helper function for testing issues
+	 */
+	void create_cuboid(float min_x, float max_x, float min_y, float max_y, float min_z, float max_z);
+	/**
 	 *  
 	 **/
 	void visualize();
@@ -105,6 +109,7 @@ public:
 	 * 
 	 */
 	void update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals);
+	
 };
 
 #endif /* SDF_H_ */

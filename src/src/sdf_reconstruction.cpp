@@ -90,11 +90,13 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	Vector3d sdf_origin(-4, -4, -0.2);
 	
 		     //m , width, height, depth, treshold
-	sdf = new SDF(140, 8.0, 8.0, 2.0, sdf_origin,0.3, 0.05);
-	//sdf->create_circle(200, 0, 0.0, 0.0);
+	sdf = new SDF(100, 8.0, 8.0, 2.0, sdf_origin,0.3, 0.05);
+	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
+	
+	//sdf->create_circle(2.0, 0, 0.0, 0.0);
 	//std::string visualeOutput;
 	//ros::param::get("~visualOutput", visualeOutput);
-	//sdf->visualize();
+	sdf->visualize();
 
 	ros::spin();
 }

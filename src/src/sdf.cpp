@@ -70,7 +70,43 @@ void SDF::get_voxel_coordinates(Vector3d& global_coordinates, Vector3d& voxel_co
 	voxel_coordinates(1) = (((global_coordinates(1)-this->sdf_origin(1))/this->height)*m -0.5);
 	voxel_coordinates(2) = (((global_coordinates(2)-this->sdf_origin(2))/this->depth)*m -0.5);
 }
-
+void SDF::create_cuboid(float min_x, float max_x, float min_y, float max_y, float min_z, float max_z){
+	Vector3i voxel_coordinates;
+	Vector3d global_coordinates;
+	double x, y, z;
+	float dx, dy, dz;
+	for (int array_idx = 0; array_idx < this->number_of_voxels; array_idx++){
+		this -> get_voxel_coordinates(array_idx, voxel_coordinates);
+		this-> get_global_coordinates(voxel_coordinates, global_coordinates);
+		x = global_coordinates(0);
+		y = global_coordinates(1);
+		z = global_coordinates(2);
+		dx = fmin(fabs(x-min_x),fabs(x-max_x));
+		dy = fmin(fabs(y-min_y),fabs(y-max_y));
+		dz = fmin(fabs(z-min_z),fabs(z-max_z));
+		if (x < max_x && x > min_x && y < max_y && y > min_y && z < max_z && z > min_z ){
+			D[array_idx] =  -fmin(dx,fmin(dy,dz));    
+		}
+		else{
+			D[array_idx] =  fmin(dx,fmin(dy,dz));    
+		}
+		W[array_idx] = 0.001;
+		R[array_idx] = 1.0;
+		G[array_idx] = 0.0;
+		B[array_idx] = 0.0;
+		if (dz < 0.017 && dz > -0.017){
+		  B[array_idx] = 1.0;
+		  W[array_idx] = 1.0;
+		  R[array_idx] = 0.0;
+		}
+		if ((dz > 0.017 && dz < 0.034) || (dz < -0.017 && dz > -0.034)){
+		  B[array_idx] = 0.0;
+		  W[array_idx] = 0.01;
+		  R[array_idx] = 1.0;
+		  G[array_idx] = 1.0;
+		}
+	}
+}
 void SDF::create_circle(float radius, float center_x, float center_y,
 		float center_z) {
 	Vector3i voxel_coordinates;
@@ -85,6 +121,7 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 		d = sqrt((x - center_x)*(x - center_x) + (y - center_y)*(y - center_y)+(z-center_z)*(z-center_z));
 		
 		D[array_idx] =  d-radius;
+		W[array_idx] = 1.0;
 		R[array_idx] = 0.0;
 		G[array_idx] = 0.0;
 		
@@ -152,7 +189,7 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
 	      current_voxel(0) = ((int) i)+i_offset;
 	      current_voxel(1) = ((int) j)+j_offset;
 	      current_voxel(2) = ((int) k)+k_offset;
-	      float volume = fabs(current_voxel(0)-i) * fabs(current_voxel(1)-j)* fabs(current_voxel(2)-k);
+	      float volume = fabs(current_voxel(0)-i) + fabs(current_voxel(1)-j)+ fabs(current_voxel(2)-k);
 	      int a_idx = get_array_index(current_voxel);
 	      if (a_idx != -1){
 		  if (volume < 0.00001){
@@ -161,7 +198,7 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
 		    color.b =  this->B[a_idx];
 		    return;
 		  }
-		  float w = 1.0/volume;
+		  float w = W[a_idx]/volume;
 		  w_sum += w;
 		  color.r +=  w*this->R[a_idx];
 		  color.g +=  w*this->G[a_idx];
