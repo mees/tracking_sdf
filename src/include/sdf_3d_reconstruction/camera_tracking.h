@@ -18,6 +18,7 @@ private:
 	 */
 	/*
 	 * current rotation matrix
+	 * from Camera to World
 	 */
 	Eigen::Matrix3d rot;
 	Eigen::Matrix3d rot_inv;

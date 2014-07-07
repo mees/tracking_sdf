@@ -2,6 +2,7 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <pcl_ros/transforms.h>
 // PCL specific includes
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/features/integral_image_normal.h>

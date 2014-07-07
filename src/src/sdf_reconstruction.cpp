@@ -21,18 +21,31 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 		ROS_ERROR("%s", ex.what());
 		return;
 	}
+	Matrix4f trans_matrix;
+	sensor_msgs::PointCloud2 test_cloud;
+	pcl_ros::transformAsMatrix(transform, trans_matrix);
+	//cout<<"Transform Matrix: "<<trans_matrix<<endl;
+	pcl_ros::transformPointCloud(trans_matrix, *ros_cloud, test_cloud);
+	test_cloud.header.frame_id = "/world";
 	
 	Vector3d trans;
 	Eigen::Quaterniond rot;
 	//TODO: als tf belassen?
 	tf::vectorTFToEigen(transform.getOrigin(),trans);
 	tf::quaternionTFToEigen(transform.getRotation(), rot);
+
 	Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
 	this->camera_tracking->set_camera_transformation(rotMat, trans);
-	//tf::Quaternion q = transform.getRotation();
+	tf::Quaternion q = transform.getRotation();
 	tf::Vector3 v = transform.getOrigin();
+	cout<<" stamp: "<<transform.stamp_<<endl;
+	//cout<<"Transform Matrix: "<<trans_matrix<<endl;
 	cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
-	
+	cout << "- Quat Rotation: [" << q.getX() << ", " << q.getY() << ", " << q.getZ() << ", " << q.getW() <<"]" << endl;
+	pub.publish(test_cloud);
+	//ros::Duration(1).sleep();
+	//cout << "- Rotation Matrix: "<<rotMat<<endl;
+
 	pcl::PCLPointCloud2 pcl_pc2;
 	pcl_conversions::toPCL(*ros_cloud, pcl_pc2);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr pcl_cloud(
@@ -53,9 +66,9 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	ne.setNormalSmoothingSize(10.0f);
 	ne.setInputCloud(cloud_filtered);
 	ne.compute(*normals);
-	//cv::Mat depth_map(cloud_filtered->height, cloud_filtered->width, CV_16UC1);
-	//cv::imshow("foo", depth_map);
-	//cv::waitKey(3);
+//	cv::Mat depth_map(cloud_filtered->height, cloud_filtered->width, CV_16UC1);
+//	cv::imshow("foo", depth_map);
+//	cv::waitKey(3);
 	
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
 }
