@@ -71,7 +71,6 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 //	cv::waitKey(3);
 	
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
-
 }
 
 SDF_Reconstruction::SDF_Reconstruction() {
@@ -88,10 +87,10 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	
 	pub = nh.advertise<sensor_msgs::PointCloud2> ("/our_output/", 1);
 	//Ros::Publisher(topic n)
-	Vector3d sdf_origin(-4, -4, -0.2);
+	Vector3d sdf_origin(-5.0, -5.0, 0.0);
 	
 		     //m , width, height, depth, treshold
-	sdf = new SDF(100, 8.0, 8.0, 2.0, sdf_origin,0.3, 0.05);
+	sdf = new SDF(140, 8.0, 8.0, 4.0, sdf_origin,0.3, 0.05);
 	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
 	
 	//sdf->create_circle(2.0, 0, 0.0, 0.0);

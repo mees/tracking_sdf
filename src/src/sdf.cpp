@@ -135,8 +135,7 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 		}
 	}
 }
-
-float SDF::interpolate_distance(Vector3d& world_coordinates){
+/*float SDF::interpolate_distance(Vector3d& world_coordinates){
 	Vector3d voxel_coordinates;
 	get_voxel_coordinates(world_coordinates, voxel_coordinates);
 	float i = voxel_coordinates(0);
@@ -165,7 +164,7 @@ float SDF::interpolate_distance(Vector3d& world_coordinates){
 	  }
 	}
 	return sum_d / w_sum;
-}
+}*/
 void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::ColorRGBA& color){
 	Vector3d global_coordinates;
 	Vector3d voxel_coordinates;
@@ -219,84 +218,92 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 	    cout << "Camera Matrix not received. Start rosbag file!" << endl;
 	    exit(0);
     } else {
-		for (int idx = 0; idx < this->get_number_of_voxels(); idx++) {
-			Vector3i voxel_coordinates;
-			Vector3d global_coordinates, camera_point;
-			Vector2d image_point;
-			this->get_voxel_coordinates(idx,voxel_coordinates);
-			this->get_global_coordinates(voxel_coordinates, global_coordinates);
-			camera_tracking->project_world_to_camera(global_coordinates, camera_point);
-			camera_tracking->project_camera_to_image_plane(camera_point, image_point);
-			
-			float z_voxel = camera_point(2);
-			int i_image = image_point(0);
-			int j_image = image_point(1);
-			if (i_image < cloud_filtered->width && j_image < cloud_filtered->height && i_image> 0 && j_image > 0){
+	int idx = -1;
+	for (int i = 0; i < m; i++){
+		for (int j = 0; j < m; j++){
+			for (int k = 0; k < m; k++){
+				idx+=1;
+				Vector3i voxel_coordinates;
+				voxel_coordinates(0) = i;
+				voxel_coordinates(1) = j;
+				voxel_coordinates(2) = k;
+				Vector3d global_coordinates, camera_point;
+				Vector2d image_point;
+				this->get_global_coordinates(voxel_coordinates, global_coordinates);
+				camera_tracking->project_world_to_camera(global_coordinates, camera_point);
+				camera_tracking->project_camera_to_image_plane(camera_point, image_point);
 				
-				pcl::PointXYZRGB point = cloud_filtered->at(i_image, j_image);
-				pcl::Normal normal = normals->at(i_image, j_image);
-				//TODO z >~ 0.3, z <~ 4
-				if (!isnan(point.x) && !isnan(point.y) && !isnan(normal.normal_x) && !isnan(normal.normal_y) && !isnan(normal.normal_z)){
+				float z_voxel = camera_point(2);
+				int i_image = image_point(0);
+				int j_image = image_point(1);
+				if (i_image < cloud_filtered->width && j_image < cloud_filtered->height && i_image> 0 && j_image > 0){
 					
-					Vector3d camera_point_img;
-					camera_point_img(0) =  point.x;
-					camera_point_img(1) =  point.y;
-					camera_point_img(2) =  point.z;
-					/*std::cout << "------------------------------"<<std::endl;
-					std::cout << "voxel:\n"<<  voxel_coordinates<<std::endl;
-					std::cout << "camera_point:\n"<<  camera_point<<std::endl;
-					std::cout << "camera_point_img:\n"<<camera_point_img<<std::endl;
-					std::cout << "ind_ratios:\n"<<  camera_point(0)/camera_point_img(0)<<std::endl;
-					std::cout << "ind_ratios:\n"<<  camera_point(1)/camera_point_img(1)<<std::endl;
-					std::cout << "ind_ratios:\n"<<  camera_point(2)/camera_point_img(2)<<std::endl;
-					std::cout << "idx:\n"<<idx<<std::endl;
-					std::cout << "idx-calc:\n"<<get_array_index(voxel_coordinates)<<std::endl;
-					
-					std::cout << "trans:\n"<<camera_tracking->trans<<std::endl;
-					std::cout << "------------------------------"<<std::endl;*/
-					//TODO ist schon im camera frame
-					//camera_tracking->project_world_to_camera(global_coordinates_img, camera_point_img);
-					
-					
-					Vector3d d_vect = (camera_point - camera_point_img);
-					float d_new = d_vect.norm();
-					if (d_vect(2) < 0){
-					  d_new = -1*d_new;
+					pcl::PointXYZRGB point = cloud_filtered->at(i_image, j_image);
+					pcl::Normal normal = normals->at(i_image, j_image);
+					//TODO z >~ 0.3, z <~ 4
+					if (!isnan(point.x) && !isnan(point.y) && !isnan(normal.normal_x) && !isnan(normal.normal_y) && !isnan(normal.normal_z)){
+					      
+						Vector3d camera_point_img;
+						camera_point_img(0) =  point.x;
+						camera_point_img(1) =  point.y;
+						camera_point_img(2) =  point.z;
+						/*std::cout << "------------------------------"<<std::endl;
+						std::cout << "voxel:\n"<<  voxel_coordinates<<std::endl;
+						std::cout << "camera_point:\n"<<  camera_point<<std::endl;
+						std::cout << "camera_point_img:\n"<<camera_point_img<<std::endl;
+						std::cout << "ind_ratios:\n"<<  camera_point(0)/camera_point_img(0)<<std::endl;
+						std::cout << "ind_ratios:\n"<<  camera_point(1)/camera_point_img(1)<<std::endl;
+						std::cout << "ind_ratios:\n"<<  camera_point(2)/camera_point_img(2)<<std::endl;
+						std::cout << "idx:\n"<<idx<<std::endl;
+						std::cout << "idx-calc:\n"<<get_array_index(voxel_coordinates)<<std::endl;
+						
+						std::cout << "trans:\n"<<camera_tracking->trans<<std::endl;
+						std::cout << "------------------------------"<<std::endl;*/
+						//TODO ist schon im camera frame
+						//camera_tracking->project_world_to_camera(global_coordinates_img, camera_point_img);
+						
+						
+						Vector3d d_vect = (camera_point - camera_point_img);
+						float d_new = d_vect.norm();
+						if (d_vect(2) < 0){
+						  d_new = -1*d_new;
+						}
+						//cout << d_new << endl;
+						float w_new = 1.0;
+						if (d_new >= this->distance_epsilon && d_new <= this->distance_delta){
+						  w_new = exp(-0.5*(d_new - this->distance_epsilon)*(d_new - this->distance_epsilon));
+						}
+						if (d_new > distance_delta){
+						  w_new = 0.0;
+						  continue;
+						}
+						if (d_new < -distance_delta){
+						  d_new = -distance_delta;
+						}
+						float w_old = W[idx];
+						W[idx] = w_old + w_new;
+						
+						D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
+						
+						Vector3d normal_eigen(normal.normal_x,normal.normal_y,normal.normal_z);
+						Vector3d cam_vect(0,0,1);
+						float scalar = fabs((cam_vect - camera_tracking->trans).dot(normal_eigen));
+						
+						//std::cout <<scalar << std::endl;;
+						w_old = Color_W[idx];
+						w_new = w_new * scalar;
+						Color_W[idx] = w_old + w_new;
+						
+						R[idx] = w_old/Color_W[idx] * R[idx] + w_new/Color_W[idx] * point.r;	
+						G[idx] = w_old/Color_W[idx] * G[idx] + w_new/Color_W[idx] * point.g;
+						B[idx] = w_old/Color_W[idx] * B[idx] + w_new/Color_W[idx] * point.b;
 					}
-					//cout << d_new << endl;
-					float w_new = 1.0;
-					if (d_new >= this->distance_epsilon && d_new <= this->distance_delta){
-					   w_new = exp(-0.5*(d_new - this->distance_epsilon)*(d_new - this->distance_epsilon));
-					}
-					if (d_new > distance_delta){
-					  w_new = 0.0;
-					  continue;
-					}
-					if (d_new < -distance_delta){
-					  d_new = -distance_delta;
-					}
-					float w_old = W[idx];
-					W[idx] = w_old + w_new;
-					
-					D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
-					
-					Vector3d normal_eigen(normal.normal_x,normal.normal_y,normal.normal_z);
-					Vector3d cam_vect(0,0,1);
-					float scalar = fabs((cam_vect - camera_tracking->trans).dot(normal_eigen));
-					
-					//std::cout <<scalar << std::endl;;
-					w_old = Color_W[idx];
-					w_new = w_new * scalar;
-					Color_W[idx] = w_old + w_new;
-					
-					R[idx] = w_old/Color_W[idx] * R[idx] + w_new/Color_W[idx] * point.r;	
-					G[idx] = w_old/Color_W[idx] * G[idx] + w_new/Color_W[idx] * point.g;
-					B[idx] = w_old/Color_W[idx] * B[idx] + w_new/Color_W[idx] * point.b;
 				}
 			}
 		}
-		std::cout << (ros::Time::now()-t0).toSec()<< std::endl;
-		this->visualize();
+	}
+	std::cout << (ros::Time::now()-t0).toSec()<< std::endl;
+	this->visualize();
 	}
 }
 
