@@ -5,6 +5,8 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include<Eigen/Eigen>
+class SDF;
+//#include "sdf_3d_reconstruction/sdf.h"
 using namespace Eigen;
 using namespace std;
 class CameraTracking {
@@ -47,11 +49,28 @@ public:
 	/**
 	 * project a global point from world coordinates to camera coordinates
 	 */
-	void project_world_to_camera(Vector3d& world_point, Vector3d& image_point);
+	void project_world_to_camera(Vector3d& world_point, Vector3d& camera_point);
+	/**
+	 * project a point from camera coordinates to world coordinates
+	 */
+	void project_camera_to_world(Vector3d& camera_point, Vector3d& world_point);
 	/**
 	 * set current transformation of the camera. 
 	 */
-	void set_camera_transformation(Eigen::Matrix<double,3,3> rot, Eigen::Vector3d trans);
+	void set_camera_transformation(Eigen::Matrix3d& rot, Eigen::Vector3d& trans);
+	/**
+	 * calculate the current derivate of the SDF at point in camera coordinates
+	 * xi is our current camera pose, where, you have to set it first
+	 * rot = 
+	 *    0 -w3  w2
+	 *   w3   0 -w1 
+	 *  -w2  w1   0 
+	 * trans =
+	 *   v1
+	 *   v2
+	 *   v3
+	 */
+	void get_partial_derivative(SDF *sdf, Eigen::Vector3d& camera_point,  Eigen::Matrix<float, 6, 1>& SDF_derivative);
 
 public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

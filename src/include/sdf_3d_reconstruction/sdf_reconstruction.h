@@ -14,8 +14,8 @@
 #include <pcl/filters/bilateral.h>
 #include <pcl/filters/fast_bilateral.h>
 
-#include "sdf_3d_reconstruction/sdf.h"
 #include "sdf_3d_reconstruction/camera_tracking.h"
+#include "sdf_3d_reconstruction/sdf.h"
 #include <fstream>
 #include <sstream>
 #include <string>
