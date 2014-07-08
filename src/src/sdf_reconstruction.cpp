@@ -87,10 +87,10 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	frame_num = 0;
 	//pub = nh.advertise<sensor_msgs::PointCloud2> ("/our_output/", 1);
 	//Ros::Publisher(topic n)
-	Vector3d sdf_origin(-5.0, -5.0, 0.0);
+	Vector3d sdf_origin(-3.0, -4.0, -1.0);
 	
 		     //m , width, height, depth, treshold
-	sdf = new SDF(180, 8.0, 8.0, 4.0, sdf_origin,0.3, 0.05);
+	sdf = new SDF(180, 6.0, 6.0, 4.0, sdf_origin,0.3, 0.05);
 	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
 	
 	//sdf->create_circle(2.0, 0, 0.0, 0.0);
