@@ -95,9 +95,10 @@ pcl::MarchingCubesSDF::interpolateEdge (Eigen::Vector3f &p1,
 }
 
 
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 void
-pcl::MarchingCubesSDF::createSurface (std::vector<float> &leaf_node,
+pcl::MarchingCubesSDF::createSurface (float (&leaf_node)[8],
                                             Eigen::Vector3i &index_3d,
                                             pcl::PointCloud<pcl::PointXYZ> &cloud)
 {
@@ -188,11 +189,11 @@ pcl::MarchingCubesSDF::createSurface (std::vector<float> &leaf_node,
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 void
-pcl::MarchingCubesSDF::getNeighborList1D (std::vector<float> &leaf,
-                                                Eigen::Vector3i &index3d)
+pcl::MarchingCubesSDF::getNeighborList1D (float (&leaf)[8],
+                                                Eigen::Vector3i &pos)
 {
-  leaf = std::vector<float> (8, 0.0f);
-  Eigen::Vector3i pos = index3d;
+  //leaf = std::vector<float> (8, 0.0f);
+ // Eigen::Vector3i pos = index3d;
   int g0 = pos[0]*zy_index_offset + pos[1]*res_z_ + pos[2];
   //pos = index3d + Eigen::Vector3i (1, 0, 0);
   int g1 = g0 + zy_index_offset;
@@ -231,112 +232,6 @@ pcl::MarchingCubesSDF::getNeighborList1D (std::vector<float> &leaf,
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-float
-pcl::MarchingCubesSDF::getGridValue (Eigen::Vector3i pos)
-{
-  /// TODO what to return?
-  if (pos[0] < 0 || pos[0] >= res_x_)
-    return -1.0f;
-  if (pos[1] < 0 || pos[1] >= res_y_)
-    return -1.0f;
-  if (pos[2] < 0 || pos[2] >= res_z_)
-    return -1.0f;
-  return grid_[pos[0]*res_y_*res_z_ + pos[1]*res_z_ + pos[2]];
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-void
-pcl::MarchingCubesSDF::performReconstruction (pcl::PolygonMesh &output)
-{
-  if (!(iso_level_ >= 0 && iso_level_ < 1))
-  {
-    PCL_ERROR ("[pcl::%s::performReconstruction] Invalid iso level %f! Please use a number between 0 and 1.\n", getClassName ().c_str (), iso_level_);
-    output.cloud.width = output.cloud.height = 0;
-    output.cloud.data.clear ();
-    output.polygons.clear ();
-    return;
-  }
-
-  // Create grid
-  //grid_ = std::vector<float> (res_x_*res_y_*res_z_, 0.0f);
-
-
-  // Transform the point cloud into a voxel grid
-  // This needs to be implemented in a child class
-  //voxelizeData ();
-
-
-
-  // Run the actual marching cubes algorithm, store it into a point cloud,
-  // and copy the point cloud + connectivity into output
-  pcl::PointCloud<pcl::PointXYZ> cloud;
-
-  for (int x = 1; x < res_x_-1; ++x)
-    for (int y = 1; y < res_y_-1; ++y)
-      for (int z = 1; z < res_z_-1; ++z)
-      {
-        Eigen::Vector3i index_3d (x, y, z);
-        std::vector<float> leaf_node;
-        getNeighborList1D (leaf_node, index_3d);
-        createSurface (leaf_node, index_3d, cloud);
-      }
-  pcl::toPCLPointCloud2 (cloud, output.cloud);
-
-  output.polygons.resize (cloud.size () / 3);
-  for (size_t i = 0; i < output.polygons.size (); ++i)
-  {
-    pcl::Vertices v;
-    v.vertices.resize (3);
-    for (int j = 0; j < 3; ++j)
-      v.vertices[j] = static_cast<int> (i) * 3 + j;
-    output.polygons[i] = v;
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////
- void
-pcl::MarchingCubesSDF::performReconstruction (pcl::PointCloud<pcl::PointXYZ> &points,
-                                                    std::vector<pcl::Vertices> &polygons)
-{
-  if (!(iso_level_ >= 0 && iso_level_ < 1))
-  {
-    PCL_ERROR ("[pcl::%s::performReconstruction] Invalid iso level %f! Please use a number between 0 and 1.\n", getClassName ().c_str (), iso_level_);
-    points.width = points.height = 0;
-    points.points.clear ();
-    polygons.clear ();
-    return;
-  }
-
-  // Create grid
-  //grid_ = std::vector<float> (res_x_*res_y_*res_z_, 0.0f);
-
-
-  // Run the actual marching cubes algorithm, store it into a point cloud,
-  // and copy the point cloud + connectivity into output
-  points.clear ();
-  for (int x = 1; x < res_x_-1; ++x)
-    for (int y = 1; y < res_y_-1; ++y)
-      for (int z = 1; z < res_z_-1; ++z)
-      {
-        Eigen::Vector3i index_3d (x, y, z);
-        std::vector<float> leaf_node;
-        getNeighborList1D (leaf_node, index_3d);
-        createSurface (leaf_node, index_3d, points);
-      }
-
-  polygons.resize (points.size () / 3);
-  for (size_t i = 0; i < polygons.size (); ++i)
-  {
-    pcl::Vertices v;
-    v.vertices.resize (3);
-    for (int j = 0; j < 3; ++j)
-      v.vertices[j] = static_cast<int> (i) * 3 + j;
-    polygons[i] = v;
-  }
-}
 
  void
  pcl::MarchingCubesSDF::performReconstruction (pcl::PointCloud<pcl::PointXYZ> &points)
@@ -356,12 +251,15 @@ pcl::MarchingCubesSDF::performReconstruction (pcl::PointCloud<pcl::PointXYZ> &po
    // Run the actual marching cubes algorithm, store it into a point cloud,
    // and copy the point cloud + connectivity into output
    points.clear ();
+   Eigen::Vector3i index_3d (0,0,0);
+   float leaf_node[8];
    for (int x = 1; x < res_x_-1; ++x)
      for (int y = 1; y < res_y_-1; ++y)
        for (int z = 1; z < res_z_-1; ++z)
        {
-         Eigen::Vector3i index_3d (x, y, z);
-         std::vector<float> leaf_node;
+    	   index_3d(0) = x;
+    	   index_3d(1) = y;
+    	   index_3d(2) = z;
          getNeighborList1D (leaf_node, index_3d);
          createSurface (leaf_node, index_3d, points);
        }

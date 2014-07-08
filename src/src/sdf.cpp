@@ -327,20 +327,11 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 void SDF::visualize()
 {
 	ros::Time t0 = ros::Time::now();
-	pcl::PolygonMesh output;
-	
 	
 	pcl::PointCloud<pcl::PointXYZ> cloud;
 	mc->performReconstruction (cloud);
 	if (ros::ok())
 	{
-		/*for (int i = 0; i < polygons.size (); i++)
-		{
-		    std::cout << "  " << polygons[i] << std::endl;
-		}*/
-	
-		//std::cout << polygons<<std::endl;
-		
 		visualization_msgs::Marker marker;
 		marker.header.frame_id = "/world";
 		marker.header.stamp = ros::Time();

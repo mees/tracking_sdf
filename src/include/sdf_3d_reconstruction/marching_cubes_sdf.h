@@ -424,19 +424,6 @@ namespace pcl
       {
 	W_ = W;
       }
-      /** \brief Extract the surface.
-        * \param[out] output the resultant polygonal mesh
-        */
-       virtual void
-       performReconstruction (pcl::PolygonMesh &output);
-
-       /** \brief Extract the surface.
-         * \param[out] points the points of the extracted mesh
-         * \param[out] polygons the connectivity between the point of the extracted mesh.
-         */
-       virtual void
-       performReconstruction (pcl::PointCloud<pcl::PointXYZ> &points,
-                              std::vector<pcl::Vertices> &polygons);
        
        virtual void
               performReconstruction (pcl::PointCloud<pcl::PointXYZ> &points);
@@ -480,25 +467,17 @@ namespace pcl
         * \param cloud point cloud to store the vertices of the polygon
        */
       void
-      createSurface (std::vector<float> &leaf_node,
+      createSurface (float (&leaf)[8],
                      Eigen::Vector3i &index_3d,
                      pcl::PointCloud<pcl::PointXYZ> &cloud);
 
-      
-
-
-      /** \brief Method that returns the scalar value at the given grid position.
-        * \param[in] pos The 3D position in the grid
-        */
-      virtual float
-      getGridValue (Eigen::Vector3i pos);
 
       /** \brief Method that returns the scalar values of the neighbors of a given 3D position in the grid.
         * \param[in] index3d the point in the grid
         * \param[out] leaf the set of values
         */
       void
-      getNeighborList1D (std::vector<float> &leaf,
+      getNeighborList1D (float (&leaf)[8],
                          Eigen::Vector3i &index3d);
 
       /** \brief Class get name method. */

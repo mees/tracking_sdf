@@ -52,6 +52,9 @@ public:
 	 * set current transformation of the camera. 
 	 */
 	void set_camera_transformation(Eigen::Matrix<double,3,3> rot, Eigen::Vector3d trans);
+
+public:
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 #endif /* CAMERA_TRACKING_H_ */

@@ -119,6 +119,9 @@ public:
 	 */
 	void update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals);
 	
+public:
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 };
 
 #endif /* SDF_H_ */
