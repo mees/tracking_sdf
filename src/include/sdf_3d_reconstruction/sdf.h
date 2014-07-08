@@ -26,7 +26,7 @@
 #include <opencv/highgui.h>
 
 #include<Eigen/Eigen>
-
+#include <omp.h>
 
 #include "sdf_3d_reconstruction/marching_cubes_sdf.h"
 #include "sdf_3d_reconstruction/camera_tracking.h"

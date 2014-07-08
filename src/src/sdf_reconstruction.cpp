@@ -38,12 +38,11 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 
 	Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
 	this->camera_tracking->set_camera_transformation(rotMat, trans);
-	tf::Quaternion q = transform.getRotation();
-	tf::Vector3 v = transform.getOrigin();
-	cout<<" stamp: "<<transform.stamp_<<endl;
-	//cout<<"Transform Matrix: "<<trans_matrix<<endl;
-	cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
-	cout << "- Quat Rotation: [" << q.getX() << ", " << q.getY() << ", " << q.getZ() << ", " << q.getW() <<"]" << endl;
+//	tf::Quaternion q = transform.getRotation();
+//	tf::Vector3 v = transform.getOrigin();
+//	cout<<" stamp: "<<transform.stamp_<<endl;
+//	cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << endl;
+//	cout << "- Quat Rotation: [" << q.getX() << ", " << q.getY() << ", " << q.getZ() << ", " << q.getW() <<"]" << endl;
 	//pub.publish(test_cloud);
 
 
@@ -69,7 +68,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	ne.compute(*normals);
 
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
-	cout<<"finished updating"<<endl;
+	//cout<<"finished updating"<<endl;
 //	if(frame_num==5){
 //		sdf->visualize();
 //		frame_num = 0;
@@ -90,7 +89,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	Vector3d sdf_origin(-3.0, -4.0, -1.0);
 	
 		     //m , width, height, depth, treshold
-	sdf = new SDF(180, 6.0, 6.0, 4.0, sdf_origin,0.3, 0.05);
+	sdf = new SDF(360, 6.0, 6.0, 4.0, sdf_origin,0.3, 0.05);
 	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
 	
 	//sdf->create_circle(2.0, 0, 0.0, 0.0);

@@ -240,16 +240,19 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 	    cout << "Camera Matrix not received. Start rosbag file!" << endl;
 	    exit(0);
     } else {
-	Vector3i voxel_coordinates;
-	Vector3d cam_vect(0,0,1);
-	Vector3d global_coordinates, camera_point, camera_point_img, d_vect,normal_eigen;
-	Vector2d image_point;
-	float d_new, scalar = 0;
-	float w_new, w_old;
-	int i_image, j_image;
-	pcl::PointXYZRGB point;
-	pcl::Normal normal;
+    	//	omp_set_num_threads(target_thread_num);
+#pragma omp parallel for
 	for (int idx=0;idx<number_of_voxels;idx++){
+		Vector3i voxel_coordinates;
+		Vector3d cam_vect(0,0,1);
+		Vector3d global_coordinates, camera_point, camera_point_img, d_vect,normal_eigen;
+		Vector2d image_point;
+		float d_new, scalar = 0;
+		float w_new, w_old;
+		int i_image, j_image;
+		pcl::PointXYZRGB point;
+		pcl::Normal normal;
+
 		global_coordinates = global_coords[idx];
 		camera_tracking->project_world_to_camera(global_coordinates, camera_point);
 		//voxel behind the camera

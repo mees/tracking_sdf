@@ -16,6 +16,8 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
   cv_bridge
 )
+find_package(OpenMP)
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
 #find_package(OpenCV)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -90,9 +92,10 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES sdf_3d_reconstruction
   CATKIN_DEPENDS roscpp std_msgs
-  DEPENDS system_lib
+  DEPENDS system_lib OpenMP
 )
-
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   ${OpenMP_C_FLAGS}")
 ###########
 ## Build ##
 ###########
