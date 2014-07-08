@@ -41,6 +41,7 @@ void CameraTracking::set_camera_transformation(Eigen::Matrix3d& rot, Eigen::Vect
 	this->trans= trans;
 	this->rot_inv_trans = -1* (rot_inv * trans);
 }
+//TODO precalculate 2*(sdf->m_div_width)
 void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_point, Eigen::Matrix<float, 6, 1>& SDF_derivative){
 	
 	Vector3d current_world_point;
@@ -52,12 +53,29 @@ void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_po
 	float difference_size;
 	
 	this->project_camera_to_world(camera_point, current_world_point);
-	//x derivative
+	//tx derivative
 	before_world_point = Vector3d(current_world_point(0)-1, current_world_point(1), current_world_point(2));
 	behind_world_point = Vector3d(current_world_point(0)+1, current_world_point(1), current_world_point(2));
 	before = sdf->interpolate_distance(before_world_point);
 	behind = sdf->interpolate_distance(behind_world_point);
 	SDF_derivative(0) = (before - behind)/(2*(sdf->m_div_width));
 	
-	//y derivative
+	//ty derivative
+	before_world_point = Vector3d(current_world_point(0), current_world_point(1)-1, current_world_point(2));
+	behind_world_point = Vector3d(current_world_point(0), current_world_point(1)+1, current_world_point(2));
+	before = sdf->interpolate_distance(before_world_point);
+	behind = sdf->interpolate_distance(behind_world_point);
+	SDF_derivative(1) = (before - behind)/(2*(sdf->m_div_height));
+	
+	//tz derivative 
+	before_world_point = Vector3d(current_world_point(0), current_world_point(1), current_world_point(2)-1);
+	behind_world_point = Vector3d(current_world_point(0), current_world_point(1), current_world_point(2)+1);
+	before = sdf->interpolate_distance(before_world_point);
+	behind = sdf->interpolate_distance(behind_world_point);
+	SDF_derivative(2) = (before - behind)/(2*(sdf->m_div_depth));
+	
+	//wx derivative
+	before_world_point = Vector3d(current_world_point(0), current_world_point(1)+camera_point(2), current_world_point(2)-camera_point(1));
+	behind_world_point = Vector3d(current_world_point(0), current_world_point(1)-camera_point(2), current_world_point(2)+camera_point(1));
+	
 }
