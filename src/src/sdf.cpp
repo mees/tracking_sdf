@@ -1,5 +1,5 @@
 #include "sdf_3d_reconstruction/sdf.h"
-#include "../include/sdf_3d_reconstruction/camera_tracking.h"
+
 
 using namespace Eigen;
 /*
@@ -150,7 +150,7 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 		}
 	}
 }
-/*float SDF::interpolate_distance(Vector3d& world_coordinates){
+float SDF::interpolate_distance(Vector3d& world_coordinates){
 	Vector3d voxel_coordinates;
 	get_voxel_coordinates(world_coordinates, voxel_coordinates);
 	float i = voxel_coordinates(0);
@@ -165,21 +165,23 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 	      current_voxel(0) = ((int) i)+i_offset;
 	      current_voxel(1) = ((int) j)+j_offset;
 	      current_voxel(2) = ((int) k)+k_offset;
-	      float volume = fabs(current_voxel(0)-i) * fabs(current_voxel(1)-j)* fabs(current_voxel(2)-k);
+	      float volume = fabs(current_voxel(0)-i) + fabs(current_voxel(1)-j)+ fabs(current_voxel(2)-k);
 	      int a_idx = get_array_index(current_voxel);
 	      if (a_idx != -1){
+		  if (W[a_idx] >0){
 			if (volume < 0.00001){
 				return this->D[a_idx];
 			}
 			float w = 1.0/volume;
 			w_sum += w;
 			sum_d +=  w*this->D[a_idx];
+		  }
 	      }
 	    }
 	  }
 	}
 	return sum_d / w_sum;
-}*/
+}
 void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::ColorRGBA& color){
 	Vector3d global_coordinates;
 	Vector3d voxel_coordinates;

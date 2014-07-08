@@ -21,12 +21,8 @@
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 #include "visualization_msgs/MarkerArray.h"
-#include "cv_bridge/cv_bridge.h"
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
 
 #include<Eigen/Eigen>
-
 
 #include "sdf_3d_reconstruction/marching_cubes_sdf.h"
 #include "sdf_3d_reconstruction/camera_tracking.h"
@@ -61,12 +57,12 @@ private:
 	pcl::MarchingCubesSDF *mc;
 
 	int m_squared;
-	float m_div_height;
-	float m_div_width;
-	float m_div_depth;
 
 
 public:
+	float m_div_height;
+	float m_div_width;
+	float m_div_depth;
 	/**
 	 *  standard constructor
 	 */

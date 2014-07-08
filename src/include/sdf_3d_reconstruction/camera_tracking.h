@@ -6,6 +6,7 @@
 #include <pcl/point_types.h>
 #include<Eigen/Eigen>
 class SDF;
+//#include "sdf_3d_reconstruction/sdf.h"
 using namespace Eigen;
 using namespace std;
 class CameraTracking {
@@ -69,7 +70,7 @@ public:
 	 *   v2
 	 *   v3
 	 */
-	void get_partial_derivative(SDF& sdf, Eigen::Vector3d& camera_point,  Eigen::Matrix<float, 6, 1>& SDF_derivative);
+	void get_partial_derivative(SDF *sdf, Eigen::Vector3d& camera_point,  Eigen::Matrix<float, 6, 1>& SDF_derivative);
 
 public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

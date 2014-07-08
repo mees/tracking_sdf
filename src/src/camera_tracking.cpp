@@ -1,4 +1,5 @@
 #include "sdf_3d_reconstruction/camera_tracking.h"
+#include "sdf_3d_reconstruction/sdf.h"
 CameraTracking::CameraTracking(){
   
 }
@@ -40,14 +41,23 @@ void CameraTracking::set_camera_transformation(Eigen::Matrix3d& rot, Eigen::Vect
 	this->trans= trans;
 	this->rot_inv_trans = -1* (rot_inv * trans);
 }
-void CameraTracking::get_partial_derivative(SDF& sdf, Eigen::Vector3d& camera_point, Eigen::Matrix<float, 6, 1>& SDF_derivative){
+void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_point, Eigen::Matrix<float, 6, 1>& SDF_derivative){
 	
 	Vector3d current_world_point;
 	//we use central difference
 	Vector3d before_world_point;
 	Vector3d behind_world_point;
+	float before;
+	float behind;
 	float difference_size;
+	
 	this->project_camera_to_world(camera_point, current_world_point);
 	//x derivative
+	before_world_point = Vector3d(current_world_point(0)-1, current_world_point(1), current_world_point(2));
+	behind_world_point = Vector3d(current_world_point(0)+1, current_world_point(1), current_world_point(2));
+	before = sdf->interpolate_distance(before_world_point);
+	behind = sdf->interpolate_distance(behind_world_point);
+	SDF_derivative(0) = (before - behind)/(2*(sdf->m_div_width));
 	
+	//y derivative
 }
