@@ -70,7 +70,14 @@ public:
 	 *   v2
 	 *   v3
 	 */
-	void get_partial_derivative(SDF *sdf, Eigen::Vector3d& camera_point,  Eigen::Matrix<float, 6, 1>& SDF_derivative);
+	void get_partial_derivative(SDF *sdf, Eigen::Vector3d& camera_point, Eigen::Matrix<double, 6, 1>& SDF_derivative,
+	   Eigen::Matrix<double, 3, 3>& r1p,Eigen::Matrix<double, 3, 3>& r1m, 
+	   Eigen::Matrix<double, 3, 3>& r2p,Eigen::Matrix<double, 3, 3>& r2m,
+	   Eigen::Matrix<double, 3, 3>& r3p,Eigen::Matrix<double, 3, 3>& r3m, double w_h, bool& is_interpolated, double& sdf_val);
+	/**
+	 * estimates the new position from the old one given the new sdf
+	 */
+	void estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud);
 
 public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

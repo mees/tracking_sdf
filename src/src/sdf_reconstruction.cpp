@@ -30,14 +30,8 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 //	pcl_ros::transformPointCloud(trans_matrix, *ros_cloud, test_cloud);
 //	test_cloud.header.frame_id = "/world";
 	
-	Vector3d trans;
-	Eigen::Quaterniond rot;
-	//TODO: als tf belassen?
-	tf::vectorTFToEigen(transform.getOrigin(),trans);
-	tf::quaternionTFToEigen(transform.getRotation(), rot);
-
-	Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();
-	this->camera_tracking->set_camera_transformation(rotMat, trans);
+	
+	
 //	tf::Quaternion q = transform.getRotation();
 //	tf::Vector3 v = transform.getOrigin();
 //	cout<<" stamp: "<<transform.stamp_<<endl;
@@ -67,12 +61,24 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	ne.setInputCloud(cloud_filtered);
 	ne.compute(*normals);
 
+	Vector3d trans;
+	Eigen::Quaterniond rot;
+	//TODO: als tf belassen?
+	tf::vectorTFToEigen(transform.getOrigin(),trans);
+	tf::quaternionTFToEigen(transform.getRotation(), rot);
+	if (frame_num > 1){
+	    this->camera_tracking->estimate_new_position(sdf,cloud_filtered);
+	}
+	Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();	
+	this->camera_tracking->set_camera_transformation(rotMat, trans);
+	
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
 	//cout<<"finished updating"<<endl;
 //	if(frame_num==5){
 //		sdf->visualize();
 //		frame_num = 0;
 //	}
+	
 	CALLGRIND_STOP_INSTRUMENTATION;
 	CALLGRIND_DUMP_STATS;
 }
@@ -89,7 +95,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	Vector3d sdf_origin(-3.0, -4.0, -1.0);
 	
 		     //m , width, height, depth, treshold
-	sdf = new SDF(360, 6.0, 6.0, 4.0, sdf_origin,0.3, 0.05);
+	sdf = new SDF(140, 6.0, 6.0, 4.0, sdf_origin,0.3, 0.05);
 	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
 	
 	//sdf->create_circle(2.0, 0, 0.0, 0.0);
