@@ -128,8 +128,12 @@ public:
 	 *  and the observed depth of the projected voxel pixel in the depth image, in camera frame
 	 */
 	void projectivePointToPointDistance(const double &voxelDepthInCameraFrame,
-			const float &observedDepthOfProjectedVoxelInDepthImage,
-			float &distance);
+			const double &observedDepthOfProjectedVoxelInDepthImage,
+			double &pointToPointDistance);
+
+	void projectivePointToPlaneDistance(const Vector3d &camera_point,
+			const Vector3d &camera_point_img, const Vector3d &normal,
+			double & pointToPlaneDistance);
 
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW

@@ -239,9 +239,15 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
  * point-to-point distance computes the difference of the depth of the voxel
  *  and the observed depth of the projected voxel pixel in the depth image, in camera frame
  */
-void SDF::projectivePointToPointDistance(const double &voxelDepthInCameraFrame, const float &observedDepthOfProjectedVoxelInDepthImage, float &distance){
+void SDF::projectivePointToPointDistance(const double &voxelDepthInCameraFrame, const double &observedDepthOfProjectedVoxelInDepthImage, double &pointToPointDistance){
 
-	distance = voxelDepthInCameraFrame - observedDepthOfProjectedVoxelInDepthImage;
+	pointToPointDistance = voxelDepthInCameraFrame - observedDepthOfProjectedVoxelInDepthImage;
+}
+
+void SDF::projectivePointToPlaneDistance(const Vector3d &camera_point, const Vector3d &camera_point_img, const Vector3d &normal, double & pointToPlaneDistance){
+	Vector3d diff_vec = camera_point_img-camera_point;
+	pointToPlaneDistance = diff_vec.dot(normal);
+
 }
 
 void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals){
@@ -256,7 +262,7 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 	for (int idx=0;idx<number_of_voxels;idx++){
 		Vector3i voxel_coordinates;
 		Vector3d cam_vect(0,0,1);
-		Vector3d global_coordinates, camera_point, camera_point_img, d_vect,normal_eigen;
+		Vector3d global_coordinates, camera_point, camera_point_img,normal_eigen;
 		Vector2d image_point;
 		float d_new, scalar = 0;
 		float w_new, w_old;
@@ -283,20 +289,18 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 		if (isnan(point.x) || isnan(point.y) || isnan(normal.normal_x) || isnan(normal.normal_y) || isnan(normal.normal_z)){
 			continue;
 		}
-//		camera_point_img(0) =  point.x;
-//		camera_point_img(1) =  point.y;
-//		camera_point_img(2) =  point.z;
-		d_vect = (camera_point - camera_point_img);
-		float pointToPointDistance = 0;
-		projectivePointToPointDistance(camera_point(2), point.z, pointToPointDistance);
-		//cout<<"camera_point: "<<camera_point<<" camera_point_img: "<<camera_point_img<<" dist: "<<pointToPointDistance<<endl;
-		//d_new = d_vect.norm();
-//		if (d_vect(2) < 0){
-//		  d_new = -1*d_new;
-//		}
-		//cout<<"d_new: "<<d_new<<endl;
-		//cout << d_new << endl;
-		d_new = pointToPointDistance;
+		camera_point_img(0) =  point.x;
+		camera_point_img(1) =  point.y;
+		camera_point_img(2) =  point.z;
+		double pointToPointDistance, pointToPlaneDistance = 0;
+		//projectivePointToPointDistance(camera_point(2), camera_point_img(2), pointToPointDistance);
+		Vector3d normalVec;
+		normalVec(0) = normal.normal_x;
+		normalVec(1) = normal.normal_y;
+		normalVec(2) = normal.normal_z;
+		projectivePointToPlaneDistance(camera_point, camera_point_img, normalVec, pointToPlaneDistance);
+		//cout<<"camera_point: \n"<<camera_point<<" camera_point_img: \n"<<camera_point_img<<" point2point dist: \n"<<pointToPointDistance<<" poin2plane: \n"<<pointToPlaneDistance<<endl;
+		d_new = pointToPlaneDistance;
 		w_new = 1.0;
 		if (d_new >= this->distance_epsilon && d_new <= this->distance_delta){
 		  w_new = exp(-0.5*(d_new - this->distance_epsilon)*(d_new - this->distance_epsilon));
