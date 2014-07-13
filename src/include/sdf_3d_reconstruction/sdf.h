@@ -32,7 +32,6 @@ using namespace Eigen;
 class SDF {
 
 private:
-	int m;
 	//width
 	float width, height, depth, distance_delta, distance_epsilon;
 	//Distance array
@@ -60,6 +59,7 @@ private:
 	int m_squared;
 
 public:
+	int m;
 	float m_div_height;
 	float m_div_width;
 	float m_div_depth;
@@ -73,7 +73,8 @@ public:
 	/**
 	 * gets interpolated distance with world coordinates.
 	 */
-	float interpolate_distance(Vector3d& world_coordinates);
+
+	float interpolate_distance(Vector3d& world_coordinates, bool& is_interpolated);
 
 	/**
 	 * gets interpolated color with world coordinates.
