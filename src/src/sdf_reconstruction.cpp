@@ -1,11 +1,7 @@
 #include "sdf_3d_reconstruction/sdf_reconstruction.h"
 #include <stdlib.h>
 
-//todo: implement
-float SDF_Reconstruction::projectivePointToPointDistance(Matrix<double, 3, 3> &CamRot,
-		Vector3d &CamTrans, Vector3i &voxel_coordinates){
-	return 0;
-}
+
 
 
 //void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,

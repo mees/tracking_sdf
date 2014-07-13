@@ -3,7 +3,7 @@
  *
  *  Created on: 19.05.2014
  *      Author: joel
- */ 
+ */
 #ifndef SDF_H_
 #define SDF_H_
 #include <string>
@@ -25,22 +25,21 @@
 #include<Eigen/Eigen>
 #include <omp.h>
 
-
 #include "sdf_3d_reconstruction/marching_cubes_sdf.h"
 #include "sdf_3d_reconstruction/camera_tracking.h"
 
 using namespace Eigen;
 class SDF {
-  
+
 private:
 	int m;
 	//width
-	float width, height, depth, distance_delta,distance_epsilon;
+	float width, height, depth, distance_delta, distance_epsilon;
 	//Distance array
 	float *D;
 	//Weight array
 	float *W;
-
+	//global coordinates of the voxels
 	Vector3d *global_coords;
 
 	float *Color_W;
@@ -60,7 +59,6 @@ private:
 
 	int m_squared;
 
-
 public:
 	float m_div_height;
 	float m_div_width;
@@ -68,26 +66,30 @@ public:
 	/**
 	 *  standard constructor
 	 */
-	SDF(int m, float width, float height, float depth, Vector3d& sdf_origin, float distance_delta, float distance_epsilon);
+	SDF(int m, float width, float height, float depth, Vector3d& sdf_origin,
+			float distance_delta, float distance_epsilon);
 	virtual ~SDF();
-	
+
 	/**
 	 * gets interpolated distance with world coordinates.
 	 */
 	float interpolate_distance(Vector3d& world_coordinates);
-	
+
 	/**
 	 * gets interpolated color with world coordinates.
 	 */
-	void interpolate_color(geometry_msgs::Point& global_coords, std_msgs::ColorRGBA& color);
+	void interpolate_color(geometry_msgs::Point& global_coords,
+			std_msgs::ColorRGBA& color);
 	/**
 	 * helper function for testing issues
 	 */
-	void create_circle(float radius, float center_x, float center_y, float center_z);
+	void create_circle(float radius, float center_x, float center_y,
+			float center_z);
 	/**
 	 * helper function for testing issues
 	 */
-	void create_cuboid(float min_x, float max_x, float min_y, float max_y, float min_z, float max_z);
+	void create_cuboid(float min_x, float max_x, float min_y, float max_y,
+			float min_z, float max_z);
 	/**
 	 *  
 	 **/
@@ -106,19 +108,31 @@ public:
 	 *  input: global_coordinates
 	 *  output: voxel_coordinates
 	 */
-	void get_voxel_coordinates(Vector3d& global_coordinates, Vector3d& voxel_coordinates);
+	void get_voxel_coordinates(Vector3d& global_coordinates,
+			Vector3d& voxel_coordinates);
 	/*
 	 *  input: globale coordinate x,y,z
 	 *  output: voxel_coordinates i,j,k
 	 */
-	void get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_coordinates);
+	void get_global_coordinates(Vector3i& voxel_coordinates,
+			Vector3d& global_coordinates);
 	/*
 	 * 
 	 */
-	void update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals);
-	
+	void update(CameraTracking* camera_tracking,
+			pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered,
+			pcl::PointCloud<pcl::Normal>::Ptr normals);
+
+	/*
+	 * point-to-point distance computes the difference of the depth of the voxel
+	 *  and the observed depth of the projected voxel pixel in the depth image, in camera frame
+	 */
+	void projectivePointToPointDistance(const double &voxelDepthInCameraFrame,
+			const float &observedDepthOfProjectedVoxelInDepthImage,
+			float &distance);
+
 public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 };
 

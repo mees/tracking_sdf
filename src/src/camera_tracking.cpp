@@ -22,6 +22,9 @@ void CameraTracking::camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_
 	cout<<"read Camera Matrix"<<this->K<<endl;
 	this->cam_info.shutdown();
 }
+/*
+ * projects a point from camera perspective to image plane
+ */
 void CameraTracking::project_camera_to_image_plane(Vector3d& camera_point, Vector2d& image_point){
 	//Eq. 2
 	Vector3d ij;
@@ -29,6 +32,9 @@ void CameraTracking::project_camera_to_image_plane(Vector3d& camera_point, Vecto
 	image_point(0) = ij(0)/ij(2); 
 	image_point(1) = ij(1)/ij(2); 
 }
+/**
+ * project a global point from world coordinates to camera coordinates
+ */
 void CameraTracking::project_world_to_camera(Vector3d& world_point, Vector3d& camera_point){
 	camera_point = this->rot_inv*world_point + this->rot_inv_trans;
 }

@@ -235,6 +235,15 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
 	color.b /= aux;
 }
 
+/*
+ * point-to-point distance computes the difference of the depth of the voxel
+ *  and the observed depth of the projected voxel pixel in the depth image, in camera frame
+ */
+void SDF::projectivePointToPointDistance(const double &voxelDepthInCameraFrame, const float &observedDepthOfProjectedVoxelInDepthImage, float &distance){
+
+	distance = voxelDepthInCameraFrame - observedDepthOfProjectedVoxelInDepthImage;
+}
+
 void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals){
 		ros::Time t0 = ros::Time::now();
     
@@ -257,14 +266,14 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 
 		global_coordinates = global_coords[idx];
 		camera_tracking->project_world_to_camera(global_coordinates, camera_point);
-		//voxel behind the camera
+		//if voxel behind the camera
 		if (camera_point(2) < 0){
 			continue;
 		}
 		camera_tracking->project_camera_to_image_plane(camera_point, image_point);
 		i_image = image_point(0);
 		j_image = image_point(1);
-		//voxel not inside the image
+		//if voxel not inside the image
 		if (i_image >= cloud_filtered->width || j_image >= cloud_filtered->height || i_image< 0 || j_image < 0){
 			continue;
 		}
@@ -274,15 +283,20 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 		if (isnan(point.x) || isnan(point.y) || isnan(normal.normal_x) || isnan(normal.normal_y) || isnan(normal.normal_z)){
 			continue;
 		}
-		camera_point_img(0) =  point.x;
-		camera_point_img(1) =  point.y;
-		camera_point_img(2) =  point.z;
+//		camera_point_img(0) =  point.x;
+//		camera_point_img(1) =  point.y;
+//		camera_point_img(2) =  point.z;
 		d_vect = (camera_point - camera_point_img);
-		d_new = d_vect.norm();
-		if (d_vect(2) < 0){
-		  d_new = -1*d_new;
-		}
+		float pointToPointDistance = 0;
+		projectivePointToPointDistance(camera_point(2), point.z, pointToPointDistance);
+		//cout<<"camera_point: "<<camera_point<<" camera_point_img: "<<camera_point_img<<" dist: "<<pointToPointDistance<<endl;
+		//d_new = d_vect.norm();
+//		if (d_vect(2) < 0){
+//		  d_new = -1*d_new;
+//		}
+		//cout<<"d_new: "<<d_new<<endl;
 		//cout << d_new << endl;
+		d_new = pointToPointDistance;
 		w_new = 1.0;
 		if (d_new >= this->distance_epsilon && d_new <= this->distance_delta){
 		  w_new = exp(-0.5*(d_new - this->distance_epsilon)*(d_new - this->distance_epsilon));
