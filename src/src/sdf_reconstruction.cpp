@@ -62,9 +62,9 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	//TODO: als tf belassen?
 	tf::vectorTFToEigen(transform.getOrigin(),trans);
 	tf::quaternionTFToEigen(transform.getRotation(), rot);
-	if (frame_num > 1){
-	    this->camera_tracking->estimate_new_position(sdf,cloud_filtered);
-	}
+//	if (frame_num > 1){
+//	    this->camera_tracking->estimate_new_position(sdf,cloud_filtered);
+//	}
 	Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();	
 	this->camera_tracking->set_camera_transformation(rotMat, trans);
 	
@@ -91,7 +91,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	Vector3d sdf_origin(-3.0, -4.0, -1.0);
 	
 		     //m , width, height, depth, treshold
-	sdf = new SDF(140, 6.0, 6.0, 4.0, sdf_origin,0.3, 0.05);
+	sdf = new SDF(360, 6.0, 6.0, 4.0, sdf_origin,0.3, 0.05);
 	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
 	
 	//sdf->create_circle(2.0, 0, 0.0, 0.0);

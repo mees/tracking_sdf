@@ -306,14 +306,14 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 		camera_point_img(1) =  point.y;
 		camera_point_img(2) =  point.z;
 		double pointToPointDistance, pointToPlaneDistance = 0;
-		//projectivePointToPointDistance(camera_point(2), camera_point_img(2), pointToPointDistance);
-		Vector3d normalVec;
-		normalVec(0) = normal.normal_x;
-		normalVec(1) = normal.normal_y;
-		normalVec(2) = normal.normal_z;
-		projectivePointToPlaneDistance(camera_point, camera_point_img, normalVec, pointToPlaneDistance);
+		projectivePointToPointDistance(camera_point(2), camera_point_img(2), pointToPointDistance);
+
+		normal_eigen(0) = normal.normal_x;
+		normal_eigen(1) = normal.normal_y;
+		normal_eigen(2) = normal.normal_z;
+		//projectivePointToPlaneDistance(camera_point, camera_point_img, normal_eigen, pointToPlaneDistance);
 		//cout<<"camera_point: \n"<<camera_point<<" camera_point_img: \n"<<camera_point_img<<" point2point dist: \n"<<pointToPointDistance<<" poin2plane: \n"<<pointToPlaneDistance<<endl;
-		d_new = pointToPlaneDistance;
+		d_new = pointToPointDistance;
 		w_new = 1.0;
 		if (d_new >= this->distance_epsilon && d_new <= this->distance_delta){
 		  w_new = exp(-0.5*(d_new - this->distance_epsilon)*(d_new - this->distance_epsilon));
@@ -330,21 +330,18 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 		
 		D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
 		
+		Vector3d tmp = (cam_vect - camera_tracking->trans);
+		double cosine = fabs((tmp.dot(normal_eigen))) / (tmp.norm()*normal_eigen.norm());
+		//std::cout <<"cosine:  "<< cosine<<std::endl;;
 
-		normal_eigen(0) = normal.normal_x;
-		normal_eigen(1) = normal.normal_y;
-		normal_eigen(2) = normal.normal_z;
 		
-		scalar = fabs((cam_vect - camera_tracking->trans).dot(normal_eigen));
-
-		//std::cout <<scalar << std::endl;;
 		w_old = Color_W[idx];
-		w_new = w_new * scalar;
+		w_new = w_new * cosine;
 		Color_W[idx] = w_old + w_new;
 		
-		R[idx] = w_old/Color_W[idx] * R[idx] + w_new/Color_W[idx] * point.r;	
-		G[idx] = w_old/Color_W[idx] * G[idx] + w_new/Color_W[idx] * point.g;
-		B[idx] = w_old/Color_W[idx] * B[idx] + w_new/Color_W[idx] * point.b;
+		R[idx] = (w_old * R[idx] + w_new * point.r)/Color_W[idx];
+		G[idx] = (w_old * G[idx] + w_new * point.g)/Color_W[idx];
+		B[idx] = (w_old * B[idx] + w_new * point.b)/Color_W[idx];
 	}
 	std::cout << "update method: "<<(ros::Time::now()-t0).toSec()<< std::endl;
 	this->visualize();
