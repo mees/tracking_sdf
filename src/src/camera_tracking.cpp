@@ -11,7 +11,7 @@ CameraTracking::CameraTracking(int gauss_newton_max_iteration, float maximum_twi
                        0,1,0,\
 		       0,0,1;
       this->rot_inv_trans =  Eigen::Vector3d(0,0,0);
-      cout << this->rot;
+      //cout << this->rot;
       this->maximum_twist_diff = maximum_twist_diff;
       this->gauss_newton_max_iteration = gauss_newton_max_iteration;
   
