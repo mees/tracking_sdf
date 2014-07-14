@@ -402,7 +402,7 @@ namespace pcl
         */
       inline void
       setGridResolution (int res_x, int res_y, int res_z)
-      { res_x_ = res_x; res_y_ = res_y; res_z_ = res_z; zy_index_offset = res_z* res_y; }
+      { res_x_ = res_x; res_y_ = res_y; res_z_ = res_z; zy_index_offset = res_z* res_y; number_of_voxels = (res_x_-2)*(res_y_-2)*(res_z_-2);}
 
 
       /** \brief Method to get the marching cubes grid resolution.
@@ -412,7 +412,7 @@ namespace pcl
         */
       inline void
       getGridResolution (int &res_x, int &res_y, int &res_z)
-      { res_x = res_x_; res_y = res_y_; res_z = res_z_; }
+      { res_x = res_x_; res_y = res_y_; res_z = res_z_; zy_index_offset = res_z* res_y; number_of_voxels = res_x_*res_y_*res_z_;}
 
       inline void
       setGrid(float *grid)
@@ -423,6 +423,11 @@ namespace pcl
       setW(float *W)
       {
 	W_ = W;
+      }
+      inline void
+      setVoxelCoordinates(Eigen::Vector3i *voxel_coords)
+      {
+    	  voxel_coords_ = voxel_coords;
       }
        
        virtual void
@@ -435,6 +440,9 @@ namespace pcl
       /** \brief The data structure storing the 3D grid */
       float *grid_;
       float *W_;
+
+      Eigen::Vector3i *voxel_coords_;
+      int number_of_voxels;
 
       /** \brief The grid resolution */
       int res_x_, res_y_, res_z_;
@@ -467,8 +475,8 @@ namespace pcl
         * \param cloud point cloud to store the vertices of the polygon
        */
       void
-      createSurface (float (&leaf)[8],
-                     Eigen::Vector3i &index_3d,
+      createSurface (const float (&leaf)[8],
+                     const Eigen::Vector3i &index_3d,
                      pcl::PointCloud<pcl::PointXYZ> &cloud);
 
 

@@ -98,10 +98,11 @@ pcl::MarchingCubesSDF::interpolateEdge (Eigen::Vector3f &p1,
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 void
-pcl::MarchingCubesSDF::createSurface (float (&leaf_node)[8],
-                                            Eigen::Vector3i &index_3d,
+pcl::MarchingCubesSDF::createSurface (const float (&leaf_node)[8],
+                                            const Eigen::Vector3i &index_3d,
                                             pcl::PointCloud<pcl::PointXYZ> &cloud)
 {
+
   int cubeindex = 0;
   Eigen::Vector3f vertex_list[12];
   if (leaf_node[0] < iso_level_) cubeindex |= 1;
@@ -123,12 +124,11 @@ pcl::MarchingCubesSDF::createSurface (float (&leaf_node)[8],
   center[1] = min_p_[1] + (max_p_[1] - min_p_[1]) * float (index_3d[1]) / float (res_y_);
   center[2] = min_p_[2] + (max_p_[2] - min_p_[2]) * float (index_3d[2]) / float (res_z_);
 
-  std::vector<Eigen::Vector3f> p;
-  p.resize (8);
-  for (int i = 0; i < 8; ++i)
+  Eigen::Vector3f *p = new Eigen::Vector3f[8];
+  for (int i = 0; i < 8; i++)
   {
     Eigen::Vector3f point = center;
-    if(i & 0x4)
+    if(i	 & 0x4)
       point[1] = static_cast<float> (center[1] + (max_p_[1] - min_p_[1]) / float (res_y_));
 
     if(i & 0x2)
@@ -167,23 +167,31 @@ pcl::MarchingCubesSDF::createSurface (float (&leaf_node)[8],
   if (edgeTable[cubeindex] & 2048)
     interpolateEdge (p[3], p[7], leaf_node[3], leaf_node[7], vertex_list[11]);
 
+
   // Create the triangle
+
   for (int i = 0; triTable[cubeindex][i] != -1; i+=3)
   {
     pcl::PointXYZ p1,p2,p3;
     p1.x = vertex_list[triTable[cubeindex][i  ]][0];
     p1.y = vertex_list[triTable[cubeindex][i  ]][1];
     p1.z = vertex_list[triTable[cubeindex][i  ]][2];
+
     cloud.push_back (p1);
+
     p2.x = vertex_list[triTable[cubeindex][i+1]][0];
     p2.y = vertex_list[triTable[cubeindex][i+1]][1];
     p2.z = vertex_list[triTable[cubeindex][i+1]][2];
+
     cloud.push_back (p2);
+
     p3.x = vertex_list[triTable[cubeindex][i+2]][0];
     p3.y = vertex_list[triTable[cubeindex][i+2]][1];
     p3.z = vertex_list[triTable[cubeindex][i+2]][2];
+
     cloud.push_back (p3);
   }
+
 }
 
 
@@ -251,18 +259,14 @@ pcl::MarchingCubesSDF::getNeighborList1D (float (&leaf)[8],
    // Run the actual marching cubes algorithm, store it into a point cloud,
    // and copy the point cloud + connectivity into output
    points.clear ();
-   Eigen::Vector3i index_3d (0,0,0);
    float leaf_node[8];
-   for (int x = 1; x < res_x_-1; ++x)
-     for (int y = 1; y < res_y_-1; ++y)
-       for (int z = 1; z < res_z_-1; ++z)
-       {
-    	   index_3d(0) = x;
-    	   index_3d(1) = y;
-    	   index_3d(2) = z;
-         getNeighborList1D (leaf_node, index_3d);
-         createSurface (leaf_node, index_3d, points);
-       }
+   Eigen::Vector3i index_3d;
+   for (int idx=0;idx<number_of_voxels;idx++){
+	   index_3d = voxel_coords_[idx];
+	   getNeighborList1D (leaf_node, index_3d);
+	   createSurface (leaf_node, index_3d, points);
+   }
+
  }
 
 #endif

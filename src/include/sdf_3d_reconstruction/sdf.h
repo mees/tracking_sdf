@@ -41,6 +41,8 @@ private:
 	//global coordinates of the voxels
 	Vector3d *global_coords;
 
+	Vector3i *voxel_coords;
+
 	float *Color_W;
 	//Red Array
 	float *R;

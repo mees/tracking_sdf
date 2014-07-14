@@ -9,6 +9,7 @@ SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, flo
 	number_of_voxels = m * m * m;
 	D = new float[number_of_voxels];
 	global_coords = new Vector3d[number_of_voxels];
+	voxel_coords = new Vector3i[(m-2)*(m-2)*(m-2)];
 	W = new float[number_of_voxels];
 	Color_W = new float[number_of_voxels];
 	R = new float[number_of_voxels];
@@ -21,6 +22,7 @@ SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, flo
 
 	Vector3i voxel_coordinates;
 	Vector3d global_coordinates;
+	int vox_ind = 0;
 	for (int i = 0; i<number_of_voxels; i++) {
 		D[i] = width+height+depth;
 		Color_W[i] = 0;
@@ -29,6 +31,10 @@ SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, flo
 		G[i] = 0.4;
 		B[i] = 0.4;
 		get_voxel_coordinates(i, voxel_coordinates);
+		if((voxel_coordinates(0)>0 && voxel_coordinates(0)<m-1) && (voxel_coordinates(1)>0 && voxel_coordinates(1)<m-1) && (voxel_coordinates(2)>0 && voxel_coordinates(2)<m-1)){
+		voxel_coords[vox_ind] = voxel_coordinates;
+		vox_ind++;
+		}
 		get_global_coordinates(voxel_coordinates, global_coordinates);
 		global_coords[i] = global_coordinates;
 	}
@@ -38,6 +44,7 @@ SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, flo
 	mc->setBBox(this->width, this->height, this->depth);
 	mc->setGrid(this->D);
 	mc->setW(this->W);
+	mc->setVoxelCoordinates(this->voxel_coords);
 	this->register_visualization();
 }
 SDF::~SDF(){
@@ -75,8 +82,8 @@ inline int SDF::get_array_index(Vector3i& voxel_coordinates){
 // boost multidimensionales array
 
 inline void SDF::get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinates){
-	voxel_coordinates(1) = (int) (array_idx % (this->m*this->m))/this->m;
-	voxel_coordinates(0) = (int) (array_idx/(this->m*this->m));
+	voxel_coordinates(1) = (int) (array_idx % m_squared)/this->m;
+	voxel_coordinates(0) = (int) (array_idx/m_squared);
 	voxel_coordinates(2) = (int) array_idx%this->m;
 }
 // auf dem Blatt verifiziert durch Oier und Joel
