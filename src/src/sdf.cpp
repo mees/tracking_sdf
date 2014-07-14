@@ -335,7 +335,7 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 		w_old = W[idx];
 		W[idx] = w_old + w_new;
 		
-		D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
+		D[idx] = (w_old * D[idx] + w_new * d_new)/W[idx];
 		
 		double cosine = fabs((cam_vect.dot(normal_eigen)))/normal_eigen.norm();
 		//std::cout <<"cosine:  "<< cosine<<std::endl;;
