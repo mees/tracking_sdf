@@ -1,10 +1,22 @@
 #include "sdf_3d_reconstruction/camera_tracking.h"
 #include "sdf_3d_reconstruction/sdf.h"
-CameraTracking::CameraTracking(){
+CameraTracking::CameraTracking(int gauss_newton_max_iteration, float maximum_twist_diff){
+      this->trans = Eigen::Vector3d(0,0,0);
+      this->rot = Eigen::Matrix3d();
+      this->rot << 1,0,0,\
+		   0,1,0,\
+		   0,0,1;
+      this->rot_inv = Eigen::Matrix3d();
+      this->rot_inv << 1,0,0,\
+                       0,1,0,\
+		       0,0,1;
+      this->rot_inv_trans =  Eigen::Vector3d(0,0,0);
+      cout << this->rot;
+      this->maximum_twist_diff = maximum_twist_diff;
+      this->gauss_newton_max_iteration = gauss_newton_max_iteration;
   
 }
 CameraTracking::~CameraTracking(){
-  
 }
 
 void CameraTracking::camera_info_cb(const sensor_msgs::CameraInfoConstPtr &rgbd_camera_info)
@@ -57,73 +69,107 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 	double w_h = 0.02;
 	bool is_interpolated;
 	Eigen::Matrix<double, 3, 3> Rotdiff,Rot_w_1_p,Rot_w_1_m,Rot_w_2_p,Rot_w_2_m,Rot_w_3_p,Rot_w_3_m;
-	Rotdiff(0,0) = 1.0; Rotdiff(0,1) = 0.0; Rotdiff(0,2) = 0.0;
-	Rotdiff(1,0) = 0.0; Rotdiff(1,1) = 1.0; Rotdiff(1,2) = -w_h;
-	Rotdiff(2,0) = 0.0; Rotdiff(2,1) = w_h; Rotdiff(2,2) = 1.0;
-	
 	Eigen::Matrix<double, 6, 6> A = Eigen::Matrix<double, 6, 6>::Zero();
 	Eigen::Matrix<double, 6, 1> b = Eigen::Matrix<double, 6, 1>::Zero();
+	//twist_diff = (v1,v2,v3,w1,w2,w3)
 	Eigen::Matrix<double, 6, 1> twist_diff = Eigen::Matrix<double, 6, 1>::Zero();
 	double int_dist;
-	for(int g = 0; g < 4; g++){
+	bool stop = false;
+	
+	for(int g = 0; g < gauss_newton_max_iteration && !stop; g++){
+		//setting A and B to 0
 		A = Eigen::Matrix<double, 6, 6>::Zero();
 		b = Eigen::Matrix<double, 6, 1>::Zero();
+		/*
+		 * We want to calculate the partial derivative of our sdf 
+		 * with respekt to the twist coordinates. So we build up
+		 * the linearized version of R' = w*R => R+_w = (I+w) R 
+		 * 
+		 * R_w1+ = 1.0 0.0 0.0
+		 *         0.0 1.0 -w1
+		 *         0.0  w1 1.0    
+		 */
+		Rotdiff(0,0) = 1.0; Rotdiff(0,1) = 0.0; Rotdiff(0,2) = 0.0;
+		Rotdiff(1,0) = 0.0; Rotdiff(1,1) = 1.0; Rotdiff(1,2) = -w_h;
+		Rotdiff(2,0) = 0.0; Rotdiff(2,1) = w_h; Rotdiff(2,2) = 1.0;
 		Rot_w_1_p = Rotdiff*this->rot;
+		/* 
+		 * R_w1- = 1.0 0.0 0.0
+		 *         0.0 1.0  w1
+		 *         0.0 -w1 1.0    
+		 */
 		Rotdiff(1,2) =  w_h;
 		Rotdiff(2,1) = -w_h;
 		Rot_w_1_m = Rotdiff*this->rot;
+		/* 
+		 * R_w2+ = 1.0 0.0  w2
+		 *         0.0 1.0 0.0
+		 *         -w2 0.0 1.0    
+		 */
 		Rotdiff(1,2) =  0;
 		Rotdiff(2,1) =  0;
 		Rotdiff(0,2) =  w_h;
 		Rotdiff(2,0) = -w_h;
 		Rot_w_2_p = Rotdiff*this->rot;
+		/* 
+		 * R_w2- = 1.0 0.0 -w2
+		 *         0.0 1.0 0.0
+		 *          w2 0.0 1.0    
+		 */
 		Rotdiff(0,2) = -w_h;
 		Rotdiff(2,0) =  w_h;
 		Rot_w_2_m = Rotdiff*this->rot;
+		/* 
+		 * R_w3+ = 1.0 -w3 0.0
+		 *          w3 1.0 0.0
+		 *         0.0 0.0 1.0    
+		 */
 		Rotdiff(0,2) =  0;
 		Rotdiff(2,0) =  0;
 		Rotdiff(0,1) = -w_h;
 		Rotdiff(1,0) =  w_h;
 		Rot_w_3_p = Rotdiff*this->rot;
+		/* 
+		 * R_w3- = 1.0  w3 0.0
+		 *         -w3 1.0 0.0
+		 *         0.0 0.0 1.0    
+		 */
 		Rotdiff(0,1) =  w_h;
 		Rotdiff(1,0) = -w_h;
 		Rot_w_3_m = Rotdiff*this->rot;
+		//iterate all image points
 		for (i=0;i<point_cloud->width;i++){
 			for (j=0;j<point_cloud->height;j++){
 				point = point_cloud->at(i, j);
+				//does a good depth exist?
 				if (isnan(point.x) || isnan(point.y) || isnan(point.z)){
 					continue;
 				}
 				camera_point(0) = point.x;
 				camera_point(1) = point.y;
 				camera_point(2) = point.z;
-				
+				//get SDF_derivative
 				get_partial_derivative(sdf, camera_point, SDF_derivative,
 				    Rot_w_1_p, Rot_w_1_m, Rot_w_2_p, Rot_w_2_m, Rot_w_3_p, Rot_w_3_m, w_h, is_interpolated, int_dist
 				);
+				//we could calculate SDF_derivative at this point
 				if (!is_interpolated){
-				    //cout  << "continue" << endl;
 				    continue;
 				}
 				
-
 				A = A + (SDF_derivative * SDF_derivative.transpose());
 				b = b + int_dist * SDF_derivative;
 				
 			}
 		}
-		/*
-		cout << "A"<<endl;
+		//calculate our optimized gradient
+		twist_diff = A.inverse()*b;
+		/*cout << "A"<<endl;
 		cout << A << endl;
 		cout << "b"<<endl;
 		cout << b << endl;
-		cout << "XI"<<endl;
-		
-		cout << SDF_derivative <<endl;
-		cout << "MAX: " << SDF_derivative.maxCoeff()<<endl;
-		cout << "TRans\n" << this->trans << endl;
-		*/
-		twist_diff = A.inverse()*b;
+		cout << "twist_diff"<<endl;
+		cout << twist_diff << endl;*/
 		
 		this->trans(0) =this->trans(0)- twist_diff(0,0);
 		this->trans(1) =this->trans(1)- twist_diff(1,0);
@@ -131,16 +177,26 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		//cout << "TRans\n" << this->trans << endl;
 		
 		Rotdiff(0,0) = 1.0; 			Rotdiff(0,1) = twist_diff(5,0); 	Rotdiff(0,2) = -twist_diff(4,0);
-		Rotdiff(1,0) = -twist_diff(5,0);		Rotdiff(1,1) = 1.0; 			Rotdiff(1,2) = twist_diff(3,0);
+		Rotdiff(1,0) = -twist_diff(5,0);	Rotdiff(1,1) = 1.0; 			Rotdiff(1,2) = twist_diff(3,0);
 		Rotdiff(2,0) = twist_diff(4,0); 	Rotdiff(2,1) = -twist_diff(3,0); 	Rotdiff(2,2) = 1.0;
 		//cout <<"r\n" << this-> rot << endl;
 		this-> rot = Rotdiff * this->rot;
-		this-> rot = this->rot.householderQr().householderQ();
+		//this-> rot = this->rot.householderQr().householderQ();
 		Eigen::Quaterniond rot2;
 		rot2 = (this->rot);
 		cout << "Step:\n" <<this->trans << "\n"<<rot2.w() << " "<<rot2.x()<<" "<<rot2.y()<<" "<<rot2.z() <<endl;
 		this->set_camera_transformation(this->rot, this->trans);
 		
+		if (twist_diff(0,0) < maximum_twist_diff && 
+		    twist_diff(1,0) < maximum_twist_diff && 
+		    twist_diff(2,0) < maximum_twist_diff && 
+		    twist_diff(3,0) < maximum_twist_diff && 
+		    twist_diff(4,0) < maximum_twist_diff && 
+		    twist_diff(5,0) < maximum_twist_diff){
+		    cout << "****** STOP *****" << endl;
+		    stop = true;
+		}
+		  
 		
 		//cout <<"r\n" << this-> rot << endl;
 		//reorthomolize
@@ -179,6 +235,7 @@ void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_po
 	this->project_camera_to_world(camera_point, current_world_point);
 	sdf->get_voxel_coordinates(current_world_point,current_voxel_point);
 	if (current_voxel_point(0) < 0 || current_voxel_point(1) < 0 || current_voxel_point(2) < 0){
+	  cout << "point not in voxel grid";
 	  return ;
         }
         if (current_voxel_point(0) >= sdf->m || current_voxel_point(1) >= sdf->m || current_voxel_point(2) >= sdf->m){
