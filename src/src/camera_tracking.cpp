@@ -63,8 +63,9 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 	
 	Eigen::Matrix<double, 6, 6> A = Eigen::Matrix<double, 6, 6>::Zero();
 	Eigen::Matrix<double, 6, 1> b = Eigen::Matrix<double, 6, 1>::Zero();
+	Eigen::Matrix<double, 6, 1> twist_diff = Eigen::Matrix<double, 6, 1>::Zero();
 	double int_dist;
-	for(int g = 0; g < 12; g++){
+	for(int g = 0; g < 4; g++){
 		A = Eigen::Matrix<double, 6, 6>::Zero();
 		b = Eigen::Matrix<double, 6, 1>::Zero();
 		Rot_w_1_p = Rotdiff*this->rot;
@@ -122,19 +123,24 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		cout << "MAX: " << SDF_derivative.maxCoeff()<<endl;
 		cout << "TRans\n" << this->trans << endl;
 		*/
-		SDF_derivative = A.inverse()*b;
+		twist_diff = A.inverse()*b;
 		
-		this->trans(0) =this->trans(0)+ SDF_derivative(0,0);
-		this->trans(1) =this->trans(1)+ SDF_derivative(1,0);
-		this->trans(2) =this->trans(2)+ SDF_derivative(2,0);
+		this->trans(0) =this->trans(0)- twist_diff(0,0);
+		this->trans(1) =this->trans(1)- twist_diff(1,0);
+		this->trans(2) =this->trans(2)- twist_diff(2,0);
 		//cout << "TRans\n" << this->trans << endl;
 		
-		Rotdiff(0,0) = 1.0; 			Rotdiff(0,1) = -SDF_derivative(5,0);	Rotdiff(0,2) =  SDF_derivative(4,0);
-		Rotdiff(1,0) = SDF_derivative(5,0);	Rotdiff(1,1) = 1.0; 			Rotdiff(1,2) = -SDF_derivative(3,0);
-		Rotdiff(2,0) = -SDF_derivative(4,0); 	Rotdiff(2,1) = SDF_derivative(3,0); 	Rotdiff(2,2) = 1.0;
+		Rotdiff(0,0) = 1.0; 			Rotdiff(0,1) = twist_diff(5,0); 	Rotdiff(0,2) = -twist_diff(4,0);
+		Rotdiff(1,0) = -twist_diff(5,0);		Rotdiff(1,1) = 1.0; 			Rotdiff(1,2) = twist_diff(3,0);
+		Rotdiff(2,0) = twist_diff(4,0); 	Rotdiff(2,1) = -twist_diff(3,0); 	Rotdiff(2,2) = 1.0;
 		//cout <<"r\n" << this-> rot << endl;
 		this-> rot = Rotdiff * this->rot;
+		Eigen::Quaterniond rot2;
+		rot2 = (this->rot);
+		cout << "Step:\n" <<this->trans << "\n"<<rot2.w() << " "<<rot2.x()<<" "<<rot2.y()<<" "<<rot2.z() <<endl;
 		this->set_camera_transformation(this->rot, this->trans);
+		
+		
 		//cout <<"r\n" << this-> rot << endl;
 		//reorthomolize
 		/*cout <<"r1" << this-> rot.block(0,0,3,1) << endl;
@@ -146,9 +152,9 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		
 		
 	}
-	//cout << "----------------------------"<<endl;
-	//cout << "----------------------------"<<endl;
-	//cout << "----------------------------"<<endl;
+	cout << "----------------------------"<<endl;
+	cout << "----------------------------"<<endl;
+	cout << "----------------------------"<<endl;
 }
 //TODO precalculate 2*(sdf->m_div_width)
 void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_point, Eigen::Matrix<double, 6, 1>& SDF_derivative,
@@ -159,14 +165,14 @@ void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_po
 	Vector3d current_world_point;
 	Vector3d current_voxel_point;
 	//we use central difference
-	Vector3d before_world_point;
-	Vector3d behind_world_point;
-	Vector3d before_camera_point;
-	Vector3d behind_camera_point;
-	Vector3d before_voxel_point;
-	Vector3d behind_voxel_point;
-	float before;
-	float behind;
+	Vector3d plus_h_world_point;
+	Vector3d minus_h_world_point;
+	Vector3d plus_h_camera_point;
+	Vector3d minus_h_camera_point;
+	Vector3d plus_h_voxel_point;
+	Vector3d minus_voxel_point;
+	float plus_h_sdf_value;
+	float minus_h_sdf_value;
 	float delta_trans = 0.01;
 	float delta_trans2 = 0.02;
 	this->project_camera_to_world(camera_point, current_world_point);
@@ -180,107 +186,107 @@ void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_po
 	sdf_val = sdf->interpolate_distance(current_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
 	//tx derivative
-	this->trans(0) = this->trans(0) -delta_trans;
-	before_world_point = this->rot*camera_point + this->trans;
-	this->trans(0) = this->trans(0) +delta_trans2;
-	behind_world_point = this->rot*camera_point + this->trans;
-	this->trans(0) = this->trans(0) -delta_trans;
-	sdf->get_voxel_coordinates(before_world_point,before_voxel_point);
-	sdf->get_voxel_coordinates(behind_world_point,behind_voxel_point);
-	before = sdf->interpolate_distance(before_voxel_point, is_interpolated);
+	this->trans(0) = this->trans(0) +delta_trans;
+	plus_h_world_point = this->rot*camera_point + this->trans;
+	this->trans(0) = this->trans(0) -delta_trans2;
+	minus_h_world_point = this->rot*camera_point + this->trans;
+	this->trans(0) = this->trans(0) +delta_trans;
+	sdf->get_voxel_coordinates(plus_h_world_point,plus_h_voxel_point);
+	sdf->get_voxel_coordinates(minus_h_world_point,minus_voxel_point);
+	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	behind = sdf->interpolate_distance(behind_voxel_point, is_interpolated);
+	minus_h_sdf_value = sdf->interpolate_distance(minus_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	SDF_derivative(0) = (before - behind)/delta_trans2;
+	SDF_derivative(0) = (plus_h_sdf_value - minus_h_sdf_value)/delta_trans2;
 	
 	//ty derivative
-	this->trans(1) = this->trans(1) -delta_trans;
-	before_world_point = this->rot*camera_point + this->trans;
-	this->trans(1) = this->trans(1) +delta_trans2;
-	behind_world_point = this->rot*camera_point + this->trans;
-	this->trans(1) = this->trans(1) -delta_trans;
-	sdf->get_voxel_coordinates(before_world_point,before_voxel_point);
-	sdf->get_voxel_coordinates(behind_world_point,behind_voxel_point);
-	before = sdf->interpolate_distance(before_voxel_point, is_interpolated);
+	this->trans(1) = this->trans(1) +delta_trans;
+	plus_h_world_point = this->rot*camera_point + this->trans;
+	this->trans(1) = this->trans(1) -delta_trans2;
+	minus_h_world_point = this->rot*camera_point + this->trans;
+	this->trans(1) = this->trans(1) +delta_trans;
+	sdf->get_voxel_coordinates(plus_h_world_point,plus_h_voxel_point);
+	sdf->get_voxel_coordinates(minus_h_world_point,minus_voxel_point);
+	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	behind = sdf->interpolate_distance(behind_voxel_point, is_interpolated);
+	minus_h_sdf_value = sdf->interpolate_distance(minus_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	SDF_derivative(1) = (before - behind)/delta_trans2;
+	SDF_derivative(1) = (plus_h_sdf_value - minus_h_sdf_value)/delta_trans2;
 	
 	//tz derivative 
-	this->trans(2) = this->trans(2) -delta_trans;
-	before_world_point = this->rot*camera_point + this->trans;
-	this->trans(2) = this->trans(2) +delta_trans2;
-	behind_world_point = this->rot*camera_point + this->trans;
-	this->trans(2) = this->trans(2) -delta_trans;
-	sdf->get_voxel_coordinates(before_world_point,before_voxel_point);
-	sdf->get_voxel_coordinates(behind_world_point,behind_voxel_point);
-	before = sdf->interpolate_distance(before_voxel_point, is_interpolated);
+	this->trans(2) = this->trans(2) +delta_trans;
+	plus_h_world_point = this->rot*camera_point + this->trans;
+	this->trans(2) = this->trans(2) -delta_trans2;
+	minus_h_world_point = this->rot*camera_point + this->trans;
+	this->trans(2) = this->trans(2) +delta_trans;
+	sdf->get_voxel_coordinates(plus_h_world_point,plus_h_voxel_point);
+	sdf->get_voxel_coordinates(minus_h_world_point,minus_voxel_point);
+	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	behind = sdf->interpolate_distance(behind_voxel_point, is_interpolated);
+	minus_h_sdf_value = sdf->interpolate_distance(minus_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	SDF_derivative(1) = (before - behind)/delta_trans2;
+	SDF_derivative(2) = (plus_h_sdf_value - minus_h_sdf_value)/delta_trans2;
 	
 	//wx derivative
-	before_world_point = r1m*camera_point + this->trans;
-	behind_world_point = r1p*camera_point + this->trans;
-	sdf->get_voxel_coordinates(before_world_point,before_voxel_point);
-	sdf->get_voxel_coordinates(behind_world_point,behind_voxel_point);
-	before = sdf->interpolate_distance(before_voxel_point, is_interpolated);
+	plus_h_world_point = r1p*camera_point + this->trans;
+	minus_h_world_point = r1m*camera_point + this->trans;
+	sdf->get_voxel_coordinates(plus_h_world_point,plus_h_voxel_point);
+	sdf->get_voxel_coordinates(minus_h_world_point,minus_voxel_point);
+	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	behind = sdf->interpolate_distance(behind_voxel_point, is_interpolated);
+	minus_h_sdf_value = sdf->interpolate_distance(minus_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	SDF_derivative(3) = (before - behind)/(2*(w_h));
+	SDF_derivative(3) = (plus_h_sdf_value - minus_h_sdf_value)/(2*(w_h));
 	
 	/*
 	cout<<"..................................................\n";
-	cout<<"before_world_point\n" << before_world_point <<endl;
-	cout<<"behind_world_point\n" << behind_world_point <<endl;
-	cout<<"before_voxel_point\n" << before_voxel_point <<endl;
-	cout<<"behind_voxel_point\n" << behind_voxel_point <<endl;
-	cout<<"before\n" << before <<endl;
-	cout<<"behind\n" << behind <<endl;
+	cout<<"plus_h_world_point\n" << plus_h_world_point <<endl;
+	cout<<"minus_h_world_point\n" << minus_h_world_point <<endl;
+	cout<<"plus_h_voxel_point\n" << plus_h_voxel_point <<endl;
+	cout<<"minus_voxel_point\n" << minus_voxel_point <<endl;
+	cout<<"plus_h_sdf_value\n" << plus_h_sdf_value <<endl;
+	cout<<"minus_h_sdf_value\n" << minus_h_sdf_value <<endl;
 	*/
 	
 	//wy derivative
-	before_world_point = r2m*camera_point + this->trans;
-	behind_world_point = r2p*camera_point + this->trans;
-	sdf->get_voxel_coordinates(before_world_point,before_voxel_point);
-	sdf->get_voxel_coordinates(behind_world_point,behind_voxel_point);
-	before = sdf->interpolate_distance(before_voxel_point, is_interpolated);
+	plus_h_world_point = r2p*camera_point + this->trans;
+	minus_h_world_point = r2m*camera_point + this->trans;
+	sdf->get_voxel_coordinates(plus_h_world_point,plus_h_voxel_point);
+	sdf->get_voxel_coordinates(minus_h_world_point,minus_voxel_point);
+	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	behind = sdf->interpolate_distance(behind_voxel_point, is_interpolated);
+	minus_h_sdf_value = sdf->interpolate_distance(minus_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	SDF_derivative(4) = (before - behind)/(2*(w_h));
+	SDF_derivative(4) = (plus_h_sdf_value - minus_h_sdf_value)/(2*(w_h));
 	
 	/*
 	cout<<"..................................................\n";
-	cout<<"before_world_point\n" << before_world_point <<endl;
-	cout<<"behind_world_point\n" << behind_world_point <<endl;
-	cout<<"before_voxel_point\n" << before_voxel_point <<endl;
-	cout<<"behind_voxel_point\n" << behind_voxel_point <<endl;
-	cout<<"before\n" << before <<endl;
-	cout<<"behind\n" << behind <<endl;
+	cout<<"plus_h_world_point\n" << plus_h_world_point <<endl;
+	cout<<"minus_h_world_point\n" << minus_h_world_point <<endl;
+	cout<<"plus_h_voxel_point\n" << plus_h_voxel_point <<endl;
+	cout<<"minus_voxel_point\n" << minus_voxel_point <<endl;
+	cout<<"plus_h_sdf_value\n" << plus_h_sdf_value <<endl;
+	cout<<"minus_h_sdf_value\n" << minus_h_sdf_value <<endl;
 	*/
 	
 	//wz derivative
-	before_world_point = r3m*camera_point + this->trans;
-	behind_world_point = r3p*camera_point + this->trans;
-	sdf->get_voxel_coordinates(before_world_point,before_voxel_point);
-	sdf->get_voxel_coordinates(behind_world_point,behind_voxel_point);
-	before = sdf->interpolate_distance(before_voxel_point, is_interpolated);
+	plus_h_world_point = r3p*camera_point + this->trans;
+	minus_h_world_point = r3m*camera_point + this->trans;
+	sdf->get_voxel_coordinates(plus_h_world_point,plus_h_voxel_point);
+	sdf->get_voxel_coordinates(minus_h_world_point,minus_voxel_point);
+	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	behind = sdf->interpolate_distance(behind_voxel_point, is_interpolated);
+	minus_h_sdf_value = sdf->interpolate_distance(minus_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
-	SDF_derivative(5) = (before - behind)/(2*(w_h));
+	SDF_derivative(5) = (plus_h_sdf_value - minus_h_sdf_value)/(2*(w_h));
 	
 	/*
 	cout<<"..................................................\n";
-	cout<<"before_world_point\n" << before_world_point <<endl;
-	cout<<"behind_world_point\n" << behind_world_point <<endl;
-	cout<<"before_voxel_point\n" << before_voxel_point <<endl;
-	cout<<"behind_voxel_point\n" << behind_voxel_point <<endl;
-	cout<<"before\n" << before <<endl;
-	cout<<"behind\n" << behind <<endl;
+	cout<<"plus_h_world_point\n" << plus_h_world_point <<endl;
+	cout<<"minus_h_world_point\n" << minus_h_world_point <<endl;
+	cout<<"plus_h_voxel_point\n" << plus_h_voxel_point <<endl;
+	cout<<"minus_voxel_point\n" << minus_voxel_point <<endl;
+	cout<<"plus_h_sdf_value\n" << plus_h_sdf_value <<endl;
+	cout<<"minus_h_sdf_value\n" << minus_h_sdf_value <<endl;
 	*/
 }

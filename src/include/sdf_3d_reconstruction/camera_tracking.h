@@ -26,6 +26,7 @@ public:
 	Eigen::Matrix3d rot_inv;
 	Eigen::Vector3d rot_inv_trans;
 	Eigen::Matrix3d K;
+	Eigen::Matrix<double, 6, 1> twist;
 	ros::Subscriber cam_info;
 	/*
 	 * current translation
