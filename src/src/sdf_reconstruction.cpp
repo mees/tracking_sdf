@@ -62,9 +62,14 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	//TODO: als tf belassen?
 	tf::vectorTFToEigen(transform.getOrigin(),trans);
 	tf::quaternionTFToEigen(transform.getRotation(), rot);
-//	if (frame_num > 1){
-//	    this->camera_tracking->estimate_new_position(sdf,cloud_filtered);
-//	}
+	if (frame_num > 1){
+	    this->camera_tracking->estimate_new_position(sdf,cloud_filtered);
+	    Eigen::Quaterniond rot2;
+	    rot2 = (this-> camera_tracking->rot);
+	    cout << "Ground Truth:\n" <<trans << "\n"<<rot.w()<<" "<<rot.x()<<" "<<rot.y()<<" "<<rot.z()<<endl;
+	    cout << "Our:\n" <<camera_tracking->trans << "\n"<<rot2.w() << " "<<rot2.x()<<" "<<rot2.y()<<" "<<rot2.z() <<endl;
+	}
+	
 	Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();	
 	this->camera_tracking->set_camera_transformation(rotMat, trans);
 	
