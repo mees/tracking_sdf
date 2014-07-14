@@ -27,6 +27,8 @@
 
 #include "sdf_3d_reconstruction/marching_cubes_sdf.h"
 #include "sdf_3d_reconstruction/camera_tracking.h"
+#include <condition_variable>
+#include <thread>
 
 using namespace Eigen;
 class SDF {
@@ -57,7 +59,9 @@ private:
 	void register_visualization();
 	Vector3d sdf_origin;
 	pcl::MarchingCubesSDF *mc;
-
+	bool initial_update_done;
+	std::condition_variable cv;
+	std::mutex cv_m;
 	int m_squared;
 
 public:
@@ -65,6 +69,7 @@ public:
 	float m_div_height;
 	float m_div_width;
 	float m_div_depth;
+
 	/**
 	 *  standard constructor
 	 */
@@ -96,7 +101,7 @@ public:
 	/**
 	 *  
 	 **/
-	void visualize();
+	void visualize(double frequency);
 	int get_number_of_voxels();
 	/*
 	 *  input: i,j,k -> idx. Idx can be used for W and for D

@@ -24,6 +24,8 @@
 #include "tf_conversions/tf_eigen.h"
 #include <valgrind/callgrind.h>
 
+#include <thread>
+
 using namespace Eigen;
 using namespace pcl;
 using namespace std;

@@ -19,6 +19,7 @@ SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, flo
 	m_div_height = m/height;
 	m_div_width = m/width;
 	m_div_depth = m/depth;
+	initial_update_done = false;
 
 	Vector3i voxel_coordinates;
 	Vector3d global_coordinates;
@@ -272,12 +273,12 @@ void SDF::projectivePointToPlaneDistance(const Vector3d &camera_point, const Vec
 
 void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals){
 		ros::Time t0 = ros::Time::now();
-    
+		static int count_id = 0;
     if (!camera_tracking->isKFilled) {
 	    cout << "Camera Matrix not received. Start rosbag file!" << endl;
 	    exit(0);
     } else {
-    	//	omp_set_num_threads(target_thread_num);
+
 #pragma omp parallel for
 	for (int idx=0;idx<number_of_voxels;idx++){
 		Vector3i voxel_coordinates;
@@ -321,6 +322,7 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 		projectivePointToPlaneDistance(camera_point, camera_point_img, normal_eigen, pointToPlaneDistance);
 		//cout<<"camera_point: \n"<<camera_point<<" camera_point_img: \n"<<camera_point_img<<" point2point dist: \n"<<pointToPointDistance<<" poin2plane: \n"<<pointToPlaneDistance<<endl;
 		d_new = pointToPlaneDistance;
+		//exponential weighting function Eq. 31
 		w_new = 1.0;
 		if (d_new >= this->distance_epsilon && d_new <= this->distance_delta){
 		  w_new = exp(-0.5*(d_new - this->distance_epsilon)*(d_new - this->distance_epsilon));
@@ -329,9 +331,11 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 		  w_new = 0.0;
 		  continue;
 		}
+		//truncation function Eq. 28
 		if (d_new < -distance_delta){
 		  d_new = -distance_delta;
 		}
+
 		w_old = W[idx];
 		W[idx] = w_old + w_new;
 		
@@ -350,18 +354,28 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 		B[idx] = (w_old * B[idx] + w_new * point.b)/Color_W[idx];
 	}
 	std::cout << "update method: "<<(ros::Time::now()-t0).toSec()<< std::endl;
-	this->visualize();
+	if(count_id==0){
+	std::lock_guard<std::mutex> lk(cv_m);
+	initial_update_done = true;
+	cv.notify_one();
+	}
+	count_id++;
+	//this->visualize();
 	}
 }
 
-void SDF::visualize()
+void SDF::visualize(double frequency)
 {
-	ros::Time t0 = ros::Time::now();
-	
+
+	ros::Rate r(frequency);
 	pcl::PointCloud<pcl::PointXYZ> cloud;
-	mc->performReconstruction (cloud);
-	if (ros::ok())
+	std::unique_lock<std::mutex> lk(cv_m);
+	//std::cerr << "Waiting... \n";
+	 cv.wait(lk, [this](){return initial_update_done == true;});
+	while (ros::ok())
 	{
+		ros::Time t0 = ros::Time::now();
+		mc->performReconstruction (cloud);
 		visualization_msgs::Marker marker;
 		marker.header.frame_id = "/world";
 		marker.header.stamp = ros::Time();
@@ -421,7 +435,10 @@ void SDF::visualize()
 		}
 		// Publish the marker
 		this->marker_publisher.publish(marker);
-		//r->sleep();
+		std::cout << "visualize method: "<<(ros::Time::now()-t0).toSec()<< std::endl;
+		//ros::Time t1 = ros::Time::now();
+		r.sleep();
+		//std::cout << "visualize method sleeped: "<<(ros::Time::now()-t1).toSec()<< std::endl;
 	}
-	std::cout << "visualize method: "<<(ros::Time::now()-t0).toSec()<< std::endl;
+
 }

@@ -62,13 +62,13 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	//TODO: als tf belassen?
 	tf::vectorTFToEigen(transform.getOrigin(),trans);
 	tf::quaternionTFToEigen(transform.getRotation(), rot);
-	if (frame_num > 1){
-	    this->camera_tracking->estimate_new_position(sdf,cloud_filtered);
-	    Eigen::Quaterniond rot2;
-	    rot2 = (this-> camera_tracking->rot);
-	    cout << "Ground Truth:\n" <<trans << "\n"<<rot.w()<<" "<<rot.x()<<" "<<rot.y()<<" "<<rot.z()<<endl;
-	    cout << "Our:\n" <<camera_tracking->trans << "\n"<<rot2.w() << " "<<rot2.x()<<" "<<rot2.y()<<" "<<rot2.z() <<endl;
-	}
+//	if (frame_num > 1){
+//	    this->camera_tracking->estimate_new_position(sdf,cloud_filtered);
+//	    Eigen::Quaterniond rot2;
+//	    rot2 = (this-> camera_tracking->rot);
+//	    cout << "Ground Truth:\n" <<trans << "\n"<<rot.w()<<" "<<rot.x()<<" "<<rot.y()<<" "<<rot.z()<<endl;
+//	    cout << "Our:\n" <<camera_tracking->trans << "\n"<<rot2.w() << " "<<rot2.x()<<" "<<rot2.y()<<" "<<rot2.z() <<endl;
+//	}
 	
 	Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();	
 	this->camera_tracking->set_camera_transformation(rotMat, trans);
@@ -93,12 +93,13 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	frame_num = 0;
 	//pub = nh.advertise<sensor_msgs::PointCloud2> ("/our_output/", 1);
 	//Ros::Publisher(topic n)
-	Vector3d sdf_origin(-3.0, -4.0, -1.0);
+	Vector3d sdf_origin(-4.0, -4.0, -4.0);
 	
 		     //m , width, height, depth, treshold
-	sdf = new SDF(240, 6.0, 6.0, 4.0, sdf_origin,0.3, 0.05);
+	sdf = new SDF(300, 8.0, 8.0, 8.0, sdf_origin,0.3, 0.025);
 	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
-	
+	//visualization_thread = new boost::thread(boost::bind(& sd.visualize, this));
+	std::thread visualization_thread(&SDF::visualize,sdf, 0.5);
 	//sdf->create_circle(2.0, 0, 0.0, 0.0);
 	//std::string visualeOutput;
 	//ros::param::get("~visualOutput", visualeOutput);
