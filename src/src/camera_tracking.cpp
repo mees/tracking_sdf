@@ -75,7 +75,7 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 	Eigen::Matrix<double, 6, 1> twist_diff = Eigen::Matrix<double, 6, 1>::Zero();
 	double int_dist;
 	bool stop = false;
-	
+	Vector3d r1,r2,r3;
 	for(int g = 0; g < gauss_newton_max_iteration && !stop; g++){
 		//setting A and B to 0
 		A = Eigen::Matrix<double, 6, 6>::Zero();
@@ -198,8 +198,19 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		}
 		  
 		
-		//cout <<"r\n" << this-> rot << endl;
+		cout <<"r\n" << this-> rot << endl;
 		//reorthomolize
+		r1 = rot.block(0,0,3,1);
+		r2 = rot.block(0,1,3,1);
+		r3 = rot.block(0,2,3,1);
+		r1 = r1/r1.norm();
+		r2 = (r2-(r1.dot(r2))*r1)/r2.norm();
+		r3 = (r3-(r1.dot(r3))*r1 -(r2.dot(r3))*r2)/r3.norm();
+		
+		rot.block(0,0,3,1) = r1;
+		rot.block(0,1,3,1) = r2;
+		rot.block(0,2,3,1) = r3;
+		cout <<"r\n" << this-> rot << endl;
 		/*cout <<"r1" << this-> rot.block(0,0,3,1) << endl;
 		cout <<"f: "<< this-> rot.block(0,0,3,1).norm() << endl;
 		cout <<"r1" << this-> rot.block(0,1,3,1) << endl;
@@ -235,7 +246,7 @@ void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_po
 	this->project_camera_to_world(camera_point, current_world_point);
 	sdf->get_voxel_coordinates(current_world_point,current_voxel_point);
 	if (current_voxel_point(0) < 0 || current_voxel_point(1) < 0 || current_voxel_point(2) < 0){
-	  cout << "point not in voxel grid";
+	  //cout << "point not in voxel grid";
 	  return ;
         }
         if (current_voxel_point(0) >= sdf->m || current_voxel_point(1) >= sdf->m || current_voxel_point(2) >= sdf->m){

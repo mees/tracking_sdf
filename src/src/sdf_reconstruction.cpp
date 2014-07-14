@@ -71,7 +71,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 //	}
 	
 	Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();	
-	this->camera_tracking->set_camera_transformation(rotMat, trans);
+	//this->camera_tracking->set_camera_transformation(rotMat, trans);
 	
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
 	//cout<<"finished updating"<<endl;
