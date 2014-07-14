@@ -135,6 +135,7 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		Rotdiff(2,0) = twist_diff(4,0); 	Rotdiff(2,1) = -twist_diff(3,0); 	Rotdiff(2,2) = 1.0;
 		//cout <<"r\n" << this-> rot << endl;
 		this-> rot = Rotdiff * this->rot;
+		this-> rot = this->rot.householderQr().householderQ();
 		Eigen::Quaterniond rot2;
 		rot2 = (this->rot);
 		cout << "Step:\n" <<this->trans << "\n"<<rot2.w() << " "<<rot2.x()<<" "<<rot2.y()<<" "<<rot2.z() <<endl;
