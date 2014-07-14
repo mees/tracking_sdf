@@ -12,19 +12,19 @@ using namespace std;
 class CameraTracking {
   
 public:
+	
+	
+	int gauss_newton_max_iteration;
+	float maximum_twist_diff;
+	Eigen::Matrix3d rot;
+	Eigen::Matrix3d rot_inv;
+	Eigen::Vector3d rot_inv_trans;
 	/**
 	 * inner camera parameter
 	 *      [fx  0 cx]
 	 *  K = [ 0 fy cy]
 	 *	[ 0  0  1]
 	 */
-	/*
-	 * current rotation matrix
-	 * from Camera to World
-	 */
-	Eigen::Matrix3d rot;
-	Eigen::Matrix3d rot_inv;
-	Eigen::Vector3d rot_inv_trans;
 	Eigen::Matrix3d K;
 	Eigen::Matrix<double, 6, 1> twist;
 	ros::Subscriber cam_info;
@@ -36,7 +36,7 @@ public:
 	/**
 	 *  standard constructor
 	 */
-	CameraTracking();
+	CameraTracking(int gauss_newton_max_iteration, float maximum_twist_diff);
 	virtual ~CameraTracking();
 	/**
 	 * read the camera info
