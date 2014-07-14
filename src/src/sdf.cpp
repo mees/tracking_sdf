@@ -264,7 +264,7 @@ void SDF::projectivePointToPointDistance(const double &voxelDepthInCameraFrame, 
 	pointToPointDistance = voxelDepthInCameraFrame - observedDepthOfProjectedVoxelInDepthImage;
 }
 
-void SDF::projectivePointToPlaneDistance(const Vector3d &camera_point, const Vector3d &camera_point_img, const Vector3d &normal, double & pointToPlaneDistance){
+void SDF::projectivePointToPlaneDistance(const Vector3d &camera_point, const Vector3d &camera_point_img, const Vector3d &normal, double &pointToPlaneDistance){
 	Vector3d diff_vec = camera_point_img-camera_point;
 	pointToPlaneDistance = diff_vec.dot(normal);
 
@@ -313,14 +313,14 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 		camera_point_img(1) =  point.y;
 		camera_point_img(2) =  point.z;
 		double pointToPointDistance, pointToPlaneDistance = 0;
-		projectivePointToPointDistance(camera_point(2), camera_point_img(2), pointToPointDistance);
+		//projectivePointToPointDistance(camera_point(2), camera_point_img(2), pointToPointDistance);
 
 		normal_eigen(0) = normal.normal_x;
 		normal_eigen(1) = normal.normal_y;
 		normal_eigen(2) = normal.normal_z;
-		//projectivePointToPlaneDistance(camera_point, camera_point_img, normal_eigen, pointToPlaneDistance);
+		projectivePointToPlaneDistance(camera_point, camera_point_img, normal_eigen, pointToPlaneDistance);
 		//cout<<"camera_point: \n"<<camera_point<<" camera_point_img: \n"<<camera_point_img<<" point2point dist: \n"<<pointToPointDistance<<" poin2plane: \n"<<pointToPlaneDistance<<endl;
-		d_new = pointToPointDistance;
+		d_new = pointToPlaneDistance;
 		w_new = 1.0;
 		if (d_new >= this->distance_epsilon && d_new <= this->distance_delta){
 		  w_new = exp(-0.5*(d_new - this->distance_epsilon)*(d_new - this->distance_epsilon));
@@ -337,8 +337,7 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 		
 		D[idx] = w_old/W[idx] * D[idx] + w_new/W[idx] * d_new;
 		
-		Vector3d tmp = (cam_vect - camera_tracking->trans);
-		double cosine = fabs((tmp.dot(normal_eigen))) / (tmp.norm()*normal_eigen.norm());
+		double cosine = fabs((cam_vect.dot(normal_eigen)))/normal_eigen.norm();
 		//std::cout <<"cosine:  "<< cosine<<std::endl;;
 
 		
