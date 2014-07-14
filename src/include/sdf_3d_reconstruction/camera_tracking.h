@@ -11,7 +11,7 @@ using namespace Eigen;
 using namespace std;
 class CameraTracking {
   
-private:
+public:
 	/**
 	 * inner camera parameter
 	 *      [fx  0 cx]
@@ -25,7 +25,6 @@ private:
 	Eigen::Matrix3d rot;
 	Eigen::Matrix3d rot_inv;
 	Eigen::Vector3d rot_inv_trans;
-public:
 	Eigen::Matrix3d K;
 	ros::Subscriber cam_info;
 	/*
