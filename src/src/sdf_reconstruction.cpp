@@ -89,7 +89,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	frame_num = 0;
 	//pub = nh.advertise<sensor_msgs::PointCloud2> ("/our_output/", 1);
 	//Ros::Publisher(topic n)
-	Vector3d sdf_origin(-3.5, -3.5, -0.5);
+	Vector3d sdf_origin(-3.5, -3.5, -1.5);
 		     //m , width, height, depth, treshold
 	sdf = new SDF(200, 7.0, 7.0, 3.0, sdf_origin,0.3, 0.025);
 
