@@ -29,6 +29,7 @@
 #include "sdf_3d_reconstruction/camera_tracking.h"
 #include <condition_variable>
 #include <thread>
+#include <atomic>
 
 using namespace Eigen;
 class SDF {
@@ -69,6 +70,7 @@ public:
 	float m_div_height;
 	float m_div_width;
 	float m_div_depth;
+	std::atomic_bool finish_visualization_thread;
 
 	/**
 	 *  standard constructor

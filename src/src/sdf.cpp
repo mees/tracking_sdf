@@ -20,6 +20,7 @@ SDF::SDF(int m, float width, float height, float depth,Vector3d& sdf_origin, flo
 	m_div_width = m/width;
 	m_div_depth = m/depth;
 	initial_update_done = false;
+	finish_visualization_thread = false;
 
 	Vector3i voxel_coordinates;
 	Vector3d global_coordinates;
@@ -372,7 +373,7 @@ void SDF::visualize(double frequency)
 	std::unique_lock<std::mutex> lk(cv_m);
 	//std::cerr << "Waiting... \n";
 	 cv.wait(lk, [this](){return initial_update_done == true;});
-	while (ros::ok())
+	while (ros::ok() && !finish_visualization_thread)
 	{
 		ros::Time t0 = ros::Time::now();
 		mc->performReconstruction (cloud);

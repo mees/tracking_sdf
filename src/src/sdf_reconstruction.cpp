@@ -71,7 +71,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 //	}
 	
 	Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();	
-	//this->camera_tracking->set_camera_transformation(rotMat, trans);
+	this->camera_tracking->set_camera_transformation(rotMat, trans);
 	
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
 	//cout<<"finished updating"<<endl;
@@ -104,6 +104,17 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	//std::string visualeOutput;
 	//ros::param::get("~visualOutput", visualeOutput);
 	//sdf->visualize();
+	int oldNumPub = pcl.getNumPublishers();
+	while(ros::ok()){
+		if((oldNumPub == 1) && (pcl.getNumPublishers() == 0)){
+			cout<<"lost connection"<<endl;
+			sdf->finish_visualization_thread = true;
+			visualization_thread.join();
+			exit(0);
+		}
+		oldNumPub = pcl.getNumPublishers();
+		ros::spinOnce();
+	}
 
-	ros::spin();
+
 }
