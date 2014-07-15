@@ -3,13 +3,13 @@
 CameraTracking::CameraTracking(int gauss_newton_max_iteration, float maximum_twist_diff){
       this->trans = Eigen::Vector3d(0,0,0);
       this->rot = Eigen::Matrix3d();
-      this->rot << 0,0,1,\
-		   0,1,0,\
-		   1,0,0;
+      this->rot << 1,0,0,\
+		   0,0,1,\
+		   0,1,0;
       this->rot_inv = Eigen::Matrix3d();
-      this->rot_inv << 0,0,1,\
-                       0,1,0,\
-		       1,0,0;
+      this->rot_inv << 1,0,0,\
+                       0,0,1,\
+		       0,1,0;
       this->rot_inv_trans =  Eigen::Vector3d(0,0,0);
       //cout << this->rot;
       this->maximum_twist_diff = maximum_twist_diff;
