@@ -65,7 +65,6 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 	ros::Time t0 = ros::Time::now();
 	int i, j;
 
-
 	Eigen::Matrix<double, 6, 6> A = Eigen::Matrix<double, 6, 6>::Zero();
 	Eigen::Matrix<double, 6, 1> b = Eigen::Matrix<double, 6, 1>::Zero();
 	//twist_diff = (v1,v2,v3,w1,w2,w3)
@@ -144,8 +143,10 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 		//iterate all image points
 		int np = omp_get_max_threads();
 		//int np = 2;
-		boost::shared_ptr<Eigen::Matrix<double, 6, 6> > *A_array = new boost::shared_ptr<Eigen::Matrix<double, 6, 6> >[np];
-		boost::shared_ptr<Eigen::Matrix<double, 6, 1> > *B_array = new boost::shared_ptr<Eigen::Matrix<double, 6, 1> >[np];
+		boost::shared_ptr<Eigen::Matrix<double, 6, 6> > *A_array =
+				new boost::shared_ptr<Eigen::Matrix<double, 6, 6> >[np];
+		boost::shared_ptr<Eigen::Matrix<double, 6, 1> > *B_array =
+				new boost::shared_ptr<Eigen::Matrix<double, 6, 1> >[np];
 		//omp_set_num_threads(2);
 #pragma omp parallel
 		{
@@ -163,50 +164,51 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 			double int_dist;
 			Eigen::Vector3d camera_point;
 #pragma omp  for
-			for (i = 0; i < point_cloud->width; i++) {
-				for (j = 0; j < point_cloud->height; j++) {
+			for (int id = 0; id < point_cloud->size(); id++) {
+				int i = id / point_cloud->height;
+				int j = id % point_cloud->height;
+//			}
+//			for (i = 0; i < point_cloud->width; i++) {
+//				for (j = 0; j < point_cloud->height; j++) {
 
-					pcl::PointXYZRGB point;
-					point = point_cloud->at(i, j);
-					//does a good depth exist?
-					if (isnan(point.x) || isnan(point.y) || isnan(point.z)) {
-						continue;
-					}
+				pcl::PointXYZRGB point;
+				point = point_cloud->at(i, j);
+				//does a good depth exist?
+				if (isnan(point.x) || isnan(point.y) || isnan(point.z)) {
+					continue;
+				}
 
-					camera_point(0) = point.x;
-					camera_point(1) = point.y;
-					camera_point(2) = point.z;
-					//get SDF_derivative
-					get_partial_derivative(sdf, camera_point, SDF_derivative,
-							Rot_w_1_p, Rot_w_1_m, Rot_w_2_p, Rot_w_2_m,
-							Rot_w_3_p, Rot_w_3_m, w_h, is_interpolated,
-							int_dist);
-					//we could calculate SDF_derivative at this point
-					if (!is_interpolated) {
-						continue;
-					}
-	//				cout<<"*A_ptr: "<<*A_ptr<<endl;
+				camera_point(0) = point.x;
+				camera_point(1) = point.y;
+				camera_point(2) = point.z;
+				//get SDF_derivative
+				get_partial_derivative(sdf, camera_point, SDF_derivative,
+						Rot_w_1_p, Rot_w_1_m, Rot_w_2_p, Rot_w_2_m, Rot_w_3_p,
+						Rot_w_3_m, w_h, is_interpolated, int_dist);
+				//we could calculate SDF_derivative at this point
+				if (!is_interpolated) {
+					continue;
+				}
+				//				cout<<"*A_ptr: "<<*A_ptr<<endl;
 
-
-					*A_ptr = *A_ptr + (SDF_derivative * SDF_derivative.transpose()) ;
-	//				cout<<"new A_ptr: "<<*A_ptr<<"thread number: "<<omp_get_thread_num()<<endl;
+				*A_ptr = *A_ptr + (SDF_derivative * SDF_derivative.transpose());
+				//				cout<<"new A_ptr: "<<*A_ptr<<"thread number: "<<omp_get_thread_num()<<endl;
 //					cout<<"new A address: "<<A_ptr<<endl;
 //					cout<<"A_array[i] address: "<<A_array[omp_get_thread_num()]<<endl;
-	//				cout<<"*A_array[i]: "<<*A_array[omp_get_thread_num()]<<endl;
-					* B_ptr = *B_ptr + (int_dist * SDF_derivative);
+				//				cout<<"*A_array[i]: "<<*A_array[omp_get_thread_num()]<<endl;
+				*B_ptr = *B_ptr + (int_dist * SDF_derivative);
 
-
-				}
 			}
+
 		}
 
-		for (int i=0; i<np; i++){
+		for (int i = 0; i < np; i++) {
 			//cout<<"2 old A_array["<<omp_get_thread_num()<<"]: "<<A_array[omp_get_thread_num()]<<endl;
 			//cout<<"A("<<i<<"): "<<*A_array[i]<<endl;
 			A += *A_array[i];
 			b += *B_array[i];
 		}
-		cout<<"A: "<<A<<endl;
+		cout << "A: " << A << endl;
 //		exit(0);
 		//calculate our optimized gradient
 		twist_diff = A.inverse() * b;
