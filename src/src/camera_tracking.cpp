@@ -186,7 +186,7 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		//this-> rot = this->rot.householderQr().householderQ();
 		Eigen::Quaterniond rot2;
 		rot2 = (this->rot);
-		cout << "Step:\n" <<this->trans << "\n"<<rot2.w() << " "<<rot2.x()<<" "<<rot2.y()<<" "<<rot2.z() <<endl;
+		//cout << "Step:\n" <<this->trans << "\n"<<rot2.w() << " "<<rot2.x()<<" "<<rot2.y()<<" "<<rot2.z() <<endl;
 		this->set_camera_transformation(this->rot, this->trans);
 		
 		if (twist_diff(0,0) < maximum_twist_diff && 
@@ -195,12 +195,12 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		    twist_diff(3,0) < maximum_twist_diff && 
 		    twist_diff(4,0) < maximum_twist_diff && 
 		    twist_diff(5,0) < maximum_twist_diff){
-		    cout << "****** STOP *****" << endl;
+		    //cout << "****** STOP *****" << endl;
 		    stop = true;
 		}
 		  
 		
-		cout <<"r\n" << this-> rot << endl;
+		//cout <<"r\n" << this-> rot << endl;
 		//reorthomolize
 		r1 = rot.block(0,0,3,1);
 		r2 = rot.block(0,1,3,1);
@@ -212,7 +212,7 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		rot.block(0,0,3,1) = r1;
 		rot.block(0,1,3,1) = r2;
 		rot.block(0,2,3,1) = r3;
-		cout <<"r\n" << this-> rot << endl;
+		//cout <<"r\n" << this-> rot << endl;
 		/*cout <<"r1" << this-> rot.block(0,0,3,1) << endl;
 		cout <<"f: "<< this-> rot.block(0,0,3,1).norm() << endl;
 		cout <<"r1" << this-> rot.block(0,1,3,1) << endl;
@@ -222,9 +222,9 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		
 		
 	}
-	cout << "----------------------------"<<endl;
-	cout << "----------------------------"<<endl;
-	cout << "----------------------------"<<endl;
+//	cout << "----------------------------"<<endl;
+//	cout << "----------------------------"<<endl;
+//	cout << "----------------------------"<<endl;
 }
 //TODO precalculate 2*(sdf->m_div_width)
 void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_point, Eigen::Matrix<double, 6, 1>& SDF_derivative,
