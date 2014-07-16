@@ -42,6 +42,7 @@
 #include <pcl/common/vector_average.h>
 #include <pcl/Vertices.h>
 #include <pcl/kdtree/kdtree_flann.h>
+#include <boost/make_shared.hpp>
 
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_cloud.h>
@@ -477,7 +478,7 @@ namespace pcl
       void
       createSurface (const float (&leaf)[8],
                      const Eigen::Vector3i &index_3d,
-                     pcl::PointCloud<pcl::PointXYZ> &cloud);
+                     pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud);
 
 
       /** \brief Method that returns the scalar values of the neighbors of a given 3D position in the grid.
