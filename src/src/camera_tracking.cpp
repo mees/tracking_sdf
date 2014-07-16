@@ -64,14 +64,14 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 		pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud) {
 	ros::Time t0 = ros::Time::now();
 	int i, j;
-	Eigen::Matrix<double, 6, 1> SDF_derivative;
-	bool is_interpolated;
+
+
 	Eigen::Matrix<double, 6, 6> A = Eigen::Matrix<double, 6, 6>::Zero();
 	Eigen::Matrix<double, 6, 1> b = Eigen::Matrix<double, 6, 1>::Zero();
 	//twist_diff = (v1,v2,v3,w1,w2,w3)
 	Eigen::Matrix<double, 6, 1> twist_diff =
 			Eigen::Matrix<double, 6, 1>::Zero();
-	double int_dist;
+
 	bool stop = false;
 	Vector3d r1, r2, r3;
 	for (int g = 0; g < gauss_newton_max_iteration && !stop; g++) {
@@ -143,9 +143,10 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 		Rot_w_3_m = Rotdiff * this->rot;
 		//iterate all image points
 		int np = omp_get_max_threads();
+		//int np = 2;
 		boost::shared_ptr<Eigen::Matrix<double, 6, 6> > *A_array = new boost::shared_ptr<Eigen::Matrix<double, 6, 6> >[np];
 		boost::shared_ptr<Eigen::Matrix<double, 6, 1> > *B_array = new boost::shared_ptr<Eigen::Matrix<double, 6, 1> >[np];
-		//omp_set_num_threads(1);
+		//omp_set_num_threads(2);
 #pragma omp parallel
 		{
 			boost::shared_ptr<Eigen::Matrix<double, 6, 6> > A_ptr;
@@ -154,21 +155,24 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 			B_ptr = boost::make_shared<Eigen::Matrix<double, 6, 1> >();
 			A_ptr->setZero();
 			B_ptr->setZero();
-			//cout<<"omp_get_thread_num(): "<<omp_get_thread_num()<<endl;
 			A_array[omp_get_thread_num()] = A_ptr;
 			B_array[omp_get_thread_num()] = B_ptr;
-
-
+			//cout<<" old A_array["<<omp_get_thread_num()<<"]: "<<A_array[omp_get_thread_num()]<<endl;
+			bool is_interpolated;
+			Eigen::Matrix<double, 6, 1> SDF_derivative;
+			double int_dist;
+			Eigen::Vector3d camera_point;
 #pragma omp  for
 			for (i = 0; i < point_cloud->width; i++) {
 				for (j = 0; j < point_cloud->height; j++) {
+
 					pcl::PointXYZRGB point;
 					point = point_cloud->at(i, j);
 					//does a good depth exist?
 					if (isnan(point.x) || isnan(point.y) || isnan(point.z)) {
 						continue;
 					}
-					Eigen::Vector3d camera_point;
+
 					camera_point(0) = point.x;
 					camera_point(1) = point.y;
 					camera_point(2) = point.z;
@@ -181,18 +185,29 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 					if (!is_interpolated) {
 						continue;
 					}
+	//				cout<<"*A_ptr: "<<*A_ptr<<endl;
+
 
 					*A_ptr = *A_ptr + (SDF_derivative * SDF_derivative.transpose()) ;
-					*B_ptr = *B_ptr + (int_dist * SDF_derivative);
+	//				cout<<"new A_ptr: "<<*A_ptr<<"thread number: "<<omp_get_thread_num()<<endl;
+//					cout<<"new A address: "<<A_ptr<<endl;
+//					cout<<"A_array[i] address: "<<A_array[omp_get_thread_num()]<<endl;
+	//				cout<<"*A_array[i]: "<<*A_array[omp_get_thread_num()]<<endl;
+					* B_ptr = *B_ptr + (int_dist * SDF_derivative);
+
 
 				}
 			}
 		}
+
 		for (int i=0; i<np; i++){
-			cout<<"A("<<i<<"): "<<*A_array[i]<<endl;
+			//cout<<"2 old A_array["<<omp_get_thread_num()<<"]: "<<A_array[omp_get_thread_num()]<<endl;
+			//cout<<"A("<<i<<"): "<<*A_array[i]<<endl;
 			A += *A_array[i];
 			b += *B_array[i];
 		}
+		cout<<"A: "<<A<<endl;
+//		exit(0);
 		//calculate our optimized gradient
 		twist_diff = A.inverse() * b;
 
