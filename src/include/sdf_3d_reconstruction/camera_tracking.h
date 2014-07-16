@@ -10,14 +10,29 @@ class SDF;
 using namespace Eigen;
 using namespace std;
 class CameraTracking {
-  
-public:
-	
-	
+private:
+	//step for estimating gradient of translation
+	float v_h;
+	//precalculation of 2*trans_h for central_difference
+	float v_h2;
+	//step for estimating gradient of rotation
+	float w_h;
+	//precalculation of 2*w_h for central_difference
+	float w_h2;
+	//maximum of gauss_newton step
 	int gauss_newton_max_iteration;
+	//do not stop gauss newton until twist difference is bigger than maximum_twist diff
 	float maximum_twist_diff;
+	//rotation differences by changin w_x in minus (m) or plus (p) direction
+	Eigen::Matrix<double, 3, 3> Rotdiff,Rot_w_1_p,Rot_w_1_m,Rot_w_2_p,Rot_w_2_m,Rot_w_3_p,Rot_w_3_m;
+public:
+	//rotation camera -> global
 	Eigen::Matrix3d rot;
+	//rotation global -> camera
 	Eigen::Matrix3d rot_inv;
+	//translation camera -> global
+	Eigen::Vector3d trans;
+	// translation global -> camera
 	Eigen::Vector3d rot_inv_trans;
 	/**
 	 * inner camera parameter
@@ -26,17 +41,13 @@ public:
 	 *	[ 0  0  1]
 	 */
 	Eigen::Matrix3d K;
-	Eigen::Matrix<double, 6, 1> twist;
 	ros::Subscriber cam_info;
-	/*
-	 * current translation
-	 */
-	Eigen::Vector3d trans;
+	
 	bool isKFilled;
 	/**
 	 *  standard constructor
 	 */
-	CameraTracking(int gauss_newton_max_iteration, float maximum_twist_diff);
+	CameraTracking(int gauss_newton_max_iteration, float maximum_twist_diff, float w_h, float v_h);
 	virtual ~CameraTracking();
 	/**
 	 * read the camera info

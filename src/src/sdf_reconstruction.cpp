@@ -80,7 +80,7 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 
 SDF_Reconstruction::SDF_Reconstruction() {
 
-        this->camera_tracking = new CameraTracking(20,0.001);
+        this->camera_tracking = new CameraTracking(20,0.001,0.02,0.01);
 	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
