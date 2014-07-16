@@ -100,7 +100,7 @@ pcl::MarchingCubesSDF::interpolateEdge (Eigen::Vector3f &p1,
 void
 pcl::MarchingCubesSDF::createSurface (const float (&leaf_node)[8],
                                             const Eigen::Vector3i &index_3d,
-                                            pcl::PointCloud<pcl::PointXYZ> &cloud)
+                                            pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud)
 {
 
   int cubeindex = 0;
@@ -170,6 +170,7 @@ pcl::MarchingCubesSDF::createSurface (const float (&leaf_node)[8],
 
   // Create the triangle
 
+
   for (int i = 0; triTable[cubeindex][i] != -1; i+=3)
   {
     pcl::PointXYZ p1,p2,p3;
@@ -177,20 +178,20 @@ pcl::MarchingCubesSDF::createSurface (const float (&leaf_node)[8],
     p1.y = vertex_list[triTable[cubeindex][i  ]][1];
     p1.z = vertex_list[triTable[cubeindex][i  ]][2];
 
-    cloud.push_back (p1);
+    cloud->push_back (p1);
 
     p2.x = vertex_list[triTable[cubeindex][i+1]][0];
     p2.y = vertex_list[triTable[cubeindex][i+1]][1];
     p2.z = vertex_list[triTable[cubeindex][i+1]][2];
-
-    cloud.push_back (p2);
+    cloud->push_back (p2);
 
     p3.x = vertex_list[triTable[cubeindex][i+2]][0];
     p3.y = vertex_list[triTable[cubeindex][i+2]][1];
     p3.z = vertex_list[triTable[cubeindex][i+2]][2];
 
-    cloud.push_back (p3);
+    cloud->push_back (p3);
   }
+ 
 
 }
 
@@ -259,13 +260,28 @@ pcl::MarchingCubesSDF::getNeighborList1D (float (&leaf)[8],
    // Run the actual marching cubes algorithm, store it into a point cloud,
    // and copy the point cloud + connectivity into output
    points.clear ();
-   float leaf_node[8];
-   Eigen::Vector3i index_3d;
+
+	int np = omp_get_max_threads();
+   std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> local(np);
+   
+#pragma omp parallel
+{ 
+	   pcl::PointCloud<pcl::PointXYZ>::Ptr localCloud;
+	   localCloud = boost::make_shared<PointCloud<pcl::PointXYZ> >();
+	   local[omp_get_thread_num()] = localCloud;
+#pragma omp for
    for (int idx=0;idx<number_of_voxels;idx++){
-	   index_3d = voxel_coords_[idx];
+	   float leaf_node[8];
+	   Eigen::Vector3i index_3d = voxel_coords_[idx];
 	   getNeighborList1D (leaf_node, index_3d);
-	   createSurface (leaf_node, index_3d, points);
+	   createSurface (leaf_node, index_3d, localCloud);
    }
+}
+//concatenate local point clouds
+   for (int i=0; i<np; i++){
+	   points += *local[i];
+   }
+
 
  }
 
