@@ -80,9 +80,15 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	frame_num = 0;
 	//pub = nh.advertise<sensor_msgs::PointCloud2> ("/our_output/", 1);
 	//Ros::Publisher(topic n)
+<<<<<<< HEAD
 	Vector3d sdf_origin(-3.5, -3.5, -1.5);
 	//m , width, height, depth, treshold
 	sdf = new SDF(200, 7.0, 7.0, 3.0, sdf_origin, 0.3, 0.025);
+=======
+	Vector3d sdf_origin(-3.0, -4.0, -0.5);
+		     //m , width, height, depth, treshold
+	sdf = new SDF(200, 7.0, 7.0, 3.0, sdf_origin,0.3, 0.025);
+>>>>>>> origin
 
 	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
 	//visualization_thread = new boost::thread(boost::bind(& sd.visualize, this));
