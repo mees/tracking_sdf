@@ -181,7 +181,7 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		    twist_diff(3,0) < maximum_twist_diff && 
 		    twist_diff(4,0) < maximum_twist_diff && 
 		    twist_diff(5,0) < maximum_twist_diff){
-		    cout << "STOP Gauss Newton at step: "<< g << endl;
+		    //cout << "STOP Gauss Newton at step: "<< g << endl;
 		    stop = true;
 		}
 		//reorthomolize rotation

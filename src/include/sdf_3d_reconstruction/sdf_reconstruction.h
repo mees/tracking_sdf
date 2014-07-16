@@ -41,6 +41,7 @@ private:
 		tf::StampedTransform transform;
 		ros::Publisher pub;
 		int frame_num;
+		bool _useGroundTruth;
 
 protected:
 
