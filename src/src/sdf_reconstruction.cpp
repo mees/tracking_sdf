@@ -66,8 +66,6 @@ void SDF_Reconstruction::kinect_callback(const sensor_msgs::PointCloud2ConstPtr&
 	    this->camera_tracking->estimate_new_position(sdf,cloud_filtered);
 	    Eigen::Quaterniond rot2;
 	    rot2 = (this-> camera_tracking->rot);
-	    cout << "Ground Truth:\n" <<trans << "\n"<<rot.w()<<" "<<rot.x()<<" "<<rot.y()<<" "<<rot.z()<<endl;
-	    cout << "Our:\n" <<camera_tracking->trans << "\n"<<rot2.w() << " "<<rot2.x()<<" "<<rot2.y()<<" "<<rot2.z() <<endl;
 	}
 	
 	Matrix3d rotMat = rot.toRotationMatrix();//quaternion.toRotationMatrix();	
@@ -89,7 +87,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	frame_num = 0;
 	//pub = nh.advertise<sensor_msgs::PointCloud2> ("/our_output/", 1);
 	//Ros::Publisher(topic n)
-	Vector3d sdf_origin(-3.5, -3.5, -1.5);
+	Vector3d sdf_origin(-3.0, -4.0, -0.5);
 		     //m , width, height, depth, treshold
 	sdf = new SDF(200, 7.0, 7.0, 3.0, sdf_origin,0.3, 0.025);
 

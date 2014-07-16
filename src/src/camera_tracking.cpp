@@ -1,17 +1,12 @@
 #include "sdf_3d_reconstruction/camera_tracking.h"
 #include "sdf_3d_reconstruction/sdf.h"
 CameraTracking::CameraTracking(int gauss_newton_max_iteration, float maximum_twist_diff){
-      this->trans = Eigen::Vector3d(0,0,0);
+      this->trans = Eigen::Vector3d(0.909536,-0.419546,0.798641);
       this->rot = Eigen::Matrix3d();
-      this->rot << 1,0,0,\
-		   0,0,1,\
-		   0,-1,0;
-      this->rot_inv = Eigen::Matrix3d();
-      this->rot_inv << 1,0,0,\
-                       0,0,-1,\
-		       0,1,0;
-      this->rot_inv_trans =  Eigen::Vector3d(0,0,0);
-      //cout << this->rot;
+      this->rot << -0.616896,  -0.195746, -0.762314,\
+		    0.786585,  -0.120238, -0.605662,\
+		    0.0268973, -0.973255,  0.228145;
+      this->set_camera_transformation(rot, trans);
       this->maximum_twist_diff = maximum_twist_diff;
       this->gauss_newton_max_iteration = gauss_newton_max_iteration;
   
@@ -156,52 +151,39 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 				if (!is_interpolated){
 				    continue;
 				}
-				
 				A = A + (SDF_derivative * SDF_derivative.transpose());
 				b = b + int_dist * SDF_derivative;
-				
 			}
 		}
 		//calculate our optimized gradient
 		twist_diff = A.inverse()*b;
-		/*cout << "A"<<endl;
-		cout << A << endl;
-		cout << "b"<<endl;
-		cout << b << endl;
-		cout << "twist_diff"<<endl;
-		cout << twist_diff << endl;*/
 		
+		//start inverting error by linearizing inverted rotation error
 		Rotdiff(0,0) = 1.0; 			Rotdiff(0,1) = twist_diff(5,0); 	Rotdiff(0,2) = -twist_diff(4,0);
 		Rotdiff(1,0) = -twist_diff(5,0);	Rotdiff(1,1) = 1.0; 			Rotdiff(1,2) = twist_diff(3,0);
 		Rotdiff(2,0) = twist_diff(4,0); 	Rotdiff(2,1) = -twist_diff(3,0); 	Rotdiff(2,2) = 1.0;
-		//cout <<"r\n" << this-> rot << endl;
+		
+		//invert translate error
 		Vector3d t_inv (twist_diff(0,0), twist_diff(1,0), twist_diff(2,0));
 		t_inv = Rotdiff * t_inv;
-		
 		this->trans(0) =this->trans(0)- t_inv(0);
 		this->trans(1) =this->trans(1)- t_inv(1);
 		this->trans(2) =this->trans(2)- t_inv(2);
-		//cout << "TRans\n" << this->trans << endl;
+		//invert rotation error
 		this-> rot = Rotdiff * this->rot;
-		//this-> rot = this->rot.householderQr().householderQ();
 		Eigen::Quaterniond rot2;
 		rot2 = (this->rot);
-		cout << "Step:\n" <<this->trans << "\n"<<rot2.w() << " "<<rot2.x()<<" "<<rot2.y()<<" "<<rot2.z() <<endl;
 		this->set_camera_transformation(this->rot, this->trans);
-		
 		if (twist_diff(0,0) < maximum_twist_diff && 
 		    twist_diff(1,0) < maximum_twist_diff && 
 		    twist_diff(2,0) < maximum_twist_diff && 
 		    twist_diff(3,0) < maximum_twist_diff && 
 		    twist_diff(4,0) < maximum_twist_diff && 
 		    twist_diff(5,0) < maximum_twist_diff){
-		    cout << "****** STOP *****" << endl;
+		    cout << "STOP Gauss Newton at step: "<< g << endl;
 		    stop = true;
 		}
-		  
-		
-		cout <<"r\n" << this-> rot << endl;
-		//reorthomolize
+		//reorthomolize rotation
 		r1 = rot.block(0,0,3,1);
 		r2 = rot.block(0,1,3,1);
 		r3 = rot.block(0,2,3,1);
@@ -212,21 +194,8 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		rot.block(0,0,3,1) = r1;
 		rot.block(0,1,3,1) = r2;
 		rot.block(0,2,3,1) = r3;
-		cout <<"r\n" << this-> rot << endl;
-		/*cout <<"r1" << this-> rot.block(0,0,3,1) << endl;
-		cout <<"f: "<< this-> rot.block(0,0,3,1).norm() << endl;
-		cout <<"r1" << this-> rot.block(0,1,3,1) << endl;
-		cout <<"f: "<< this-> rot.block(0,1,3,1).norm() << endl;
-		cout <<"r1" << this-> rot.block(0,2,3,1) << endl;
-		cout <<"f: "<< this-> rot.block(0,2,3,1).norm() << endl;*/
-		
-		
 	}
-	cout << "----------------------------"<<endl;
-	cout << "----------------------------"<<endl;
-	cout << "----------------------------"<<endl;
 }
-//TODO precalculate 2*(sdf->m_div_width)
 void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_point, Eigen::Matrix<double, 6, 1>& SDF_derivative,
 	   Eigen::Matrix<double, 3, 3>& r1p,Eigen::Matrix<double, 3, 3>& r1m, 
 	   Eigen::Matrix<double, 3, 3>& r2p,Eigen::Matrix<double, 3, 3>& r2m,
@@ -248,7 +217,6 @@ void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_po
 	this->project_camera_to_world(camera_point, current_world_point);
 	sdf->get_voxel_coordinates(current_world_point,current_voxel_point);
 	if (current_voxel_point(0) < 0 || current_voxel_point(1) < 0 || current_voxel_point(2) < 0){
-	  //cout << "point not in voxel grid";
 	  return ;
         }
         if (current_voxel_point(0) >= sdf->m || current_voxel_point(1) >= sdf->m || current_voxel_point(2) >= sdf->m){
@@ -309,16 +277,6 @@ void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_po
 	if (!is_interpolated) return;
 	SDF_derivative(3) = (plus_h_sdf_value - minus_h_sdf_value)/(2*(w_h));
 	
-	/*
-	cout<<"..................................................\n";
-	cout<<"plus_h_world_point\n" << plus_h_world_point <<endl;
-	cout<<"minus_h_world_point\n" << minus_h_world_point <<endl;
-	cout<<"plus_h_voxel_point\n" << plus_h_voxel_point <<endl;
-	cout<<"minus_voxel_point\n" << minus_voxel_point <<endl;
-	cout<<"plus_h_sdf_value\n" << plus_h_sdf_value <<endl;
-	cout<<"minus_h_sdf_value\n" << minus_h_sdf_value <<endl;
-	*/
-	
 	//wy derivative
 	plus_h_world_point = r2p*camera_point + this->trans;
 	minus_h_world_point = r2m*camera_point + this->trans;
@@ -329,16 +287,6 @@ void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_po
 	minus_h_sdf_value = sdf->interpolate_distance(minus_voxel_point, is_interpolated);
 	if (!is_interpolated) return;
 	SDF_derivative(4) = (plus_h_sdf_value - minus_h_sdf_value)/(2*(w_h));
-	
-	/*
-	cout<<"..................................................\n";
-	cout<<"plus_h_world_point\n" << plus_h_world_point <<endl;
-	cout<<"minus_h_world_point\n" << minus_h_world_point <<endl;
-	cout<<"plus_h_voxel_point\n" << plus_h_voxel_point <<endl;
-	cout<<"minus_voxel_point\n" << minus_voxel_point <<endl;
-	cout<<"plus_h_sdf_value\n" << plus_h_sdf_value <<endl;
-	cout<<"minus_h_sdf_value\n" << minus_h_sdf_value <<endl;
-	*/
 	
 	//wz derivative
 	plus_h_world_point = r3p*camera_point + this->trans;
@@ -351,13 +299,5 @@ void CameraTracking::get_partial_derivative(SDF* sdf, Eigen::Vector3d& camera_po
 	if (!is_interpolated) return;
 	SDF_derivative(5) = (plus_h_sdf_value - minus_h_sdf_value)/(2*(w_h));
 	
-	/*
-	cout<<"..................................................\n";
-	cout<<"plus_h_world_point\n" << plus_h_world_point <<endl;
-	cout<<"minus_h_world_point\n" << minus_h_world_point <<endl;
-	cout<<"plus_h_voxel_point\n" << plus_h_voxel_point <<endl;
-	cout<<"minus_voxel_point\n" << minus_voxel_point <<endl;
-	cout<<"plus_h_sdf_value\n" << plus_h_sdf_value <<endl;
-	cout<<"minus_h_sdf_value\n" << minus_h_sdf_value <<endl;
-	*/
+	
 }
