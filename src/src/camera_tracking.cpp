@@ -4,12 +4,12 @@ CameraTracking::CameraTracking(int gauss_newton_max_iteration, float maximum_twi
       this->trans = Eigen::Vector3d(0,0,0);
       this->rot = Eigen::Matrix3d();
       this->rot << 1,0,0,\
-		   0,1,0,\
-		   0,0,1;
+		   0,0,1,\
+		   0,-1,0;
       this->rot_inv = Eigen::Matrix3d();
       this->rot_inv << 1,0,0,\
-                       0,1,0,\
-		       0,0,1;
+                       0,0,-1,\
+		       0,1,0;
       this->rot_inv_trans =  Eigen::Vector3d(0,0,0);
       //cout << this->rot;
       this->maximum_twist_diff = maximum_twist_diff;
@@ -171,15 +171,17 @@ void CameraTracking::estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXY
 		cout << "twist_diff"<<endl;
 		cout << twist_diff << endl;*/
 		
-		this->trans(0) =this->trans(0)- twist_diff(0,0);
-		this->trans(1) =this->trans(1)- twist_diff(1,0);
-		this->trans(2) =this->trans(2)- twist_diff(2,0);
-		//cout << "TRans\n" << this->trans << endl;
-		
 		Rotdiff(0,0) = 1.0; 			Rotdiff(0,1) = twist_diff(5,0); 	Rotdiff(0,2) = -twist_diff(4,0);
 		Rotdiff(1,0) = -twist_diff(5,0);	Rotdiff(1,1) = 1.0; 			Rotdiff(1,2) = twist_diff(3,0);
 		Rotdiff(2,0) = twist_diff(4,0); 	Rotdiff(2,1) = -twist_diff(3,0); 	Rotdiff(2,2) = 1.0;
 		//cout <<"r\n" << this-> rot << endl;
+		Vector3d t_inv (twist_diff(0,0), twist_diff(1,0), twist_diff(2,0));
+		t_inv = Rotdiff * t_inv;
+		
+		this->trans(0) =this->trans(0)- t_inv(0);
+		this->trans(1) =this->trans(1)- t_inv(1);
+		this->trans(2) =this->trans(2)- t_inv(2);
+		//cout << "TRans\n" << this->trans << endl;
 		this-> rot = Rotdiff * this->rot;
 		//this-> rot = this->rot.householderQr().householderQ();
 		Eigen::Quaterniond rot2;
