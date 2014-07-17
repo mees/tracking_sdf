@@ -1,7 +1,7 @@
 #include "sdf_3d_reconstruction/camera_tracking.h"
 #include "sdf_3d_reconstruction/sdf.h"
 CameraTracking::CameraTracking(int gauss_newton_max_iteration,
-		float maximum_twist_diff, float v_h, float w_h) {
+		float maximum_twist_diff, float v_h, float w_h, SDF *sdf) {
 	this->trans = Eigen::Vector3d(0.909536, -0.419546, 0.798641);
 	this->rot = Eigen::Matrix3d();
 	this->rot << -0.616896, -0.195746, -0.762314, 0.786585, -0.120238, -0.605662, 0.0268973, -0.973255, 0.228145;
@@ -12,6 +12,12 @@ CameraTracking::CameraTracking(int gauss_newton_max_iteration,
 	this->w_h = w_h;
 	this->v_h2 = 2 * v_h;
 	this->w_h2 = 2 * w_h;
+	this->v_h2_width = this->v_h2/sdf->m_div_width;
+	cout << "v_h2_width" <<v_h2_width << endl;
+	this->v_h2_height = this->v_h2/sdf->m_div_height;
+	cout << "v_h2_height" <<this->v_h2_height << endl;
+	this->v_h2_depth =this->v_h2/sdf->m_div_depth;
+	cout << "v_h2_depth" <<this->v_h2_depth << endl;
 }
 CameraTracking::~CameraTracking() {
 }
@@ -146,18 +152,6 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 		Rotdiff(0, 1) = w_h;
 		Rotdiff(1, 0) = -w_h;
 		r3m = Rotdiff * this->rot;
-		t1p = this->trans;
-		t1p(0) += v_h;
-		t1m = this->trans;
-		t1m(0) -= v_h;
-		t2p = this->trans;
-		t2p(1) += v_h;
-		t2m = this->trans;
-		t2m(1) -= v_h;
-		t3p = this->trans;
-		t3p(2) += v_h;
-		t3m = this->trans;
-		t3m(2) -= v_h;
 #pragma omp parallel
 		{
 			boost::shared_ptr<Eigen::Matrix<double, 6, 6> > A_ptr;
@@ -278,11 +272,12 @@ void CameraTracking::get_partial_derivative(SDF* sdf,
 	sdf_val = sdf->interpolate_distance(current_voxel_point, is_interpolated);
 	if (!is_interpolated)
 		return;
+	
 	//tx derivative
-	plus_h_world_point = this->rot * camera_point + this->t1p;
-	minus_h_world_point = this->rot * camera_point + this->t2m;
-	sdf->get_voxel_coordinates(plus_h_world_point, plus_h_voxel_point);
-	sdf->get_voxel_coordinates(minus_h_world_point, minus_voxel_point);
+	plus_h_voxel_point = current_voxel_point;
+	plus_h_voxel_point(0) += v_h;
+	minus_voxel_point = current_voxel_point;
+	minus_voxel_point(0) -= v_h;
 	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point,
 			is_interpolated);
 	if (!is_interpolated)
@@ -291,13 +286,13 @@ void CameraTracking::get_partial_derivative(SDF* sdf,
 			is_interpolated);
 	if (!is_interpolated)
 		return;
-	SDF_derivative(0) = (plus_h_sdf_value - minus_h_sdf_value) / v_h2;
+	SDF_derivative(0) = (plus_h_sdf_value - minus_h_sdf_value) / v_h2_width;
 
 	//ty derivative
-	plus_h_world_point = this->rot * camera_point + this->t2p;
-	minus_h_world_point = this->rot * camera_point + this->t2m;
-	sdf->get_voxel_coordinates(plus_h_world_point, plus_h_voxel_point);
-	sdf->get_voxel_coordinates(minus_h_world_point, minus_voxel_point);
+	plus_h_voxel_point = current_voxel_point;
+	plus_h_voxel_point(1) += v_h;
+	minus_voxel_point = current_voxel_point;
+	minus_voxel_point(1) -= v_h;
 	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point,
 			is_interpolated);
 	if (!is_interpolated)
@@ -306,13 +301,13 @@ void CameraTracking::get_partial_derivative(SDF* sdf,
 			is_interpolated);
 	if (!is_interpolated)
 		return;
-	SDF_derivative(1) = (plus_h_sdf_value - minus_h_sdf_value) / v_h2;
+	SDF_derivative(1) = (plus_h_sdf_value - minus_h_sdf_value) / v_h2_height;
 
 	//tz derivative 
-	plus_h_world_point = this->rot * camera_point + this->t3p;
-	minus_h_world_point = this->rot * camera_point + this->t3m;
-	sdf->get_voxel_coordinates(plus_h_world_point, plus_h_voxel_point);
-	sdf->get_voxel_coordinates(minus_h_world_point, minus_voxel_point);
+	plus_h_voxel_point = current_voxel_point;
+	plus_h_voxel_point(2) += v_h;
+	minus_voxel_point = current_voxel_point;
+	minus_voxel_point(2) -= v_h;
 	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point,
 			is_interpolated);
 	if (!is_interpolated)
@@ -321,7 +316,7 @@ void CameraTracking::get_partial_derivative(SDF* sdf,
 			is_interpolated);
 	if (!is_interpolated)
 		return;
-	SDF_derivative(2) = (plus_h_sdf_value - minus_h_sdf_value) / v_h2;
+	SDF_derivative(2) = (plus_h_sdf_value - minus_h_sdf_value) / v_h2_depth;
 
 	//wx derivative
 	plus_h_world_point = r1p * camera_point + this->trans;

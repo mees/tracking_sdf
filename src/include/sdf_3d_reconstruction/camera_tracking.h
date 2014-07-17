@@ -15,6 +15,11 @@ private:
 	float v_h;
 	//precalculation of 2*trans_h for central_difference
 	float v_h2;
+	//vh2_world
+	float v_h2_width;
+	float v_h2_height;
+	float v_h2_depth;
+	
 	//step for estimating gradient of rotation
 	float w_h;
 	//precalculation of 2*w_h for central_difference
@@ -25,8 +30,7 @@ private:
 	float maximum_twist_diff;
 	//rotation differences by changing w_x in minus (m) or plus (p) direction
 	Eigen::Matrix<double, 3, 3> Rotdiff,r1p,r1m,r2p,r2m,r3p,r3m;
-	//translation difference by changing v_x in minus (m) or plus (p) direction
-	Eigen::Vector3d t1p, t1m, t2p, t2m, t3p, t3m;
+	
 public:
 	//rotation camera -> global
 	Eigen::Matrix3d rot;
@@ -49,7 +53,7 @@ public:
 	/**
 	 *  standard constructor
 	 */
-	CameraTracking(int gauss_newton_max_iteration, float maximum_twist_diff, float w_h, float v_h);
+	CameraTracking(int gauss_newton_max_iteration, float maximum_twist_diff, float w_h, float v_h, SDF *sdf);
 	virtual ~CameraTracking();
 	/**
 	 * read the camera info

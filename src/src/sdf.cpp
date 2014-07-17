@@ -367,7 +367,6 @@ void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZR
 
 void SDF::visualize(double frequency)
 {
-
 	ros::Rate r(frequency);
 	pcl::PointCloud<pcl::PointXYZ> cloud;
 	std::unique_lock<std::mutex> lk(cv_m);
@@ -437,9 +436,7 @@ void SDF::visualize(double frequency)
 		// Publish the marker
 		this->marker_publisher.publish(marker);
 		std::cout << "visualize method: "<<(ros::Time::now()-t0).toSec()<< std::endl;
-		//ros::Time t1 = ros::Time::now();
 		r.sleep();
-		//std::cout << "visualize method sleeped: "<<(ros::Time::now()-t1).toSec()<< std::endl;
 	}
 
 }
