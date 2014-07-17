@@ -83,7 +83,7 @@ public:
 	 * gets interpolated distance with world coordinates.
 	 */
 
-	float interpolate_distance(Vector3d& world_coordinates, bool& is_interpolated) const;
+	float interpolate_distance(const Vector3d& world_coordinates, bool& is_interpolated) const;
 
 	/**
 	 * gets interpolated color with world coordinates.
@@ -110,7 +110,21 @@ public:
 	/*
 	 *  input: i,j,k -> idx. Idx can be used for W and for D
 	 */
-	int get_array_index(Vector3i& voxel_coordinates) const;
+	inline int get_array_index(Vector3i& voxel_coordinates) const{
+	        if (voxel_coordinates(0) < 0 || voxel_coordinates(1) < 0 || voxel_coordinates(2) < 0){
+		  return -1;
+	        }
+	        if (voxel_coordinates(0) >= m || voxel_coordinates(1) >= m || voxel_coordinates(2) >= m){
+		  return -1;
+	        }
+		int _idx = m_squared*voxel_coordinates(0)+this->m*voxel_coordinates(1)+voxel_coordinates(2);
+		if (_idx < 0 || _idx >= number_of_voxels){
+		  std::cout << "Error in get_array_index \n"<< voxel_coordinates << std::endl;
+		  _idx = -1;
+		}
+
+		return _idx;
+	}
 	/*
 	 *  input: array_idx
 	 *  output: voxel_coordinates -> i, j, k voxel grid coordinates. i represents x axes, j represents y axes, k represents z axes

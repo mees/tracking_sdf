@@ -60,31 +60,6 @@ void SDF::register_visualization(){
 	shape_type = visualization_msgs::Marker::CUBE;
 }
 
-
-
-int SDF::get_array_index(Vector3i& voxel_coordinates) const{
-        if (voxel_coordinates(0) < 0 || voxel_coordinates(1) < 0 || voxel_coordinates(2) < 0){
-	  return -1;
-        }
-        if (voxel_coordinates(0) >= m || voxel_coordinates(1) >= m || voxel_coordinates(2) >= m){
-	  return -1;
-        }
-	int _idx = m_squared*voxel_coordinates(0)+this->m*voxel_coordinates(1)+voxel_coordinates(2);
-	if (_idx < 0 || _idx >= number_of_voxels){
-	  std::cout << "Error in get_array_index \n"<< voxel_coordinates << std::endl;
-	  _idx = -1;
-	}
-	  
-	return _idx;
-}
-
-// auf dem Blatt verifiziert durch Oier und Joel
-// boost multidimensionales array
-
-
-
-
-
 void SDF::create_cuboid(float min_x, float max_x, float min_y, float max_y, float min_z, float max_z){
 	Vector3i voxel_coordinates;
 	Vector3d global_coordinates;
@@ -150,7 +125,7 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 		}
 	}
 }
-float SDF::interpolate_distance(Vector3d& voxel_coordinates, bool& is_interpolated) const{
+float SDF::interpolate_distance(const Vector3d& voxel_coordinates, bool& is_interpolated) const{
 	//Vector3d voxel_coordinates;
 	//get_voxel_coordinates(world_coordinates, voxel_coordinates);
 	float i = voxel_coordinates(0);

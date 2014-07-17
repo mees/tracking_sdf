@@ -156,10 +156,10 @@ void CameraTracking::estimate_new_position(const SDF *sdf,
 			B_ptr->setZero();
 			A_array[omp_get_thread_num()] = A_ptr;
 			B_array[omp_get_thread_num()] = B_ptr;
-			bool is_interpolated;
-			Eigen::Matrix<double, 6, 1> SDF_derivative;
-			double int_dist;
-			Eigen::Vector3d camera_point;
+			bool is_interpolated = false;
+			Eigen::Matrix<double, 6, 1> SDF_derivative = Eigen::Matrix<double, 6, 1>::Zero();
+			double int_dist = 0;
+			Eigen::Vector3d camera_point = Eigen::Vector3d::Zero();
 #pragma omp  for
 			//iterate all image points
 			for (int i = 0; i < point_cloud->width; i+=3) {
