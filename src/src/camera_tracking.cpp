@@ -169,8 +169,8 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 #pragma omp  for
 			
 			//iterate all image points
-			for (int i = 0; i < point_cloud->width; i++) {
-				for (int j = 0; j < point_cloud->height; j++) {
+			for (int i = 0; i < point_cloud->width; i+=3) {
+				for (int j = 0; j < point_cloud->height; j+=3) {
 
 					pcl::PointXYZRGB point;
 					point = point_cloud->at(i, j);
