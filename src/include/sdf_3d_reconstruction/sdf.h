@@ -83,13 +83,13 @@ public:
 	 * gets interpolated distance with world coordinates.
 	 */
 
-	float interpolate_distance(Vector3d& world_coordinates, bool& is_interpolated);
+	float interpolate_distance(Vector3d& world_coordinates, bool& is_interpolated) const;
 
 	/**
 	 * gets interpolated color with world coordinates.
 	 */
 	void interpolate_color(geometry_msgs::Point& global_coords,
-			std_msgs::ColorRGBA& color);
+			std_msgs::ColorRGBA& color) const;
 	/**
 	 * helper function for testing issues
 	 */
@@ -104,28 +104,43 @@ public:
 	 *  
 	 **/
 	void visualize(double frequency);
-	int get_number_of_voxels();
+	inline int get_number_of_voxels() const {
+		return number_of_voxels;
+	}
 	/*
 	 *  input: i,j,k -> idx. Idx can be used for W and for D
 	 */
-	int get_array_index(Vector3i& voxel_coordinates);
+	int get_array_index(Vector3i& voxel_coordinates) const;
 	/*
 	 *  input: array_idx
 	 *  output: voxel_coordinates -> i, j, k voxel grid coordinates. i represents x axes, j represents y axes, k represents z axes
 	 */
-	void get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinates);
+	inline void get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinates) const {
+		voxel_coordinates(1) = (int) (array_idx % m_squared)/this->m;
+		voxel_coordinates(0) = (int) (array_idx/m_squared);
+		voxel_coordinates(2) = (int) array_idx%this->m;
+	}
+
+
 	/*
 	 *  input: global_coordinates
 	 *  output: voxel_coordinates
 	 */
-	void get_voxel_coordinates(Vector3d& global_coordinates,
-			Vector3d& voxel_coordinates);
+	inline void get_voxel_coordinates(Vector3d& global_coordinates, Vector3d& voxel_coordinates)  const{
+		voxel_coordinates(0) = ((global_coordinates(0)-this->sdf_origin(0))*m_div_width -0.5);
+		voxel_coordinates(1) = ((global_coordinates(1)-this->sdf_origin(1))*m_div_height -0.5);
+		voxel_coordinates(2) = ((global_coordinates(2)-this->sdf_origin(2))*m_div_depth -0.5);
+	}
 	/*
 	 *  input: globale coordinate x,y,z
 	 *  output: voxel_coordinates i,j,k
 	 */
-	void get_global_coordinates(Vector3i& voxel_coordinates,
-			Vector3d& global_coordinates);
+	// auf dem Blatt verifiziert durch Oier und Joel
+	inline void get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_coordinates) const{
+		global_coordinates(0) = (this->width/((float)m)) * (voxel_coordinates(0)+0.5)+this->sdf_origin(0);
+		global_coordinates(1) = (this->height/((float)m)) * (voxel_coordinates(1)+0.5)+this->sdf_origin(1);
+		global_coordinates(2) = (this->depth/((float)m)) * (voxel_coordinates(2)+0.5)+this->sdf_origin(2);
+	}
 	/*
 	 * 
 	 */
@@ -137,13 +152,19 @@ public:
 	 * point-to-point distance computes the difference of the depth of the voxel
 	 *  and the observed depth of the projected voxel pixel in the depth image, in camera frame
 	 */
-	void projectivePointToPointDistance(const double &voxelDepthInCameraFrame,
-			const double &observedDepthOfProjectedVoxelInDepthImage,
-			double &pointToPointDistance);
+	inline void projectivePointToPointDistance(const double &voxelDepthInCameraFrame, const double &observedDepthOfProjectedVoxelInDepthImage, double &pointToPointDistance) const {
 
-	void projectivePointToPlaneDistance(const Vector3d &camera_point,
-			const Vector3d &camera_point_img, const Vector3d &normal,
-			double & pointToPlaneDistance);
+		pointToPointDistance = voxelDepthInCameraFrame - observedDepthOfProjectedVoxelInDepthImage;
+	}
+	/*
+	 * point-to-point distance computes the difference of the depth of the voxel
+	 *  and the observed depth of the projected voxel pixel in the depth image, in camera frame
+	 */
+	inline void projectivePointToPlaneDistance(const Vector3d &camera_point, const Vector3d &camera_point_img, const Vector3d &normal, double &pointToPlaneDistance) const{
+		Vector3d diff_vec = camera_point_img-camera_point;
+		pointToPlaneDistance = diff_vec.dot(normal);
+
+	}
 
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW

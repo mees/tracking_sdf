@@ -458,6 +458,8 @@ namespace pcl
       /** \brief The iso level to be extracted. */
       float iso_level_;
 
+      pcl::PointCloud<pcl::PointXYZ>::Ptr *global_array;
+
 
       /** \brief Interpolate along the voxel edge.
         * \param[in] p1 The first point on the edge

@@ -60,11 +60,9 @@ void SDF::register_visualization(){
 	shape_type = visualization_msgs::Marker::CUBE;
 }
 
-int SDF::get_number_of_voxels() {
-	return number_of_voxels;
-}
 
-inline int SDF::get_array_index(Vector3i& voxel_coordinates){
+
+int SDF::get_array_index(Vector3i& voxel_coordinates) const{
         if (voxel_coordinates(0) < 0 || voxel_coordinates(1) < 0 || voxel_coordinates(2) < 0){
 	  return -1;
         }
@@ -83,23 +81,10 @@ inline int SDF::get_array_index(Vector3i& voxel_coordinates){
 // auf dem Blatt verifiziert durch Oier und Joel
 // boost multidimensionales array
 
-inline void SDF::get_voxel_coordinates(int array_idx, Vector3i& voxel_coordinates){
-	voxel_coordinates(1) = (int) (array_idx % m_squared)/this->m;
-	voxel_coordinates(0) = (int) (array_idx/m_squared);
-	voxel_coordinates(2) = (int) array_idx%this->m;
-}
-// auf dem Blatt verifiziert durch Oier und Joel
-void SDF::get_global_coordinates(Vector3i& voxel_coordinates, Vector3d& global_coordinates){
-	global_coordinates(0) = (this->width/((float)m)) * (voxel_coordinates(0)+0.5)+this->sdf_origin(0);
-	global_coordinates(1) = (this->height/((float)m)) * (voxel_coordinates(1)+0.5)+this->sdf_origin(1);
-	global_coordinates(2) = (this->depth/((float)m)) * (voxel_coordinates(2)+0.5)+this->sdf_origin(2);
-}
 
-void SDF::get_voxel_coordinates(Vector3d& global_coordinates, Vector3d& voxel_coordinates){
-	voxel_coordinates(0) = ((global_coordinates(0)-this->sdf_origin(0))*m_div_width -0.5);
-	voxel_coordinates(1) = ((global_coordinates(1)-this->sdf_origin(1))*m_div_height -0.5);
-	voxel_coordinates(2) = ((global_coordinates(2)-this->sdf_origin(2))*m_div_depth -0.5);
-}
+
+
+
 void SDF::create_cuboid(float min_x, float max_x, float min_y, float max_y, float min_z, float max_z){
 	Vector3i voxel_coordinates;
 	Vector3d global_coordinates;
@@ -165,7 +150,7 @@ void SDF::create_circle(float radius, float center_x, float center_y,
 		}
 	}
 }
-float SDF::interpolate_distance(Vector3d& voxel_coordinates, bool& is_interpolated){
+float SDF::interpolate_distance(Vector3d& voxel_coordinates, bool& is_interpolated) const{
 	//Vector3d voxel_coordinates;
 	//get_voxel_coordinates(world_coordinates, voxel_coordinates);
 	float i = voxel_coordinates(0);
@@ -202,7 +187,7 @@ float SDF::interpolate_distance(Vector3d& voxel_coordinates, bool& is_interpolat
 	}
 	return sum_d / w_sum;
 }
-void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::ColorRGBA& color){
+void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::ColorRGBA& color) const{
 	Vector3d global_coordinates;
 	Vector3d voxel_coordinates;
 	global_coordinates(0) = global_coords.x;
@@ -257,20 +242,10 @@ void SDF::interpolate_color(geometry_msgs::Point& global_coords, std_msgs::Color
 	color.b /= aux;
 }
 
-/*
- * point-to-point distance computes the difference of the depth of the voxel
- *  and the observed depth of the projected voxel pixel in the depth image, in camera frame
- */
-void SDF::projectivePointToPointDistance(const double &voxelDepthInCameraFrame, const double &observedDepthOfProjectedVoxelInDepthImage, double &pointToPointDistance){
 
-	pointToPointDistance = voxelDepthInCameraFrame - observedDepthOfProjectedVoxelInDepthImage;
-}
 
-void SDF::projectivePointToPlaneDistance(const Vector3d &camera_point, const Vector3d &camera_point_img, const Vector3d &normal, double &pointToPlaneDistance){
-	Vector3d diff_vec = camera_point_img-camera_point;
-	pointToPlaneDistance = diff_vec.dot(normal);
 
-}
+
 
 void SDF::update(CameraTracking* camera_tracking, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered, pcl::PointCloud<pcl::Normal>::Ptr normals){
 		ros::Time t0 = ros::Time::now();

@@ -262,13 +262,14 @@ pcl::MarchingCubesSDF::getNeighborList1D (float (&leaf)[8],
    points.clear ();
 
 	int np = omp_get_max_threads();
-   std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> local(np);
+   //std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> local(np);
+   global_array = new pcl::PointCloud<pcl::PointXYZ>::Ptr[np];
    
 #pragma omp parallel
 { 
 	   pcl::PointCloud<pcl::PointXYZ>::Ptr localCloud;
 	   localCloud = boost::make_shared<PointCloud<pcl::PointXYZ> >();
-	   local[omp_get_thread_num()] = localCloud;
+	   global_array[omp_get_thread_num()] = localCloud;
 #pragma omp for
    for (int idx=0;idx<number_of_voxels;idx++){
 	   float leaf_node[8];
@@ -279,7 +280,7 @@ pcl::MarchingCubesSDF::getNeighborList1D (float (&leaf)[8],
 }
 //concatenate local point clouds
    for (int i=0; i<np; i++){
-	   points += *local[i];
+	   points += *global_array[i];
    }
 
 

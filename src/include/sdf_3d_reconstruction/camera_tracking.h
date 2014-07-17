@@ -30,6 +30,11 @@ private:
 	float maximum_twist_diff;
 	//rotation differences by changing w_x in minus (m) or plus (p) direction
 	Eigen::Matrix<double, 3, 3> Rotdiff,r1p,r1m,r2p,r2m,r3p,r3m;
+	Eigen::Matrix<double, 6, 6> A;
+	Eigen::Matrix<double, 6, 1> b;
+	Eigen::Matrix<double, 6, 1> twist_diff;
+	boost::shared_ptr<Eigen::Matrix<double, 6, 6> > *A_array;
+	boost::shared_ptr<Eigen::Matrix<double, 6, 1> > *B_array;
 	
 public:
 	//rotation camera -> global
@@ -70,7 +75,7 @@ public:
 	/**
 	 * project a point from camera coordinates to world coordinates
 	 */
-	void project_camera_to_world(Vector3d& camera_point, Vector3d& world_point);
+	void project_camera_to_world(const Vector3d& camera_point, Vector3d& world_point);
 	/**
 	 * set current transformation of the camera. 
 	 */
@@ -87,11 +92,11 @@ public:
 	 *   v2
 	 *   v3
 	 */
-	void get_partial_derivative(SDF *sdf, Eigen::Vector3d& camera_point, Eigen::Matrix<double, 6, 1>& SDF_derivative, bool& is_interpolated, double& sdf_val);
+	void get_partial_derivative(const SDF *sdf, const Eigen::Vector3d& camera_point, Eigen::Matrix<double, 6, 1>& SDF_derivative, bool& is_interpolated, double& sdf_val);
 	/**
 	 * estimates the new position from the old one given the new sdf
 	 */
-	void estimate_new_position(SDF *sdf,pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud);
+	void estimate_new_position(const SDF *sdf,const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &point_cloud);
 
 public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

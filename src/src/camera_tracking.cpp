@@ -13,11 +13,11 @@ CameraTracking::CameraTracking(int gauss_newton_max_iteration,
 	this->v_h2 = 2 * v_h;
 	this->w_h2 = 2 * w_h;
 	this->v_h2_width = this->v_h2/sdf->m_div_width;
-	cout << "v_h2_width" <<v_h2_width << endl;
+	//cout << "v_h2_width" <<v_h2_width << endl;
 	this->v_h2_height = this->v_h2/sdf->m_div_height;
-	cout << "v_h2_height" <<this->v_h2_height << endl;
+	//cout << "v_h2_height" <<this->v_h2_height << endl;
 	this->v_h2_depth =this->v_h2/sdf->m_div_depth;
-	cout << "v_h2_depth" <<this->v_h2_depth << endl;
+	//cout << "v_h2_depth" <<this->v_h2_depth << endl;
 }
 CameraTracking::~CameraTracking() {
 }
@@ -55,7 +55,7 @@ void CameraTracking::project_world_to_camera(Vector3d& world_point,
 		Vector3d& camera_point) {
 	camera_point = this->rot_inv * world_point + this->rot_inv_trans;
 }
-void CameraTracking::project_camera_to_world(Vector3d& camera_point,
+void CameraTracking::project_camera_to_world(const Vector3d& camera_point,
 		Vector3d& world_point) {
 	world_point = this->rot * camera_point + this->trans;
 }
@@ -66,22 +66,16 @@ void CameraTracking::set_camera_transformation(Eigen::Matrix3d& rot,
 	this->trans = trans;
 	this->rot_inv_trans = -1 * (rot_inv * trans);
 }
-void CameraTracking::estimate_new_position(SDF *sdf,
-		pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud) {
+void CameraTracking::estimate_new_position(const SDF *sdf,
+		const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &point_cloud) {
 	ros::Time t0 = ros::Time::now();
 	
-
-	Eigen::Matrix<double, 6, 6> A = Eigen::Matrix<double, 6, 6>::Zero();
-	Eigen::Matrix<double, 6, 1> b = Eigen::Matrix<double, 6, 1>::Zero();
 	//twist_diff = (v1,v2,v3,w1,w2,w3)
-	Eigen::Matrix<double, 6, 1> twist_diff =
-			Eigen::Matrix<double, 6, 1>::Zero();
-	int np = omp_get_max_threads();;
-	cout << "Threads: " << np<< endl;
-	boost::shared_ptr<Eigen::Matrix<double, 6, 6> > *A_array =
-			new boost::shared_ptr<Eigen::Matrix<double, 6, 6> >[np];
-	boost::shared_ptr<Eigen::Matrix<double, 6, 1> > *B_array =
-			new boost::shared_ptr<Eigen::Matrix<double, 6, 1> >[np];
+	 twist_diff = Eigen::Matrix<double, 6, 1>::Zero();
+	int np = omp_get_max_threads();
+	//cout << "Threads: " << np<< endl;
+	A_array = new boost::shared_ptr<Eigen::Matrix<double, 6, 6> >[np];
+	B_array = new boost::shared_ptr<Eigen::Matrix<double, 6, 1> >[np];
 	omp_set_num_threads(np);
 	Vector3d r1,r2,r3;
 	bool stop = false;
@@ -167,7 +161,6 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 			double int_dist;
 			Eigen::Vector3d camera_point;
 #pragma omp  for
-			
 			//iterate all image points
 			for (int i = 0; i < point_cloud->width; i+=3) {
 				for (int j = 0; j < point_cloud->height; j+=3) {
@@ -246,8 +239,8 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 	std::cout << "camera estimation method: " << (ros::Time::now() - t0).toSec()<< std::endl;
 
 }
-void CameraTracking::get_partial_derivative(SDF* sdf,
-		Eigen::Vector3d& camera_point, Eigen::Matrix<double, 6, 1>& SDF_derivative, bool& is_interpolated, double& sdf_val) {
+void CameraTracking::get_partial_derivative(const SDF* sdf,
+		const Eigen::Vector3d& camera_point, Eigen::Matrix<double, 6, 1>& SDF_derivative, bool& is_interpolated, double& sdf_val) {
 	Vector3d current_world_point;
 	Vector3d current_voxel_point;
 	//we use central difference
