@@ -1,8 +1,6 @@
 #include "sdf_3d_reconstruction/sdf_reconstruction.h"
 #include <stdlib.h>
 
-//void SDF_Reconstruction::kinect_callback(const sensor_msgs::ImageConstPtr& image_rgb,
-//		const sensor_msgs::ImageConstPtr& image_depth) {
 void SDF_Reconstruction::kinect_callback(
 		const sensor_msgs::PointCloud2ConstPtr& ros_cloud) {
 	cout << "callback!" << endl;
@@ -35,8 +33,8 @@ void SDF_Reconstruction::kinect_callback(
 
 	if (_useGroundTruth) {
 		try {
-			//listener.waitForTransform("/world", "/openni_rgb_optical_frame",
-			//		ros::Time(), ros::Duration(12.0));
+			listener.waitForTransform("/world", "/openni_rgb_optical_frame",
+					ros::Time(), ros::Duration(12.0));
 			listener.lookupTransform("/world", "/openni_rgb_optical_frame",
 					ros::Time(), transform);
 		} catch (tf::TransformException ex) {
@@ -53,12 +51,6 @@ void SDF_Reconstruction::kinect_callback(
 
 		if (frame_num > 1) {
 			this->camera_tracking->estimate_new_position(sdf, cloud_filtered);
-//		Eigen::Quaterniond rot2;
-//		rot2 = (this->camera_tracking->rot);
-//		cout << "Ground Truth:\n" << trans << "\n" << rot.w() << " " << rot.x()
-//				<< " " << rot.y() << " " << rot.z() << endl;
-//		cout << "Our:\n" << camera_tracking->trans << "\n" << rot2.w() << " "
-//				<< rot2.x() << " " << rot2.y() << " " << rot2.z() << endl;
 		}
 	}
 	sdf->update(this->camera_tracking, cloud_filtered, normals);
@@ -84,13 +76,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	//m , width, height, depth, treshold
 	sdf = new SDF(200, 7.0, 7.0, 3.0, sdf_origin, 0.3, 0.025);
 
-	//sdf->create_cuboid(-1.0, 1.0, 0.0, 0.1, 0.2, 0.8);
-	//visualization_thread = new boost::thread(boost::bind(& sd.visualize, this));
-	std::thread visualization_thread(&SDF::visualize, sdf, 0.5);
-	//sdf->create_circle(2.0, 0, 0.0, 0.0);
-	//std::string visualeOutput;
-	//ros::param::get("~visualOutput", visualeOutput);
-	//sdf->visualize();
+	std::thread visualization_thread(&SDF::visualize, sdf, 0.2);
 	int oldNumPub = pcl.getNumPublishers();
 	while (ros::ok()) {
 		if ((oldNumPub == 1) && (pcl.getNumPublishers() == 0)) {

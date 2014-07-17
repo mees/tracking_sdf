@@ -63,16 +63,22 @@ void CameraTracking::set_camera_transformation(Eigen::Matrix3d& rot,
 void CameraTracking::estimate_new_position(SDF *sdf,
 		pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud) {
 	ros::Time t0 = ros::Time::now();
-	int i, j;
+	
 
 	Eigen::Matrix<double, 6, 6> A = Eigen::Matrix<double, 6, 6>::Zero();
 	Eigen::Matrix<double, 6, 1> b = Eigen::Matrix<double, 6, 1>::Zero();
 	//twist_diff = (v1,v2,v3,w1,w2,w3)
 	Eigen::Matrix<double, 6, 1> twist_diff =
 			Eigen::Matrix<double, 6, 1>::Zero();
-
+	int np = omp_get_max_threads();;
+	cout << "Threads: " << np<< endl;
+	boost::shared_ptr<Eigen::Matrix<double, 6, 6> > *A_array =
+			new boost::shared_ptr<Eigen::Matrix<double, 6, 6> >[np];
+	boost::shared_ptr<Eigen::Matrix<double, 6, 1> > *B_array =
+			new boost::shared_ptr<Eigen::Matrix<double, 6, 1> >[np];
+	omp_set_num_threads(np);
+	Vector3d r1,r2,r3;
 	bool stop = false;
-	Vector3d r1, r2, r3;
 	for (int g = 0; g < gauss_newton_max_iteration && !stop; g++) {
 		//setting A and B to 0
 		A = Eigen::Matrix<double, 6, 6>::Zero();
@@ -95,7 +101,7 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 		Rotdiff(2, 0) = 0.0;
 		Rotdiff(2, 1) = w_h;
 		Rotdiff(2, 2) = 1.0;
-		Rot_w_1_p = Rotdiff * this->rot;
+		r1p = Rotdiff * this->rot;
 		/* 
 		 * R_w1- = 1.0 0.0 0.0
 		 *         0.0 1.0  w1
@@ -103,7 +109,7 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 		 */
 		Rotdiff(1, 2) = w_h;
 		Rotdiff(2, 1) = -w_h;
-		Rot_w_1_m = Rotdiff * this->rot;
+		r1m = Rotdiff * this->rot;
 		/* 
 		 * R_w2+ = 1.0 0.0  w2
 		 *         0.0 1.0 0.0
@@ -113,7 +119,7 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 		Rotdiff(2, 1) = 0;
 		Rotdiff(0, 2) = w_h;
 		Rotdiff(2, 0) = -w_h;
-		Rot_w_2_p = Rotdiff * this->rot;
+		r2p = Rotdiff * this->rot;
 		/* 
 		 * R_w2- = 1.0 0.0 -w2
 		 *         0.0 1.0 0.0
@@ -121,7 +127,7 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 		 */
 		Rotdiff(0, 2) = -w_h;
 		Rotdiff(2, 0) = w_h;
-		Rot_w_2_m = Rotdiff * this->rot;
+		r2m = Rotdiff * this->rot;
 		/* 
 		 * R_w3+ = 1.0 -w3 0.0
 		 *          w3 1.0 0.0
@@ -131,7 +137,7 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 		Rotdiff(2, 0) = 0;
 		Rotdiff(0, 1) = -w_h;
 		Rotdiff(1, 0) = w_h;
-		Rot_w_3_p = Rotdiff * this->rot;
+		r3p = Rotdiff * this->rot;
 		/* 
 		 * R_w3- = 1.0  w3 0.0
 		 *         -w3 1.0 0.0
@@ -139,15 +145,19 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 		 */
 		Rotdiff(0, 1) = w_h;
 		Rotdiff(1, 0) = -w_h;
-		Rot_w_3_m = Rotdiff * this->rot;
-		//iterate all image points
-		int np = omp_get_max_threads();
-		//int np = 2;
-		boost::shared_ptr<Eigen::Matrix<double, 6, 6> > *A_array =
-				new boost::shared_ptr<Eigen::Matrix<double, 6, 6> >[np];
-		boost::shared_ptr<Eigen::Matrix<double, 6, 1> > *B_array =
-				new boost::shared_ptr<Eigen::Matrix<double, 6, 1> >[np];
-		//omp_set_num_threads(2);
+		r3m = Rotdiff * this->rot;
+		t1p = this->trans;
+		t1p(0) += v_h;
+		t1m = this->trans;
+		t1m(0) -= v_h;
+		t2p = this->trans;
+		t2p(1) += v_h;
+		t2m = this->trans;
+		t2m(1) -= v_h;
+		t3p = this->trans;
+		t3p(2) += v_h;
+		t3m = this->trans;
+		t3m(2) -= v_h;
 #pragma omp parallel
 		{
 			boost::shared_ptr<Eigen::Matrix<double, 6, 6> > A_ptr;
@@ -158,58 +168,41 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 			B_ptr->setZero();
 			A_array[omp_get_thread_num()] = A_ptr;
 			B_array[omp_get_thread_num()] = B_ptr;
-			//cout<<" old A_array["<<omp_get_thread_num()<<"]: "<<A_array[omp_get_thread_num()]<<endl;
 			bool is_interpolated;
 			Eigen::Matrix<double, 6, 1> SDF_derivative;
 			double int_dist;
 			Eigen::Vector3d camera_point;
 #pragma omp  for
-			for (int id = 0; id < point_cloud->size(); id++) {
-				int i = id / point_cloud->height;
-				int j = id % point_cloud->height;
-//			}
-//			for (i = 0; i < point_cloud->width; i++) {
-//				for (j = 0; j < point_cloud->height; j++) {
+			
+			//iterate all image points
+			for (int i = 0; i < point_cloud->width; i++) {
+				for (int j = 0; j < point_cloud->height; j++) {
 
-				pcl::PointXYZRGB point;
-				point = point_cloud->at(i, j);
-				//does a good depth exist?
-				if (isnan(point.x) || isnan(point.y) || isnan(point.z)) {
-					continue;
+					pcl::PointXYZRGB point;
+					point = point_cloud->at(i, j);
+					//does a good depth exist?
+					if (isnan(point.x) || isnan(point.y) || isnan(point.z)) {
+						continue;
+					}
+
+					camera_point(0) = point.x;
+					camera_point(1) = point.y;
+					camera_point(2) = point.z;
+					//get SDF_derivative
+					get_partial_derivative(sdf, camera_point, SDF_derivative, is_interpolated, int_dist);
+					//we could calculate SDF_derivative at this point
+					if (!is_interpolated) {
+						continue;
+					}
+					*A_ptr = *A_ptr + (SDF_derivative * SDF_derivative.transpose());
+					*B_ptr = *B_ptr + (int_dist * SDF_derivative);
 				}
-
-				camera_point(0) = point.x;
-				camera_point(1) = point.y;
-				camera_point(2) = point.z;
-				//get SDF_derivative
-				get_partial_derivative(sdf, camera_point, SDF_derivative,
-						Rot_w_1_p, Rot_w_1_m, Rot_w_2_p, Rot_w_2_m, Rot_w_3_p,
-						Rot_w_3_m, w_h, is_interpolated, int_dist);
-				//we could calculate SDF_derivative at this point
-				if (!is_interpolated) {
-					continue;
-				}
-				//				cout<<"*A_ptr: "<<*A_ptr<<endl;
-
-				*A_ptr = *A_ptr + (SDF_derivative * SDF_derivative.transpose());
-				//				cout<<"new A_ptr: "<<*A_ptr<<"thread number: "<<omp_get_thread_num()<<endl;
-//					cout<<"new A address: "<<A_ptr<<endl;
-//					cout<<"A_array[i] address: "<<A_array[omp_get_thread_num()]<<endl;
-				//				cout<<"*A_array[i]: "<<*A_array[omp_get_thread_num()]<<endl;
-				*B_ptr = *B_ptr + (int_dist * SDF_derivative);
-
 			}
-
 		}
-
 		for (int i = 0; i < np; i++) {
-			//cout<<"2 old A_array["<<omp_get_thread_num()<<"]: "<<A_array[omp_get_thread_num()]<<endl;
-			//cout<<"A("<<i<<"): "<<*A_array[i]<<endl;
 			A += *A_array[i];
 			b += *B_array[i];
 		}
-		cout << "A: " << A << endl;
-//		exit(0);
 		//calculate our optimized gradient
 		twist_diff = A.inverse() * b;
 
@@ -241,7 +234,7 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 				&& twist_diff(3, 0) < maximum_twist_diff
 				&& twist_diff(4, 0) < maximum_twist_diff
 				&& twist_diff(5, 0) < maximum_twist_diff) {
-			//cout << "STOP Gauss Newton at step: "<< g << endl;
+			cout << "STOP Gauss Newton at step: "<< g << endl;
 			stop = true;
 		}
 		//reorthomolize rotation
@@ -256,17 +249,11 @@ void CameraTracking::estimate_new_position(SDF *sdf,
 		rot.block(0, 1, 3, 1) = r2;
 		rot.block(0, 2, 3, 1) = r3;
 	}
-	std::cout << "camera estimation method: " << (ros::Time::now() - t0).toSec()
-			<< std::endl;
+	std::cout << "camera estimation method: " << (ros::Time::now() - t0).toSec()<< std::endl;
 
 }
 void CameraTracking::get_partial_derivative(SDF* sdf,
-		Eigen::Vector3d& camera_point,
-		Eigen::Matrix<double, 6, 1>& SDF_derivative,
-		Eigen::Matrix<double, 3, 3>& r1p, Eigen::Matrix<double, 3, 3>& r1m,
-		Eigen::Matrix<double, 3, 3>& r2p, Eigen::Matrix<double, 3, 3>& r2m,
-		Eigen::Matrix<double, 3, 3>& r3p, Eigen::Matrix<double, 3, 3>& r3m,
-		double w_h, bool& is_interpolated, double& sdf_val) {
+		Eigen::Vector3d& camera_point, Eigen::Matrix<double, 6, 1>& SDF_derivative, bool& is_interpolated, double& sdf_val) {
 	Vector3d current_world_point;
 	Vector3d current_voxel_point;
 	//we use central difference
@@ -292,11 +279,8 @@ void CameraTracking::get_partial_derivative(SDF* sdf,
 	if (!is_interpolated)
 		return;
 	//tx derivative
-	this->trans(0) = this->trans(0) + v_h;
-	plus_h_world_point = this->rot * camera_point + this->trans;
-	this->trans(0) = this->trans(0) - v_h2;
-	minus_h_world_point = this->rot * camera_point + this->trans;
-	this->trans(0) = this->trans(0) + v_h;
+	plus_h_world_point = this->rot * camera_point + this->t1p;
+	minus_h_world_point = this->rot * camera_point + this->t2m;
 	sdf->get_voxel_coordinates(plus_h_world_point, plus_h_voxel_point);
 	sdf->get_voxel_coordinates(minus_h_world_point, minus_voxel_point);
 	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point,
@@ -310,11 +294,8 @@ void CameraTracking::get_partial_derivative(SDF* sdf,
 	SDF_derivative(0) = (plus_h_sdf_value - minus_h_sdf_value) / v_h2;
 
 	//ty derivative
-	this->trans(1) = this->trans(1) + v_h;
-	plus_h_world_point = this->rot * camera_point + this->trans;
-	this->trans(1) = this->trans(1) - v_h2;
-	minus_h_world_point = this->rot * camera_point + this->trans;
-	this->trans(1) = this->trans(1) + v_h;
+	plus_h_world_point = this->rot * camera_point + this->t2p;
+	minus_h_world_point = this->rot * camera_point + this->t2m;
 	sdf->get_voxel_coordinates(plus_h_world_point, plus_h_voxel_point);
 	sdf->get_voxel_coordinates(minus_h_world_point, minus_voxel_point);
 	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point,
@@ -328,11 +309,8 @@ void CameraTracking::get_partial_derivative(SDF* sdf,
 	SDF_derivative(1) = (plus_h_sdf_value - minus_h_sdf_value) / v_h2;
 
 	//tz derivative 
-	this->trans(2) = this->trans(2) + v_h;
-	plus_h_world_point = this->rot * camera_point + this->trans;
-	this->trans(2) = this->trans(2) - v_h2;
-	minus_h_world_point = this->rot * camera_point + this->trans;
-	this->trans(2) = this->trans(2) + v_h;
+	plus_h_world_point = this->rot * camera_point + this->t3p;
+	minus_h_world_point = this->rot * camera_point + this->t3m;
 	sdf->get_voxel_coordinates(plus_h_world_point, plus_h_voxel_point);
 	sdf->get_voxel_coordinates(minus_h_world_point, minus_voxel_point);
 	plus_h_sdf_value = sdf->interpolate_distance(plus_h_voxel_point,

@@ -23,8 +23,10 @@ private:
 	int gauss_newton_max_iteration;
 	//do not stop gauss newton until twist difference is bigger than maximum_twist diff
 	float maximum_twist_diff;
-	//rotation differences by changin w_x in minus (m) or plus (p) direction
-	Eigen::Matrix<double, 3, 3> Rotdiff,Rot_w_1_p,Rot_w_1_m,Rot_w_2_p,Rot_w_2_m,Rot_w_3_p,Rot_w_3_m;
+	//rotation differences by changing w_x in minus (m) or plus (p) direction
+	Eigen::Matrix<double, 3, 3> Rotdiff,r1p,r1m,r2p,r2m,r3p,r3m;
+	//translation difference by changing v_x in minus (m) or plus (p) direction
+	Eigen::Vector3d t1p, t1m, t2p, t2m, t3p, t3m;
 public:
 	//rotation camera -> global
 	Eigen::Matrix3d rot;
@@ -81,10 +83,7 @@ public:
 	 *   v2
 	 *   v3
 	 */
-	void get_partial_derivative(SDF *sdf, Eigen::Vector3d& camera_point, Eigen::Matrix<double, 6, 1>& SDF_derivative,
-	   Eigen::Matrix<double, 3, 3>& r1p,Eigen::Matrix<double, 3, 3>& r1m, 
-	   Eigen::Matrix<double, 3, 3>& r2p,Eigen::Matrix<double, 3, 3>& r2m,
-	   Eigen::Matrix<double, 3, 3>& r3p,Eigen::Matrix<double, 3, 3>& r3m, double w_h, bool& is_interpolated, double& sdf_val);
+	void get_partial_derivative(SDF *sdf, Eigen::Vector3d& camera_point, Eigen::Matrix<double, 6, 1>& SDF_derivative, bool& is_interpolated, double& sdf_val);
 	/**
 	 * estimates the new position from the old one given the new sdf
 	 */
