@@ -5,8 +5,8 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include<Eigen/Eigen>
+#include "sdf_3d_reconstruction/eigen_utils.h"
 class SDF;
-//#include "sdf_3d_reconstruction/sdf.h"
 using namespace Eigen;
 using namespace std;
 class CameraTracking {
@@ -30,11 +30,13 @@ private:
 	float maximum_twist_diff;
 	//rotation differences by changing w_x in minus (m) or plus (p) direction
 	Eigen::Matrix<double, 3, 3> Rotdiff,r1p,r1m,r2p,r2m,r3p,r3m;
+
 	Eigen::Matrix<double, 6, 6> A;
 	Eigen::Matrix<double, 6, 1> b;
 	Eigen::Matrix<double, 6, 1> twist_diff;
 	boost::shared_ptr<Eigen::Matrix<double, 6, 6> > *A_array;
 	boost::shared_ptr<Eigen::Matrix<double, 6, 1> > *B_array;
+	Eigen::Matrix<double, 6, 1> twist;
 	
 public:
 	//rotation camera -> global

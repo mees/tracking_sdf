@@ -13,11 +13,8 @@ CameraTracking::CameraTracking(int gauss_newton_max_iteration,
 	this->v_h2 = 2 * v_h;
 	this->w_h2 = 2 * w_h;
 	this->v_h2_width = this->v_h2/sdf->m_div_width;
-	//cout << "v_h2_width" <<v_h2_width << endl;
 	this->v_h2_height = this->v_h2/sdf->m_div_height;
-	//cout << "v_h2_height" <<this->v_h2_height << endl;
 	this->v_h2_depth =this->v_h2/sdf->m_div_depth;
-	//cout << "v_h2_depth" <<this->v_h2_depth << endl;
 }
 CameraTracking::~CameraTracking() {
 }
@@ -192,9 +189,9 @@ void CameraTracking::estimate_new_position(const SDF *sdf,
 		}
 		//calculate our optimized gradient
 		twist_diff = A.inverse() * b;
-
+		Eigen::Affine3d aff = eigen_utils::direct_exponential_map(twist_diff,1.0);
 		//start inverting error by linearizing inverted rotation error
-		Rotdiff(0, 0) = 1.0;
+		/*Rotdiff(0, 0) = 1.0;
 		Rotdiff(0, 1) = twist_diff(5, 0);
 		Rotdiff(0, 2) = -twist_diff(4, 0);
 		Rotdiff(1, 0) = -twist_diff(5, 0);
@@ -214,7 +211,8 @@ void CameraTracking::estimate_new_position(const SDF *sdf,
 		this->rot = Rotdiff * this->rot;
 		Eigen::Quaterniond rot2;
 		rot2 = (this->rot);
-		this->set_camera_transformation(this->rot, this->trans);
+		this->set_camera_transformation(this->rot, this->trans);*/
+		
 		if (twist_diff(0, 0) < maximum_twist_diff
 				&& twist_diff(1, 0) < maximum_twist_diff
 				&& twist_diff(2, 0) < maximum_twist_diff
@@ -224,8 +222,9 @@ void CameraTracking::estimate_new_position(const SDF *sdf,
 			cout << "STOP Gauss Newton at step: "<< g << endl;
 			stop = true;
 		}
+		
 		//reorthomolize rotation
-		r1 = rot.block(0, 0, 3, 1);
+		/*r1 = rot.block(0, 0, 3, 1);
 		r2 = rot.block(0, 1, 3, 1);
 		r3 = rot.block(0, 2, 3, 1);
 		r1 = r1 / r1.norm();
@@ -234,7 +233,12 @@ void CameraTracking::estimate_new_position(const SDF *sdf,
 
 		rot.block(0, 0, 3, 1) = r1;
 		rot.block(0, 1, 3, 1) = r2;
-		rot.block(0, 2, 3, 1) = r3;
+		rot.block(0, 2, 3, 1) = r3;*/
+		this->rot = aff.rotation().transpose()*this->rot;
+		this->trans = trans-aff.rotation().transpose() *aff.translation();
+		this->set_camera_transformation(this->rot, this->trans);
+		//cout << "Exp Trans:\n"<< this->trans-aff.rotation().transpose() *aff.translation()<<"Exp Rot:\n" << << endl;
+		//cout << "Gram Schmidt Trans:\n"<< this->trans<<"Gram Schmidt Rot:\n" << this->rot<< endl;
 	}
 	std::cout << "camera estimation method: " << (ros::Time::now() - t0).toSec()<< std::endl;
 
