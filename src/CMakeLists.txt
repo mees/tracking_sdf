@@ -162,7 +162,8 @@ install(FILES
    launch/sdf.launch.gdb
    launch/sdf.launch.valgrind
    launch/sdf.launch.memcheck
-   launch/kinect.launch
+   launch/kinect_own.launch
+   launch/kinect_normal.launch
    rgbd_dataset_freiburg1_plant-groundtruth.txt
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

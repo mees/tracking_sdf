@@ -68,7 +68,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	
 	_useGroundTruth = false;
         this->camera_tracking = new CameraTracking(20,0.001,1.0,0.01, sdf);
-	pcl = nh.subscribe("/camera/rgb/points", 1, &SDF_Reconstruction::kinect_callback, this);
+	pcl = nh.subscribe("/camera/depth_registered/points", 1, &SDF_Reconstruction::kinect_callback, this);
 	this->camera_tracking->cam_info = nh.subscribe("/camera/rgb/camera_info", 1,
 			&CameraTracking::camera_info_cb, this->camera_tracking);
 	frame_num = 0;

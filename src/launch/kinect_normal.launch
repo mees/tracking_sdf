@@ -50,8 +50,9 @@
   <node pkg="nodelet" type="nodelet" name="cloudify"
         args="load depth_image_proc/point_cloud_xyzrgb record_player_manager --no-bond">
     <remap from="depth_registered/image_rect" to="camera/depth/image"/>
-    <remap from="depth_registered/points" to="camera/rgb/points"/>
+    <remap from="depth_registered/points" to="camera/depth_registered/points"/>
     <remap from="rgb/image_rect_color" to="$(arg cloud_input_ns)/image_rect_color"/>
     <remap from="rgb/camera_info" to="$(arg cloud_input_ns)/camera_info"/>
   </node>
 </launch>
+

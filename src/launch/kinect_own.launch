@@ -1,0 +1,36 @@
+<launch>
+
+  <!--
+  To distinguish between the cases where the rgb image is
+  1280x1024 versus 640x480.  This affects the pipeline.
+  -->
+  <arg name="high_res_rgb" default="true"/>
+  <arg name="cloud_input_ns" value="camera/rgb_downsampled"
+       if="$(arg high_res_rgb)"/>
+  <arg name="cloud_input_ns" value="camera/rgb" unless="$(arg high_res_rgb)"/>
+
+  <!-- Nodelet manager for this pipeline -->
+  <node pkg="nodelet" type="nodelet" args="manager"
+        name="record_player_manager" output="screen"/>
+
+  <!-- Debayer and undistort the rgb image
+       TODO: this should be split into nodelets -->
+  <node 
+    pkg="image_proc" 
+    type="image_proc" 
+    name="ip_node1" 
+    ns="camera/rgb"
+    />
+
+  
+
+
+  <!-- Convert it into a point cloud -->
+  <node pkg="nodelet" type="nodelet" name="cloudify"
+        args="load depth_image_proc/point_cloud_xyzrgb record_player_manager --no-bond">
+    <remap from="depth_registered/image_rect" to="camera/depth_registered/image_raw"/>
+    <remap from="depth_registered/points" to="camera/depth_registered/points"/>
+    <remap from="rgb/image_rect_color" to="/camera/rgb/image_raw"/>
+    <remap from="rgb/camera_info" to="/camera/rgb/camera_info"/>
+  </node>
+</launch>
