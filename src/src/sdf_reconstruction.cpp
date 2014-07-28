@@ -1,6 +1,23 @@
 #include "sdf_3d_reconstruction/sdf_reconstruction.h"
 #include <stdlib.h>
 
+void SDF_Reconstruction::writePoseToFile(const ros::Time &timestamp, const Eigen::Vector3d &trans, const Eigen::Matrix3d &rot)  {
+	myfile.open ("/home/oier/trajectory.txt", ios::out | ios::app);
+	if (myfile.is_open())
+	  {
+		Eigen::Quaterniond quat(rot);
+//		std::cout.precision(3);
+//		std::cout.setf(std::ios::fixed,std::ios::floatfield);
+//		cout<<timestamp.nsec<<" "<<trans.x() <<" "<<trans.y()<<" "<<trans.z()<<" "<< quat.x()<< " "<<quat.y()<<" "<<quat.z()<<" "<<quat.w()<<endl;
+		myfile<<std::fixed << std::setprecision(4)<<timestamp.sec<<" "<<trans.x() <<" "<<trans.y()<<" "<<trans.z()<<" "<< quat.x()<< " "<<quat.y()<<" "<<quat.z()<<" "<<quat.w()<<"\n";
+		myfile.close();
+	  } else {
+		  cout << "Unable to open file";
+	  }
+}
+
+
+
 void SDF_Reconstruction::kinect_callback(
 		const sensor_msgs::PointCloud2ConstPtr& ros_cloud) {
 	cout << "callback!" << endl;
@@ -51,6 +68,7 @@ void SDF_Reconstruction::kinect_callback(
 
 		if (frame_num > 1) {
 			this->camera_tracking->estimate_new_position(sdf, cloud_filtered);
+			writePoseToFile(ros_cloud->header.stamp, this->camera_tracking->trans, this->camera_tracking->rot);
 		}
 	}
 	sdf->update(this->camera_tracking, cloud_filtered, normals);

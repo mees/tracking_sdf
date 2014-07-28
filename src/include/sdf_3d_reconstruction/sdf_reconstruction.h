@@ -42,8 +42,10 @@ private:
 		ros::Publisher pub;
 		int frame_num;
 		bool _useGroundTruth;
+		ofstream myfile;
 
 protected:
+		void writePoseToFile(const ros::Time &timestap, const Eigen::Vector3d &trans, const Eigen::Matrix3d &rot);
 
 		void kinect_callback(const sensor_msgs::PointCloud2ConstPtr& pointCloud);
 
