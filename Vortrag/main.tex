@@ -105,6 +105,15 @@ Using Signed Distance Functions}\\
 \end{figure}
 }
 
+\frame{
+\frametitle{SDF Reconstruction}
+\begin{figure}[h]
+        \centering
+        \captionsetup[subfigure]{labelformat=empty}
+                \includegraphics[scale=0.4]{sdfDistances.png}
+                \caption{Source: \cite{bylow2013real}}
+\end{figure}
+}
 
 \frame{
 \frametitle{Camera Tracking}
@@ -118,18 +127,10 @@ Using Signed Distance Functions}\\
 
 
 
-\frame{
-\frametitle{SDF Reconstruction}
-\begin{figure}[h]
-        \centering
-        \captionsetup[subfigure]{labelformat=empty}
-                \includegraphics[scale=0.4]{sdfDistances.png}
-                \caption{Source: \cite{bylow2013real}}
-\end{figure}
-}
+
 
 \frame{
-\frametitle{3D Reconstruction}
+\frametitle{3D Reconstruction: Marching Cubes}
 \begin{figure}[h]
         \centering
         \captionsetup[subfigure]{labelformat=empty}
@@ -198,12 +199,13 @@ Using Signed Distance Functions}\\
 \frame{
 \frametitle{SDF}
 \begin{columns}
-		\column{0.45\textwidth} 
+		\column{0.55\textwidth} 
 			\begin{figure}
-				\includegraphics[scale=0.35]{cam2.png}
+				\includegraphics[scale=0.8]{dia1.png}
+				\includegraphics[scale=0.3]{exponential_weight.png}
 			\end{figure}
 		\column{0.55\textwidth} 
-		%\vspace{-30pt}
+		\vspace{-70pt}
 			\begin{itemize}
 				\item Implemented Point-to-point and Point-to-plane distances 
 				\item Truncation and exponential weighting of distance
