@@ -54,7 +54,6 @@ SDF::~SDF(){
 }
 void SDF::register_visualization(){
 	ros::NodeHandle n;
-	r = new ros::Rate(1);
 	marker_publisher = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
 	shape_type = visualization_msgs::Marker::TRIANGLE_LIST;
 	shape_type = visualization_msgs::Marker::CUBE;
