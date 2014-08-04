@@ -1,0 +1,11 @@
+m: 200
+width: 7m
+height: 7m
+depth: 3m
+delta: 0.3m
+epsilon: 0.025
+Maximal Twist difference: 0.01
+Comp: Joels Laptop (2 Threads)
+Gauss-Newton: every 9th pixel
+Rosbag Play Publish rate: 0.04
+SDF Origin: -3.5, -3.5, -1.5
