@@ -1,0 +1,996 @@
+
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0525543
+update method: 0.126156
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0314742
+update method: 0.115567
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0381085
+update method: 0.113796
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0412311
+update method: 0.105873
+callback!
+STOP Gauss Newton at step: 1
+camera estimation method: 0.0177644
+update method: 0.126119
+callback!
+STOP Gauss Newton at step: 9
+camera estimation method: 0.0693482
+update method: 0.125915
+callback!
+STOP Gauss Newton at step: 10
+camera estimation method: 0.0893879
+update method: 0.127548
+callback!
+STOP Gauss Newton at step: 1
+camera estimation method: 0.0245292
+update method: 0.115602
+callback!
+STOP Gauss Newton at step: 7
+camera estimation method: 0.0634972
+update method: 0.123509
+callback!
+STOP Gauss Newton at step: 6
+camera estimation method: 0.061324
+update method: 0.116516
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0433804
+update method: 0.121221
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.033872
+update method: 0.116515
+callback!
+STOP Gauss Newton at step: 6
+camera estimation method: 0.0680944
+update method: 0.11691
+callback!
+STOP Gauss Newton at step: 6
+camera estimation method: 0.0551497
+update method: 0.114926
+callback!
+STOP Gauss Newton at step: 7
+camera estimation method: 0.0571498
+update method: 0.120546
+callback!
+STOP Gauss Newton at step: 6
+camera estimation method: 0.058289
+update method: 0.110049
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0376086
+update method: 0.0984132
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0481793
+update method: 0.0945056
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0364611
+update method: 0.095882
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0478267
+update method: 0.100908
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0426771
+update method: 0.108324
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0368212
+update method: 0.100842
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0364421
+update method: 0.0994268
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0295204
+update method: 0.111151
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0237768
+update method: 0.095408
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0241441
+update method: 0.109636
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0246522
+visualize method: 0.562544
+update method: 0.113845
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0443928
+update method: 0.102219
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0228705
+update method: 0.105909
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0365218
+update method: 0.0989548
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0267312
+update method: 0.0970035
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0277475
+update method: 0.102504
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0230037
+update method: 0.107656
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0419954
+update method: 0.101406
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0376437
+update method: 0.10004
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.041853
+update method: 0.0926496
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0452014
+update method: 0.0920798
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0271791
+update method: 0.100689
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0208885
+update method: 0.0994307
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0207288
+update method: 0.104109
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0225993
+update method: 0.0979877
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.027099
+update method: 0.0988795
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.048686
+update method: 0.098436
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0381884
+update method: 0.0984004
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0321817
+update method: 0.0909837
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0245104
+update method: 0.0987619
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0276363
+update method: 0.100144
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0390281
+update method: 0.0844894
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0330666
+update method: 0.094452
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0356749
+update method: 0.113964
+callback!
+STOP Gauss Newton at step: 7
+camera estimation method: 0.0595289
+update method: 0.103605
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0565869
+update method: 0.103285
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0381863
+update method: 0.115224
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.041309
+update method: 0.106919
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0417238
+update method: 0.107271
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0379211
+update method: 0.122236
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0405253
+update method: 0.108124
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0264441
+update method: 0.110805
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0314625
+update method: 0.112111
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0353657
+update method: 0.113474
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0296794
+update method: 0.116558
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0316931
+update method: 0.123001
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0350772
+update method: 0.125751
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0313613
+update method: 0.12382
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0402289
+update method: 0.129601
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0313078
+update method: 0.124801
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0307319
+update method: 0.128393
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0240309
+update method: 0.121642
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0221852
+update method: 0.121433
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0411311
+update method: 0.122064
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0462773
+update method: 0.145596
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0238509
+update method: 0.127364
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0328758
+update method: 0.127828
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0277024
+update method: 0.137356
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0356658
+update method: 0.129564
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0415841
+update method: 0.11405
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0361408
+update method: 0.124417
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0344631
+update method: 0.118799
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0380212
+update method: 0.115738
+callback!
+STOP Gauss Newton at step: 11
+camera estimation method: 0.082197
+update method: 0.115037
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.030093
+update method: 0.123707
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0321016
+update method: 0.129747
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0215316
+update method: 0.104157
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0252161
+update method: 0.134485
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0222683
+update method: 0.118243
+visualize method: 0.647332
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0404949
+update method: 0.146104
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0324182
+update method: 0.114158
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0254597
+update method: 0.116587
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0413368
+update method: 0.106743
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0405779
+update method: 0.111902
+callback!
+STOP Gauss Newton at step: 8
+camera estimation method: 0.0668595
+update method: 0.0987038
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0306073
+update method: 0.0994367
+callback!
+STOP Gauss Newton at step: 1
+camera estimation method: 0.0154999
+update method: 0.0975873
+callback!
+STOP Gauss Newton at step: 1
+camera estimation method: 0.0176123
+update method: 0.0993531
+callback!
+STOP Gauss Newton at step: 1
+camera estimation method: 0.0120621
+update method: 0.0990949
+callback!
+STOP Gauss Newton at step: 0
+camera estimation method: 0.00822863
+update method: 0.100755
+callback!
+STOP Gauss Newton at step: 0
+camera estimation method: 0.0068756
+update method: 0.100699
+callback!
+STOP Gauss Newton at step: 0
+camera estimation method: 0.00841266
+update method: 0.0927722
+callback!
+STOP Gauss Newton at step: 0
+camera estimation method: 0.00570938
+update method: 0.0916253
+callback!
+STOP Gauss Newton at step: 0
+camera estimation method: 0.00573551
+update method: 0.0904839
+callback!
+STOP Gauss Newton at step: 8
+camera estimation method: 0.0617216
+update method: 0.104796
+callback!
+STOP Gauss Newton at step: 0
+camera estimation method: 0.0106087
+update method: 0.0934374
+callback!
+STOP Gauss Newton at step: 11
+camera estimation method: 0.0859856
+update method: 0.0934773
+callback!
+STOP Gauss Newton at step: 12
+camera estimation method: 0.0839077
+update method: 0.103164
+callback!
+STOP Gauss Newton at step: 18
+camera estimation method: 0.126734
+update method: 0.0943686
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0311468
+update method: 0.0991265
+callback!
+STOP Gauss Newton at step: 7
+camera estimation method: 0.0555308
+update method: 0.0846018
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0435007
+update method: 0.090265
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0362003
+update method: 0.0906849
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0191296
+update method: 0.0805945
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0504522
+update method: 0.0792501
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0300469
+update method: 0.0852774
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0269626
+update method: 0.074088
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0243223
+update method: 0.0894561
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0211868
+update method: 0.0831078
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.048405
+update method: 0.0861572
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0374761
+update method: 0.0800485
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0202835
+update method: 0.0859998
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0337367
+update method: 0.0773468
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0244315
+update method: 0.0822066
+callback!
+STOP Gauss Newton at step: 1
+camera estimation method: 0.0214612
+update method: 0.0859474
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.020437
+update method: 0.0853303
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0291186
+update method: 0.077636
+callback!
+STOP Gauss Newton at step: 0
+camera estimation method: 0.00978428
+update method: 0.0995602
+callback!
+STOP Gauss Newton at step: 6
+camera estimation method: 0.0497144
+update method: 0.0775323
+callback!
+STOP Gauss Newton at step: 0
+camera estimation method: 0.00773751
+update method: 0.0829802
+callback!
+STOP Gauss Newton at step: 6
+camera estimation method: 0.0490497
+update method: 0.0812614
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0569336
+update method: 0.0817763
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0284028
+update method: 0.0732188
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0278063
+update method: 0.0715646
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0203698
+update method: 0.0674204
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0289447
+update method: 0.111822
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0472107
+update method: 0.10023
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0270335
+visualize method: 0.746027
+update method: 0.0931052
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0337579
+update method: 0.100028
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0264874
+update method: 0.0888571
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.038259
+update method: 0.0757032
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0369393
+update method: 0.0891989
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0371609
+update method: 0.0869413
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0282611
+update method: 0.0840244
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0262038
+update method: 0.0889638
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0384971
+update method: 0.0952836
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0351479
+update method: 0.0729679
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0267754
+update method: 0.0861566
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0400249
+update method: 0.0742933
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0342202
+update method: 0.0871407
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0239537
+update method: 0.0858622
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0359845
+update method: 0.0903635
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0391808
+update method: 0.0924537
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0388643
+update method: 0.11241
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0381611
+update method: 0.0798272
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0295782
+update method: 0.090331
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0297682
+update method: 0.100933
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0394311
+update method: 0.0907824
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0350498
+update method: 0.0873691
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0240115
+update method: 0.0806045
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0359625
+update method: 0.0974963
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0271508
+update method: 0.0862376
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0250609
+update method: 0.0867768
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0379704
+update method: 0.0827232
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0246584
+update method: 0.0869356
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0375942
+update method: 0.0981628
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0333471
+update method: 0.0811214
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0347826
+update method: 0.106274
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0338297
+update method: 0.0958777
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0271771
+update method: 0.0780895
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0331537
+update method: 0.100663
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.049327
+update method: 0.0842178
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0333503
+update method: 0.0824807
+callback!
+STOP Gauss Newton at step: 0
+camera estimation method: 0.0117451
+update method: 0.0926241
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0568557
+update method: 0.091684
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0399537
+update method: 0.0820112
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0230364
+update method: 0.0819467
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0326796
+update method: 0.0966524
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0321227
+update method: 0.097913
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0286149
+update method: 0.0881776
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0323149
+update method: 0.093378
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0271727
+update method: 0.0854478
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0320636
+update method: 0.101383
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0351084
+update method: 0.0871168
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0230436
+update method: 0.0978944
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0388992
+update method: 0.108506
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0356283
+update method: 0.114865
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0317804
+update method: 0.0871158
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0345316
+update method: 0.0936961
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.050642
+update method: 0.10229
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0341576
+update method: 0.084648
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0434827
+update method: 0.106901
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.06455
+update method: 0.10536
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0414009
+update method: 0.096771
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.120784
+update method: 0.104588
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0632927
+update method: 0.124656
+callback!
+visualize method: 0.693518
+STOP Gauss Newton at step: 5
+camera estimation method: 0.0617305
+update method: 0.113467
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0349468
+update method: 0.118148
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.042915
+update method: 0.104403
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0367315
+update method: 0.102693
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0431038
+update method: 0.108688
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0350381
+update method: 0.115824
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0425091
+update method: 0.111013
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0322987
+update method: 0.10826
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0391816
+update method: 0.112665
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0339007
+update method: 0.101151
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0434468
+update method: 0.121002
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0419805
+update method: 0.120174
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0391402
+update method: 0.115492
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0311141
+update method: 0.118575
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0262592
+update method: 0.110533
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0358016
+update method: 0.141039
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0301015
+update method: 0.133437
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0269176
+update method: 0.123321
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0299496
+update method: 0.125616
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.023204
+update method: 0.107756
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0309608
+update method: 0.124766
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0225483
+update method: 0.125278
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0229656
+update method: 0.1026
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0313223
+update method: 0.127564
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0325797
+update method: 0.128277
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.025399
+update method: 0.133613
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0410492
+update method: 0.117319
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0442531
+update method: 0.141991
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.035626
+update method: 0.118615
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0305163
+update method: 0.130142
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0429013
+update method: 0.136773
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0336297
+update method: 0.117772
+callback!
+STOP Gauss Newton at step: 5
+camera estimation method: 0.049285
+update method: 0.133272
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0241806
+update method: 0.126337
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0312444
+update method: 0.131234
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0233017
+update method: 0.108813
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0335988
+update method: 0.140906
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0245215
+update method: 0.111698
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0312794
+update method: 0.131008
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0226282
+update method: 0.123478
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0264441
+update method: 0.132519
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0263702
+update method: 0.135451
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.019626
+update method: 0.135748
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0348002
+update method: 0.140296
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0259215
+update method: 0.134254
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0223852
+update method: 0.135633
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0231673
+update method: 0.150604
+callback!
+STOP Gauss Newton at step: 4
+camera estimation method: 0.0396402
+update method: 0.124433
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0293586
+update method: 0.109387
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0301185
+update method: 0.119497
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0258007
+update method: 0.132229
+callback!
+STOP Gauss Newton at step: 1
+camera estimation method: 0.0181713
+update method: 0.132016
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0283429
+update method: 0.106116
+callback!
+STOP Gauss Newton at step: 3
+camera estimation method: 0.0295172
+update method: 0.133082
+callback!
+STOP Gauss Newton at step: 1
+camera estimation method: 0.0173637
+update method: 0.127954
+callback!
+STOP Gauss Newton at step: 2
+camera estimation method: 0.0231871
+update method: 0.118759
