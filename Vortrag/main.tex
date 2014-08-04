@@ -55,15 +55,15 @@
 
 \setcounter{section}{0}
 
-\title[Real-Time Camera Tracking and 3D Reconstruction
-Using SDF]{Real-Time Camera Tracking and 3D Reconstruction
+\title[Real Time Camera Tracking and 3D Reconstruction
+Using SDF]{Real Time Camera Tracking and 3D Reconstruction
 Using Signed Distance Functions}
 \author{Joel Kaiser, Oier Mees}
 \begin{frame}
  \begin{center}
 \begin{figure}[h]
 \centering
-\LARGE{Real-Time Camera Tracking and 3D Reconstruction
+\LARGE{Real Time Camera Tracking and 3D Reconstruction
 Using Signed Distance Functions}\\
 \large{Authors: E. Bylow, J. Sturm, C. Kerl, F. Kahl, D. Cremers}\\
 \includegraphics{titleImg.jpg}
@@ -85,6 +85,7 @@ Using Signed Distance Functions}\\
 \end{figure}
 }
 \section{Introduction}
+\subsection{Overview}
 \frame{
 \frametitle{Overview}
 \begin{figure}[h]
@@ -133,13 +134,114 @@ Using Signed Distance Functions}\\
         \centering
         \captionsetup[subfigure]{labelformat=empty}
                 \includegraphics[scale=0.4]{marchingcubes.png}
-                \caption{Source: wikipedia}
+                \caption{Source: Wikipedia}
 \end{figure}
 }
+\section{Implementation}
+\frame{
+\frametitle{SDF Reconstruction}
+\begin{columns}
+		\column{0.4\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.33]{visualization1.png}
+			\end{figure}
+		\column{0.5\textwidth} 
+		%\vspace{-40pt}
+			\begin{itemize}
+				\item Extended PCL Marching Cubes
+\item Draw SDF mesh in Rviz
+\item Color Interpolation
+			\end{itemize} 
+	\end{columns}
+
+}
+
+\frame{
+\frametitle{Perception}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.5]{pcl2.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-40pt}
+			\begin{itemize}
+				\item Creating Point Clouds on the fly from RGB and Depth images
+				\item Preprocessing for point-to-plane:
+				\begin{itemize}
+				\item Computing point cloud normals
+				\item Applying bilateral filter
+				\end{itemize}
+				\item Reading trajectory ground truth  with TF
+				\item Record Kinect data with rosbag to validate approach
+			\end{itemize} 
+	\end{columns}
+
+}
+\frame{
+\frametitle{Camera Tracking}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.35]{cam2.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-30pt}
+			\begin{itemize}
+				\item Minimize reprojection error with Gauss-Newton using Twist coordinates
+				\item Computation of SDF partial derivatives
+				\item Exponential mapping
+		\end{itemize}
+	\end{columns}
+}
+
+\frame{
+\frametitle{SDF}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.35]{cam2.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-30pt}
+			\begin{itemize}
+				\item Implemented Point-to-point and Point-to-plane distances 
+				\item Truncation and exponential weighting of distance
+		\end{itemize}
+	\end{columns}
+}
+
+\frame{
+\frametitle{Optimizations}
+
+			\begin{itemize}
+				\item Extensive use of OpenMP to parallelize:
+				\begin{itemize}
+				 \item SDF update, Camera Tracking and Marching Cubes
+				 \item Initial difficulties due to need to concatenate results
+				 \end{itemize} 
+				\item Usage of Valgrind profiler to detect bottlenecks and memory leaks
+		\end{itemize}
+
+}
+
+\frame{
+\frametitle{Live Demo!}
+}
+
 
 \section{Results}
 
+\frame{
+\frametitle{Evaluation}
 
+			\begin{itemize}
+				\item RGB-D SLAM Dataset and Benchmark online evaluation
+		\end{itemize}
+
+}
+
+%Do some problems encountered and solutions found slide somewhere?
 
 
 
