@@ -1,0 +1,13 @@
+m: 256
+width: 6m
+height: 6m
+depth: 3.5m
+delta: 0.3m
+epsilon: 0.025
+Maximal Twist difference: 0.001
+Comp: Joels Desktop
+  CPU: 4 core (8 Threads), Intel(R) Core(TM) i7-3820 CPU @ 3.60GHz
+  Memory: 16 DDR3, 1600 MHz
+Gauss-Newton: every 9th pixel
+!Rosbag Play Publish rate: 0.1
+SDF Origin: -3.0, -4.0, -0.5
