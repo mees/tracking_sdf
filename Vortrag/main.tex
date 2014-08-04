@@ -55,9 +55,10 @@
 
 \setcounter{section}{0}
 
-\title[3D Object Perception and Grasping  in Domestic Environments]{Real-Time Camera Tracking and 3D Reconstruction
+\title[Real-Time Camera Tracking and 3D Reconstruction
+Using SDF]{Real-Time Camera Tracking and 3D Reconstruction
 Using Signed Distance Functions}
-\author{Oier Mees}
+\author{Joel Kaiser, Oier Mees}
 \begin{frame}
  \begin{center}
 \begin{figure}[h]
@@ -65,9 +66,9 @@ Using Signed Distance Functions}
 \LARGE{Real-Time Camera Tracking and 3D Reconstruction
 Using Signed Distance Functions}\\
 \large{Authors: E. Bylow, J. Sturm, C. Kerl, F. Kahl, D. Cremers}\\
-%\includegraphics[scale=0.45]{../pics/pr2Table.jpg}
+\includegraphics{titleImg.jpg}
 \end{figure}
-\large{Oier Mees}
+\large{Joel Kaiser, Oier Mees}
 \end{center}
 \end{frame}
 
@@ -75,18 +76,66 @@ Using Signed Distance Functions}\\
 \section{Motivation}
 \frame{
 \frametitle{Motivation}
-Grasping skills are fundamental for many applications
+3D localization and mapping is fundamental for many robotic applications
 \begin{figure}
         \centering
         \captionsetup[subfigure]{labelformat=empty}
-                %\includegraphics[scale=0.4]{../pics/tum.jpg}
-                \caption{\small Source: ias.cs.tum.edu}
+                \includegraphics[scale=0.4]{video1.png}
+                \caption{\small Source: vision.in.tum.de}
+\end{figure}
+}
+\section{Introduction}
+\frame{
+\frametitle{Overview}
+\begin{figure}[h]
+        \centering
+        \captionsetup[subfigure]{labelformat=empty}
+                \includegraphics[scale=0.32]{overview.png}
+\end{figure}
+}
+
+\frame{
+\frametitle{Signed Distance Function}
+\begin{figure}[h]
+        \centering
+        \captionsetup[subfigure]{labelformat=empty}
+                \includegraphics[scale=0.32]{sdf.png}
+                \caption{\small Source: lecture "Introduction to Mobile Robotics"}
+\end{figure}
+}
+
+
+\frame{
+\frametitle{Camera Tracking}
+\begin{figure}[h]
+        \centering
+        \captionsetup[subfigure]{labelformat=empty}
+                \includegraphics[scale=0.45]{camera.png}
+                \caption{Source: \cite{bylow2013real}}
 \end{figure}
 }
 
 
 
+\frame{
+\frametitle{SDF Reconstruction}
+\begin{figure}[h]
+        \centering
+        \captionsetup[subfigure]{labelformat=empty}
+                \includegraphics[scale=0.4]{sdfDistances.png}
+                \caption{Source: \cite{bylow2013real}}
+\end{figure}
+}
 
+\frame{
+\frametitle{3D Reconstruction}
+\begin{figure}[h]
+        \centering
+        \captionsetup[subfigure]{labelformat=empty}
+                \includegraphics[scale=0.4]{marchingcubes.png}
+                \caption{Source: wikipedia}
+\end{figure}
+}
 
 \section{Results}
 
