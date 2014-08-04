@@ -9,7 +9,7 @@ void SDF_Reconstruction::writePoseToFile(const ros::Time &timestamp, const Eigen
 //		std::cout.precision(3);
 //		std::cout.setf(std::ios::fixed,std::ios::floatfield);
 //		cout<<timestamp.nsec<<" "<<trans.x() <<" "<<trans.y()<<" "<<trans.z()<<" "<< quat.x()<< " "<<quat.y()<<" "<<quat.z()<<" "<<quat.w()<<endl;
-		myfile<<std::fixed << std::setprecision(4)<<timestamp.sec<<" "<<trans.x() <<" "<<trans.y()<<" "<<trans.z()<<" "<< quat.x()<< " "<<quat.y()<<" "<<quat.z()<<" "<<quat.w()<<"\n";
+		myfile<<std::fixed << std::setprecision(4)<<timestamp.toSec()<<" "<<trans.x() <<" "<<trans.y()<<" "<<trans.z()<<" "<< quat.x()<< " "<<quat.y()<<" "<<quat.z()<<" "<<quat.w()<<"\n";
 		myfile.close();
 	  } else {
 		  cout << "Unable to open file";
