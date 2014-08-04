@@ -1,0 +1,127 @@
+\documentclass{beamer}
+\usepackage[english]{babel}
+\usepackage{subcaption}
+\usepackage{gensymb}
+\usepackage{multicol}
+\usepackage{natbib}
+\usepackage{textcomp}
+\useoutertheme{infolines}
+\definecolor{vubgreen}{rgb}{0.67,0.698,0.00784} 
+\definecolor{vubdarkgreen}{rgb}{0.374,0.373,0.290} 
+\definecolor{vubgrey}{rgb}{0.549,0.510,0.431}
+\setbeamercolor*{structure}{fg=vubgreen,bg=vubdarkgreen,bg_alt=vubgrey}
+\setbeamercolor*{palette primary}{use=structure,fg=white,bg=structure.fg}
+\setbeamercolor*{palette secondary}{use=structure,fg=white,bg=structure.fg!75!black}
+\setbeamercolor*{palette tertiary}{use=structure,fg=white,bg=structure.fg!50!black}
+\setbeamercolor*{palette quaternary}{use=structure,fg=white,bg=structure.bg}
+\setbeamercolor*{sidebar}{use=structure,bg=structure.fg}
+\setbeamercolor*{palette sidebar primary}{use=structure,fg=structure.fg!10}
+\setbeamercolor*{palette sidebar secondary}{fg=white}
+\setbeamercolor*{palette sidebar tertiary}{use=structure,fg=structure.fg!50}
+\setbeamercolor*{palette sidebar quaternary}{fg=white}
+\setbeamercolor*{titlelike}{use=structure,fg=vubgrey,bg=white}
+\setbeamercolor*{separation line}{}
+\setbeamercolor*{fine separation line}{}
+%\newcommand{\Section}[1]{\section{#1} \setcounter{figure}{1}}
+\renewcommand{\thefigure}{\thesection.\arabic{figure}}
+\setbeamerfont{frametitle}{size={\huge}}
+\newcommand{\myitem}{\item[$\bullet$]}
+\newcommand{\nireitem}{\item[$\Rightarrow$]}
+\makeatletter
+\setbeamertemplate{footline}
+{
+%  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.25\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\insertshortauthor
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\insertshorttitle
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.25\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+    %\usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+    \insertframenumber /\inserttotalframenumber
+  \end{beamercolorbox}}%
+%  \vskip0pt%
+}
+\makeatother
+
+\usepackage{caption}
+\captionsetup{labelformat=empty,labelsep=none}
+\newcommand\pro{\item[$+$]}
+\newcommand\con{\item[\textcolor{red}{$-$}]}
+
+\begin{document}
+
+\setcounter{section}{0}
+
+\title[3D Object Perception and Grasping  in Domestic Environments]{Real-Time Camera Tracking and 3D Reconstruction
+Using Signed Distance Functions}
+\author{Oier Mees}
+\begin{frame}
+ \begin{center}
+\begin{figure}[h]
+\centering
+\LARGE{Real-Time Camera Tracking and 3D Reconstruction
+Using Signed Distance Functions}\\
+\large{Authors: E. Bylow, J. Sturm, C. Kerl, F. Kahl, D. Cremers}\\
+%\includegraphics[scale=0.45]{../pics/pr2Table.jpg}
+\end{figure}
+\large{Oier Mees}
+\end{center}
+\end{frame}
+
+
+\section{Motivation}
+\frame{
+\frametitle{Motivation}
+Grasping skills are fundamental for many applications
+\begin{figure}
+        \centering
+        \captionsetup[subfigure]{labelformat=empty}
+                %\includegraphics[scale=0.4]{../pics/tum.jpg}
+                \caption{\small Source: ias.cs.tum.edu}
+\end{figure}
+}
+
+
+
+
+
+\section{Results}
+
+
+
+
+
+\newcommand{\deftitlebar}[5]{\pgfdeclarehorizontalshading{frametitlebarhshad}{#1}{color(#2)=(#3); color(#4)=(#5)}}
+\deftitlebar{0.01\paperheight}{0\paperwidth}{olive}{\the\paperwidth}{white} % can be changed during the presentation
+\setbeamertemplate{frametitle}
+{
+	\hspace*{-0.035\paperwidth} \vbox{\insertframetitle}\par
+	\hspace*{-0.045\paperwidth}\pgfuseshading{frametitlebarhshad}
+}
+
+\begin{frame}
+\frametitle{\centerline{QA}}
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.3]{QA.jpg}
+\end{figure}
+\end{frame}
+
+\section{Bibliography}
+%\clearpage
+\begin{frame}[allowframebreaks]
+\frametitle{Bibliography}
+\small
+\bibliographystyle{plainnat}
+%\nocite{*}
+\bibliography{bibliography}
+\vspace*{0.5cm}
+Th title image page is by Josh Ellingson and available under Creative Commons (NC, BA) license at \url{www.flickr.com/photos/willowgarage}.
+\end{frame}
+
+
+
+\end{document}
