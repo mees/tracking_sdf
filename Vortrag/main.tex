@@ -115,15 +115,15 @@ Using Signed Distance Functions}\\
 \end{figure}
 }
 
-\frame{
-\frametitle{Camera Tracking}
-\begin{figure}[h]
-        \centering
-        \captionsetup[subfigure]{labelformat=empty}
-                \includegraphics[scale=0.45]{camera.png}
-                \caption{Source: \cite{bylow2013real}}
-\end{figure}
-}
+%\frame{
+%\frametitle{Camera Tracking}
+%\begin{figure}[h]
+%        \centering
+%        \captionsetup[subfigure]{labelformat=empty}
+%                \includegraphics[scale=0.45]{camera.png}
+%                \caption{Source: \cite{bylow2013real}}
+%\end{figure}
+%}
 
 
 
@@ -179,23 +179,104 @@ Using Signed Distance Functions}\\
 	\end{columns}
 
 }
+%----------------------------------------------------------
+%           START CAMERA TRACKING
+%----------------------------------------------------------
 \frame{
-\frametitle{Camera Tracking}
+\frametitle{Camera Tracking - What we have}
 \begin{columns}
 		\column{0.45\textwidth} 
 			\begin{figure}
-				\includegraphics[scale=0.35]{cam2.png}
+				\includegraphics[scale=0.25]{camera_estimation1.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-30pt}
+		\begin{itemize}
+			    \item Successfully estimated our previous camera positions
+				%\item Minimize reprojection error with Gauss-Newton using Twist coordinates
+				%\item Computation of SDF partial derivatives
+				%\item Exponential mapping
+		\end{itemize}
+\end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - What we get}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.25]{camera_estimation2.png}
 			\end{figure}
 		\column{0.55\textwidth} 
 		%\vspace{-30pt}
 			\begin{itemize}
-				\item Minimize reprojection error with Gauss-Newton using Twist coordinates
-				\item Computation of SDF partial derivatives
-				\item Exponential mapping
+			    \item Successfully estimated our previous camera positions
+			    \item New point cloud given by perception
+				%\item Minimize reprojection error with Gauss-Newton using Twist coordinates
+				%\item Computation of SDF partial derivatives
+				%\item Exponential mapping
 		\end{itemize}
 	\end{columns}
 }
-
+\frame{
+\frametitle{Camera Tracking - What we want}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.25]{camera_estimation4.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-30pt}
+			\begin{itemize}
+			    \item Successfully estimated our previous camera positions
+			    \item New point cloud given by perception
+			    \item We search transition from last camera position
+				%\item Minimize reprojection error with Gauss-Newton using Twist coordinates
+				%\item Computation of SDF partial derivatives
+				%\item Exponential mapping
+		\end{itemize}
+	\end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - What we want}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.25]{camera_estimation5.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-30pt}
+			\begin{itemize}
+			    \item Successfully estimated our previous camera positions
+			    \item New point cloud given by perception
+			    \item We search transition from last camera position\\
+			    given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+				%\item Minimize reprojection error with Gauss-Newton using Twist coordinates
+				%\item Computation of SDF partial derivatives
+				%\item Exponential mapping
+		\end{itemize}
+	\end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - How we get it}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.25]{camera_estimation3.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-30pt}
+			\begin{itemize}
+			    \item Successfully estimated our previous camera positions
+			    \item New point cloud given by perception
+			    \item We search transition from last camera position\\
+			    given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+			    \item Minimize the error
+				%\item Minimize reprojection error with Gauss-Newton using Twist coordinates
+				%\item Computation of SDF partial derivatives
+				%\item Exponential mapping
+		\end{itemize}
+	\end{columns}
+}
 \frame{
 \frametitle{SDF}
 \begin{columns}
