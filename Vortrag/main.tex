@@ -97,7 +97,7 @@ Using Signed Distance Functions}\\
 }
 
 \frame{
-\frametitle{Perception}
+\frametitle{Preprocessing}
 \begin{columns}
 		\column{0.45\textwidth} 
 			\begin{figure}
@@ -106,14 +106,11 @@ Using Signed Distance Functions}\\
 		\column{0.55\textwidth} 
 		%\vspace{-40pt}
 			\begin{itemize}
-				\item Creating Point Clouds on the fly from RGB and Depth images
-				\item Preprocessing for point-to-plane:
-				\begin{itemize}
-				\item Computing point cloud normals
-				\item Applying bilateral filter
-				\end{itemize}
-				\item Reading trajectory ground truth  with TF
-				\item Record Kinect data with rosbag to validate approach
+				\item Create Point Clouds on the fly from RGB and Depth images
+				\item Compute point cloud normals
+				\item Apply bilateral filter
+				\item Option to read trajectory ground truth  with TF
+				%\item Record Kinect data with rosbag to validate approach
 			\end{itemize} 
 	\end{columns}
 
@@ -159,6 +156,23 @@ Using Signed Distance Functions}\\
 				
 
 \end{figure}
+}
+
+\frame{
+\frametitle{SDF Update}
+\begin{columns}
+		\column{0.5\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.8]{dia1.png}
+			\end{figure}
+		\column{0.45\textwidth} 
+		\vspace{-30pt}
+	\begin{align*}
+D &\gets \frac{WD+ w_{n+1}d_{n+1}}{W+w_{n+1}} \\
+W &\gets W + w_{n+1}
+\end{align*}
+\end{columns}
+
 }
 %\frame{
 %\frametitle{Camera Tracking}
