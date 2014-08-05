@@ -96,6 +96,29 @@ Using Signed Distance Functions}\\
 }
 
 \frame{
+\frametitle{Perception}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.5]{pcl2.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-40pt}
+			\begin{itemize}
+				\item Creating Point Clouds on the fly from RGB and Depth images
+				\item Preprocessing for point-to-plane:
+				\begin{itemize}
+				\item Computing point cloud normals
+				\item Applying bilateral filter
+				\end{itemize}
+				\item Reading trajectory ground truth  with TF
+				\item Record Kinect data with rosbag to validate approach
+			\end{itemize} 
+	\end{columns}
+
+}
+
+\frame{
 \frametitle{Signed Distance Function}
 \begin{figure}[h]
         \centering
@@ -150,56 +173,27 @@ Using Signed Distance Functions}\\
 
 
 
-\frame{
-\frametitle{3D Reconstruction: Marching Cubes}
-\begin{figure}[h]
-        \centering
-        \captionsetup[subfigure]{labelformat=empty}
-                \includegraphics[scale=0.4]{marchingcubes.png}
-                \caption{Source: Wikipedia}
-\end{figure}
-}
+
 \section{Implementation}
-\frame{
-\frametitle{SDF Reconstruction}
-\begin{columns}
-		\column{0.4\textwidth} 
-			\begin{figure}
-				\includegraphics[scale=0.33]{visualization1.png}
-			\end{figure}
-		\column{0.5\textwidth} 
-		%\vspace{-40pt}
-			\begin{itemize}
-				\item Extended PCL Marching Cubes
-\item Draw SDF mesh in Rviz
-\item Color Interpolation
-			\end{itemize} 
-	\end{columns}
+%\frame{
+%\frametitle{SDF Reconstruction}
+%\begin{columns}
+%		\column{0.4\textwidth} 
+%			\begin{figure}
+%				\includegraphics[scale=0.33]{visualization1.png}
+%			\end{figure}
+%		\column{0.5\textwidth} 
+%		%\vspace{-40pt}
+%			\begin{itemize}
+%				\item Extended PCL Marching Cubes
+%\item Draw SDF mesh in Rviz
+%\item Color Interpolation
+%			\end{itemize} 
+%	\end{columns}
+%
+%}
 
-}
 
-\frame{
-\frametitle{Perception}
-\begin{columns}
-		\column{0.45\textwidth} 
-			\begin{figure}
-				\includegraphics[scale=0.5]{pcl2.png}
-			\end{figure}
-		\column{0.55\textwidth} 
-		%\vspace{-40pt}
-			\begin{itemize}
-				\item Creating Point Clouds on the fly from RGB and Depth images
-				\item Preprocessing for point-to-plane:
-				\begin{itemize}
-				\item Computing point cloud normals
-				\item Applying bilateral filter
-				\end{itemize}
-				\item Reading trajectory ground truth  with TF
-				\item Record Kinect data with rosbag to validate approach
-			\end{itemize} 
-	\end{columns}
-
-}
 %----------------------------------------------------------
 %           START CAMERA TRACKING
 %----------------------------------------------------------
@@ -298,21 +292,16 @@ Using Signed Distance Functions}\\
 		\end{itemize}
 	\end{columns}
 }
+
+
 \frame{
-\frametitle{SDF}
-\begin{columns}
-		\column{0.55\textwidth} 
-			\begin{figure}
-				\includegraphics[scale=0.8]{dia1.png}
-				\includegraphics[scale=0.3]{exponential_weight.png}
-			\end{figure}
-		\column{0.55\textwidth} 
-		\vspace{-70pt}
-			\begin{itemize}
-				\item Implemented Point-to-point and Point-to-plane distances 
-				\item Truncation and exponential weighting of distance
-		\end{itemize}
-	\end{columns}
+\frametitle{3D Reconstruction: Marching Cubes}
+\begin{figure}[h]
+        \centering
+        \captionsetup[subfigure]{labelformat=empty}
+                \includegraphics[scale=0.4]{marchingcubes.png}
+                \caption{Source: Wikipedia}
+\end{figure}
 }
 
 \frame{
