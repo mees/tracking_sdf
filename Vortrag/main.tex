@@ -385,7 +385,7 @@ Using Signed Distance Functions}\\
                             \item Use Gauss-Newton Method
                             \begin{itemize}
                                   \item Linearize Transformation
-                                  \item Solve linear system $\nabla E = 0 \to \Xi$
+                                  \item Solve linear system $\nabla E = 0 \to \xi$
                                   \item \textbf{Apply transformation to camera}
                                   
                             \end{itemize}
@@ -430,29 +430,29 @@ Using Signed Distance Functions}\\
                             \item Use Gauss-Newton Method
                             \begin{itemize}
                                   \item Linearize Transformation
-                                  \item Solve linear system $\nabla E = 0 \to \Xi$
+                                  \item Solve linear system $\nabla E = 0 \to \xi$
                                   \item \textbf{Apply transformation to camera}
                                   
                             \end{itemize}
                 \end{itemize}
         \end{columns}
 }
-\frame{
-\frametitle{SDF}
-\begin{columns}
-		\column{0.55\textwidth} 
-			\begin{figure}
-				\includegraphics[scale=0.8]{dia1.png}
-				\includegraphics[scale=0.3]{exponential_weight.png}
-			\end{figure}
-		\column{0.55\textwidth} 
-		\vspace{-70pt}
-			\begin{itemize}
-				\item Implemented Point-to-point and Point-to-plane distances 
-				\item Truncation and exponential weighting of distance
-		\end{itemize}
-	\end{columns}
-}
+%\frame{
+%\frametitle{SDF}
+%\begin{columns}
+%		\column{0.55\textwidth} 
+%			\begin{figure}
+%				\includegraphics[scale=0.8]{dia1.png}
+%				\includegraphics[scale=0.3]{exponential_weight.png}
+%			\end{figure}
+%		\column{0.55\textwidth} 
+%		\vspace{-70pt}
+%			\begin{itemize}
+%				\item Implemented Point-to-point and Point-to-plane distances 
+%				\item Truncation and exponential weighting of distance
+%		\end{itemize}
+%	\end{columns}
+%}
 \frame{
 \frametitle{3D Reconstruction: Marching Cubes}
 \begin{figure}[h]
@@ -476,9 +476,6 @@ Using Signed Distance Functions}\\
 
 }
 
-\frame{
-\frametitle{Live Demo!}
-}
 
 
 %\section{Results}
@@ -540,6 +537,9 @@ m  & method &  max $\Delta$$\xi$ &  pub rate & trans error& notes\\
 	\hspace*{-0.045\paperwidth}\pgfuseshading{frametitlebarhshad}
 }
 
+\frame{
+\frametitle{Demo!}
+}
 \begin{frame}
 \frametitle{\centerline{QA}}
 \begin{figure}[h]
