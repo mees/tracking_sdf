@@ -106,15 +106,26 @@ Using Signed Distance Functions}\\
 }
 
 \frame{
-\frametitle{SDF Reconstruction}
+\frametitle{SDF Distances}
+\begin{figure}[h]
+\vspace*{-30pt}
+        \centering
+        \captionsetup[subfigure]{labelformat=empty}
+                \includegraphics[scale=0.9]{dia_point.png}
+                \includegraphics[scale=0.9]{dia_plane2.png}
+                \caption{Point-To-Point \hspace*{3cm} Point-To-Plane}
+\end{figure}
+}
+\frame{
+\frametitle{SDF Weighting and Truncation}
 \begin{figure}[h]
         \centering
         \captionsetup[subfigure]{labelformat=empty}
-                \includegraphics[scale=0.4]{sdfDistances.png}
-                \caption{Source: \cite{bylow2013real}}
+				\includegraphics[scale=0.8]{dia1.png}
+				\includegraphics[scale=0.3]{exponential_weight.png}
+
 \end{figure}
 }
-
 %\frame{
 %\frametitle{Camera Tracking}
 %\begin{figure}[h]
@@ -340,7 +351,7 @@ m  & method &  max $\Delta$$\xi$ &  pub rate & trans error& notes\\
 256 & Point-To-Point&  & & 0.047 m & Paper\\
 \hline
 \end{tabular}
-\caption{$\delta$$=0.3m$, $\epsilon$$=0.025$, Gauss-Newton every 9th pixel, rmse absolute translational error }
+\caption{$\delta$$=0.3m$, $\epsilon$$=0.025$, Gauss-Newton every 9th pixel, RMSE absolute translational error }
 \end{table}
 
 }
