@@ -20,3 +20,13 @@ build/
 /kdev4/
 *.kdev4
 .kdev_*
+
+
+Vortrag/main.aux
+Vortrag/main.log
+Vortrag/main.nav
+Vortrag/main.out
+Vortrag/main.pdf
+Vortrag/main.snm
+Vortrag/main.synctex.gz
+Vortrag/main.toc
