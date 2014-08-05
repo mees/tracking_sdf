@@ -352,7 +352,7 @@ Using Signed Distance Functions}\\
 \begin{columns}
                 \column{0.45\textwidth}
                         \begin{figure}
-                                \includegraphics[scale=0.25]{camera_estimation7.png}
+                                \includegraphics[scale=0.25]{camera_estimation8.png}
                         \end{figure}
                 \column{0.55\textwidth}
                 %\vspace{-30pt}
@@ -363,7 +363,7 @@ Using Signed Distance Functions}\\
                             \item Use Gauss-Newton Method
                             \begin{itemize}
                                   \item Linearize Transformation
-                                  \item \textbf{Solve linear system $\nabla E = 0 \to \Xi$}
+                                  \item \textbf{Solve linear system $\nabla E = 0 \to \xi$}
                                   \item Apply transformation to camera
                             \end{itemize}
                 \end{itemize}
@@ -374,7 +374,52 @@ Using Signed Distance Functions}\\
 \begin{columns}
                 \column{0.45\textwidth}
                         \begin{figure}
-                                \includegraphics[scale=0.25]{camera_estimation7.png}
+                                \includegraphics[scale=0.25]{camera_estimation9.png}
+                        \end{figure}
+                \column{0.55\textwidth}
+                %\vspace{-30pt}
+                        \begin{itemize}
+                            \item We search transformation from last camera position\\
+                            given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+                            \item Minimize the squared distance error $E(\xi)$
+                            \item Use Gauss-Newton Method
+                            \begin{itemize}
+                                  \item Linearize Transformation
+                                  \item Solve linear system $\nabla E = 0 \to \Xi$
+                                  \item \textbf{Apply transformation to camera}
+                                  
+                            \end{itemize}
+                \end{itemize}
+        \end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - How we get it}
+\begin{columns}
+                \column{0.45\textwidth}
+                        \begin{figure}
+                                \includegraphics[scale=0.25]{camera_estimation10.png}
+                        \end{figure}
+                \column{0.55\textwidth}
+                %\vspace{-30pt}
+                        \begin{itemize}
+                            \item We search transformation from last camera position\\
+                            given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+                            \item Minimize the squared distance error $E(\xi)$
+                            \item Use Gauss-Newton Method
+                            \begin{itemize}
+                                  \item Linearize Transformation
+                                  \item \textbf{Solve linear system $\nabla E = 0 \to \xi$}
+                                  \item Apply transformation to camera
+                            \end{itemize}
+                \end{itemize}
+        \end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - How we get it}
+\begin{columns}
+                \column{0.45\textwidth}
+                        \begin{figure}
+                                \includegraphics[scale=0.25]{camera_estimation11.png}
                         \end{figure}
                 \column{0.55\textwidth}
                 %\vspace{-30pt}
