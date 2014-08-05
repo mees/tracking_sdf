@@ -5,6 +5,7 @@
 \usepackage{multicol}
 \usepackage{natbib}
 \usepackage{textcomp}
+\usepackage{pbox}
 \useoutertheme{infolines}
 \definecolor{vubgreen}{rgb}{0.67,0.698,0.00784} 
 \definecolor{vubdarkgreen}{rgb}{0.374,0.373,0.290} 
@@ -168,8 +169,8 @@ Using Signed Distance Functions}\\
 		\column{0.45\textwidth} 
 		\vspace{-30pt}
 	\begin{align*}
-D &\gets \frac{WD+ w_{n+1}d_{n+1}}{W+w_{n+1}} \\
-W &\gets W + w_{n+1}
+D &\gets \frac{W D+ \omega_{n+1}d_{n+1}}{W+\omega_{n+1}} \\
+W &\gets W + \omega_{n+1}
 \end{align*}
 \end{columns}
 
@@ -482,8 +483,11 @@ W &\gets W + w_{n+1}
 			\begin{itemize}
 				\item Extensive use of OpenMP to parallelize:
 				\begin{itemize}
-				 \item SDF update, Camera Tracking and Marching Cubes
-				 \item Initial difficulties due to need to concatenate results
+				 \item SDF update, Pose Tracking and Marching Cubes
+				 \item In Marching Cubes, creating a point cloud per thread and combining them at the end is necessary
+				 \begin{itemize}
+				 \item In Pose Tracking, similar approach needed to parallelize matrix computation for solving linear system
+				 \end{itemize}
 				 \end{itemize} 
 				\item Usage of Valgrind profiler to detect bottlenecks and memory leaks
 		\end{itemize}
@@ -497,15 +501,15 @@ W &\gets W + w_{n+1}
 \frame{
 \frametitle{Evaluation}
 
-			\begin{itemize}
-				\item RGB-D SLAM Dataset and Benchmark online evaluation
-		\end{itemize}
+%			\begin{itemize}
+%				\item RGB-D SLAM Dataset and Benchmark online evaluation
+%		\end{itemize}
 		\begin{table}[h]
-
+\vspace{-20pt}
 \centering
-\begin{tabular}{|c|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|l|}
 \hline
-m  & method &  max $\Delta$$\xi$ &  pub rate & trans error& notes\\
+m  & method &  max $\Delta$$\xi$ &  play rate & trans error& notes\\
 \hline
 200   & Point-To-Plane& 0.001  & 0.04 & 0.125 m& laptop\\
 256  & Point-To-Plane& 0.001  & 1.0 & 0.418 m&desktop\\
@@ -516,7 +520,9 @@ m  & method &  max $\Delta$$\xi$ &  pub rate & trans error& notes\\
 256  & Point-To-Plane& 0.001  & 0.1 & 0.060 m & gram schmidt\\
 256  & Point-To-Point& 0.001  & 0.1 & \textbf{0.057 m} & \\
 \hline
-256 & Point-To-Point&  & & 0.047 m & Paper\\
+256 & Point-To-Point&  & & 0.047 m & \pbox{20cm}{Paper: same \\params as our}\\
+& & & & &     \\
+512 & Point-To-Plane&  & & \textbf{0.041 m} & \pbox{20cm}{Paper: best \\params}\\
 \hline
 \end{tabular}
 \caption{$\delta$$=0.3m$, $\epsilon$$=0.025$, Gauss-Newton every 9th pixel, RMSE absolute translational error }
