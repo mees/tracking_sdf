@@ -240,10 +240,44 @@ Using Signed Distance Functions}\\
 			\begin{itemize}
 				\item RGB-D SLAM Dataset and Benchmark online evaluation
 		\end{itemize}
+		\begin{table}[h]
+
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+m  & method &  max $\Delta$$\xi$ &  pub rate & trans error& notes\\
+\hline
+200   & Point-To-Plane& 0.001  & 0.04 & 0.125 m& laptop\\
+256  & Point-To-Plane& 0.001  & 1.0 & 0.418 m&desktop\\
+256  & Point-To-Plane& 0.001  & 0.1 & 0.060 m&\\
+256  & Point-To-Plane& 0.0001  & 0.1 & 0.060 m&\\
+512 & Point-To-Plane & 0.01 &  0.1 & 0.320 m &\\
+512  & Point-To-Plane& 0.001  & 0.1 & 0.071 m & out of memory\\
+256  & Point-To-Plane& 0.001  & 0.1 & 0.060 m & gram schmidt\\
+256  & Point-To-Point& 0.001  & 0.1 & \textbf{0.057 m} & \\
+\hline
+256 & Point-To-Point&  & & 0.047 m & Paper\\
+\hline
+\end{tabular}
+\caption{$\delta$$=0.3m$, $\epsilon$$=0.025$, Gauss-Newton every 9th pixel, rmse absolute translational error }
+\end{table}
+
+}
+\frame{
+\frametitle{Results}
+\begin{figure}[h]
+\centering
+ \begin{subfigure}[h]{0.5\textwidth}
+\includegraphics[scale=0.34]{absolute_trajectory_error_best.png}
+ \end{subfigure}
+ %\qquad
+                \begin{subfigure}[h]{0.49\textwidth}
+                \includegraphics[scale=0.345]{absolute_trajectory_error_worst.png}
+        \end{subfigure}
+\end{figure}
 
 }
 
-%Do some problems encountered and solutions found slide somewhere?
 
 
 
