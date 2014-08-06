@@ -290,7 +290,7 @@ W &\gets W + \omega_{n+1}
 			    \item New point cloud given by perception
 			    \item We search transformation from last camera position\\
 			    given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
-			    \item Minimize the squared distance error $E(\xi)$ %$E = \sum\limits_\mathbf{x} \Psi_{R, t}()$ 
+			    \item Minimize the squared distance error $E(\xi)$ between points and surface %$E = \sum\limits_\mathbf{x} \Psi_{R, t}()$  
 		\end{itemize}
 	\end{columns}
 }
@@ -308,7 +308,7 @@ W &\gets W + \omega_{n+1}
                         \begin{itemize}
                             \item We search transformation from last camera position\\
                             given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
-                            \item Minimize the squared distance error $E(\xi)$
+                            \item Minimize the squared distance error $E(\xi)$ between points and surface
                             \item Use Gauss-Newton Method
                             \begin{itemize}
                                   \item Linearize Transformation
@@ -330,7 +330,7 @@ W &\gets W + \omega_{n+1}
                         \begin{itemize}
                             \item We search transformation from last camera position\\
                             given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
-                            \item Minimize the squared distance error $E(\xi)$
+                            \item Minimize the squared distance error $E(\xi)$ between points and surface
                             \item Use Gauss-Newton Method
                             \begin{itemize}
                                   \item {\textbf{Linearize Transformation}}
@@ -352,7 +352,7 @@ W &\gets W + \omega_{n+1}
                         \begin{itemize}
                             \item We search transformation from last camera position\\
                             given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
-                            \item Minimize the squared distance error $E(\xi)$
+                            \item Minimize the squared distance error $E(\xi)$ between points and surface
                             \item Use Gauss-Newton Method
                             \begin{itemize}
                                   \item {\textbf{Linearize Transformation}}
@@ -374,7 +374,7 @@ W &\gets W + \omega_{n+1}
                         \begin{itemize}
                             \item We search transformation from last camera position\\
                             given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
-                            \item Minimize the squared distance error $E(\xi)$
+                            \item Minimize the squared distance error $E(\xi)$ between points and surface
                             \item Use Gauss-Newton Method
                             \begin{itemize}
                                   \item Linearize Transformation
@@ -396,7 +396,7 @@ W &\gets W + \omega_{n+1}
                         \begin{itemize}
                             \item We search transformation from last camera position\\
                             given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
-                            \item Minimize the squared distance error $E(\xi)$
+                            \item Minimize the squared distance error $E(\xi)$ between points and surface
                             \item Use Gauss-Newton Method
                             \begin{itemize}
                                   \item Linearize Transformation
@@ -419,7 +419,7 @@ W &\gets W + \omega_{n+1}
                         \begin{itemize}
                             \item We search transformation from last camera position\\
                             given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
-                            \item Minimize the squared distance error $E(\xi)$
+                            \item Minimize the squared distance error $E(\xi)$ between points and surface
                             \item Use Gauss-Newton Method
                             \begin{itemize}
                                   \item Linearize Transformation
@@ -441,7 +441,7 @@ W &\gets W + \omega_{n+1}
                         \begin{itemize}
                             \item We search transformation from last camera position\\
                             given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
-                            \item Minimize the squared distance error $E(\xi)$
+                            \item Minimize the squared distance error $E(\xi)$ between points and surface
                             \item Use Gauss-Newton Method
                             \begin{itemize}
                                   \item Linearize Transformation
@@ -518,7 +518,7 @@ m  & method &  max $\Delta$$\xi$ &  play rate & trans error& notes\\
 512 & Point-To-Plane & 0.01 &  0.1 & 0.320 m &\\
 512  & Point-To-Plane& 0.001  & 0.1 & 0.071 m & out of memory\\
 256  & Point-To-Plane& 0.001  & 0.1 & 0.060 m & gram schmidt\\
-256  & Point-To-Point& 0.001  & 0.1 & \textbf{0.057 m} & \\
+256  & Point-To-Point& 0.001  & 0.1 & \textbf{0.057 m} & every (9th) pixel\\
 \hline
 256 & Point-To-Point&  & & 0.047 m & \pbox{20cm}{Paper: same \\params as our}\\
 & & & & &     \\
