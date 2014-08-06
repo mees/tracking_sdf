@@ -5,6 +5,7 @@
 \usepackage{multicol}
 \usepackage{natbib}
 \usepackage{textcomp}
+\usepackage{pbox}
 \useoutertheme{infolines}
 \definecolor{vubgreen}{rgb}{0.67,0.698,0.00784} 
 \definecolor{vubdarkgreen}{rgb}{0.374,0.373,0.290} 
@@ -22,6 +23,7 @@
 \setbeamercolor*{titlelike}{use=structure,fg=vubgrey,bg=white}
 \setbeamercolor*{separation line}{}
 \setbeamercolor*{fine separation line}{}
+
 %\newcommand{\Section}[1]{\section{#1} \setcounter{figure}{1}}
 \renewcommand{\thefigure}{\thesection.\arabic{figure}}
 \setbeamerfont{frametitle}{size={\huge}}
@@ -73,7 +75,7 @@ Using Signed Distance Functions}\\
 \end{frame}
 
 
-\section{Motivation}
+%\section{Motivation}
 \frame{
 \frametitle{Motivation}
 3D localization and mapping is fundamental for many robotic applications
@@ -84,8 +86,8 @@ Using Signed Distance Functions}\\
                 \caption{\small Source: vision.in.tum.de}
 \end{figure}
 }
-\section{Introduction}
-\subsection{Overview}
+%\section{Introduction}
+%\subsection{Overview}
 \frame{
 \frametitle{Overview}
 \begin{figure}[h]
@@ -93,6 +95,26 @@ Using Signed Distance Functions}\\
         \captionsetup[subfigure]{labelformat=empty}
                 \includegraphics[scale=0.32]{overview.png}
 \end{figure}
+}
+
+\frame{
+\frametitle{Preprocessing}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.5]{pcl2.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-40pt}
+			\begin{itemize}
+				\item Create Point Clouds on the fly from RGB and Depth images
+				\item Compute point cloud normals
+				\item Apply bilateral filter
+				\item Option to read trajectory ground truth  with TF
+				%\item Record Kinect data with rosbag to validate approach
+			\end{itemize} 
+	\end{columns}
+
 }
 
 \frame{
@@ -105,31 +127,349 @@ Using Signed Distance Functions}\\
 \end{figure}
 }
 
-
 \frame{
-\frametitle{Camera Tracking}
+\frametitle{SDF Distances}
+\begin{figure}[h]
+\vspace*{-30pt}
+        \centering
+        \captionsetup[subfigure]{labelformat=empty}
+                \includegraphics[scale=0.9]{dia_point.png}
+                \includegraphics[scale=0.9]{dia_plane2.png}
+                \caption{Point-To-Point \hspace*{3cm} Point-To-Plane}
+\end{figure}
+}
+\frame{
+\frametitle{SDF Weighting and Truncation}
 \begin{figure}[h]
         \centering
         \captionsetup[subfigure]{labelformat=empty}
-                \includegraphics[scale=0.45]{camera.png}
-                \caption{Source: \cite{bylow2013real}}
+         \begin{subfigure}[h]{0.5\textwidth}
+\includegraphics[scale=0.8]{dia1.png}
+ \end{subfigure}
+ %\qquad
+ \hspace*{0.3cm}
+       \begin{subfigure}[h]{0.45\textwidth}
+        \includegraphics[scale=0.23]{truncation.png}\\
+        \\
+         \includegraphics[scale=0.29]{exponential_weight.png}
+        \end{subfigure}
+				
+				
+
 \end{figure}
 }
 
-
-
 \frame{
-\frametitle{SDF Reconstruction}
-\begin{figure}[h]
-        \centering
-        \captionsetup[subfigure]{labelformat=empty}
-                \includegraphics[scale=0.4]{sdfDistances.png}
-                \caption{Source: \cite{bylow2013real}}
-\end{figure}
+\frametitle{SDF Update}
+\begin{columns}
+		\column{0.5\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.8]{dia1.png}
+			\end{figure}
+		\column{0.45\textwidth} 
+		\vspace{-30pt}
+	\begin{align*}
+D &\gets \frac{W D+ \omega_{n+1}d_{n+1}}{W+\omega_{n+1}} \\
+W &\gets W + \omega_{n+1}
+\end{align*}
+\end{columns}
+
+}
+%\frame{
+%\frametitle{Camera Tracking}
+%\begin{figure}[h]
+%        \centering
+%        \captionsetup[subfigure]{labelformat=empty}
+%                \includegraphics[scale=0.45]{camera.png}
+%                \caption{Source: \cite{bylow2013real}}
+%\end{figure}
+%}
+
+
+
+
+
+
+%\section{Implementation}
+%\frame{
+%\frametitle{SDF Reconstruction}
+%\begin{columns}
+%		\column{0.4\textwidth} 
+%			\begin{figure}
+%				\includegraphics[scale=0.33]{visualization1.png}
+%			\end{figure}
+%		\column{0.5\textwidth} 
+%		%\vspace{-40pt}
+%			\begin{itemize}
+%				\item Extended PCL Marching Cubes
+%\item Draw SDF mesh in Rviz
+%\item Color Interpolation
+%			\end{itemize} 
+%	\end{columns}
+%
+%}
+
+
+%----------------------------------------------------------
+%           START CAMERA TRACKING
+%----------------------------------------------------------
+\frame{
+\frametitle{Camera Tracking - What we have}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.25]{camera_estimation1.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-30pt}
+		\begin{itemize}
+			    \item Successfully estimated our previous camera positions
+				%\item Minimize reprojection error with Gauss-Newton using Twist coordinates
+				%\item Computation of SDF partial derivatives
+				%\item Exponential mapping
+		\end{itemize}
+\end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - What we get}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.25]{camera_estimation2.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-30pt}
+			\begin{itemize}
+			    \item Successfully estimated our previous camera positions
+			    \item New point cloud given by perception
+		\end{itemize}
+	\end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - What we want}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.25]{camera_estimation4.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-30pt}
+			\begin{itemize}
+			    \item Successfully estimated our previous camera positions
+			    \item New point cloud given by perception
+			    \item We search transformation from last camera position
+		\end{itemize}
+	\end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - What we want}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.25]{camera_estimation5.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-30pt}
+			\begin{itemize}
+			    \item New point cloud given by perception
+			    \item We search transformation from last camera position\\
+			    given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+		\end{itemize}
+	\end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - How we get it}
+\begin{columns}
+		\column{0.45\textwidth} 
+			\begin{figure}
+				\includegraphics[scale=0.25]{camera_estimation3.png}
+			\end{figure}
+		\column{0.55\textwidth} 
+		%\vspace{-30pt}
+			\begin{itemize}
+			    \item New point cloud given by perception
+			    \item We search transformation from last camera position\\
+			    given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+			    \item Minimize the squared distance error $E(\xi)$ %$E = \sum\limits_\mathbf{x} \Psi_{R, t}()$ 
+		\end{itemize}
+	\end{columns}
 }
 
+
 \frame{
-\frametitle{3D Reconstruction}
+\frametitle{Camera Tracking - How we get it}
+\begin{columns}
+                \column{0.45\textwidth}
+                        \begin{figure}
+                                \includegraphics[scale=0.25]{camera_estimation3.png}
+                        \end{figure}
+                \column{0.55\textwidth}
+                %\vspace{-30pt}
+                        \begin{itemize}
+                            \item We search transformation from last camera position\\
+                            given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+                            \item Minimize the squared distance error $E(\xi)$
+                            \item Use Gauss-Newton Method
+                            \begin{itemize}
+                                  \item Linearize Transformation
+                                  \item Solve linear system
+                                  \item Apply transformation to camera 
+                            \end{itemize}
+                \end{itemize}
+        \end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - How we get it}
+\begin{columns}
+                \column{0.45\textwidth}
+                        \begin{figure}
+                                \includegraphics[scale=0.25]{camera_estimation6.png}
+                        \end{figure}
+                \column{0.55\textwidth}
+                %\vspace{-30pt}
+                        \begin{itemize}
+                            \item We search transformation from last camera position\\
+                            given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+                            \item Minimize the squared distance error $E(\xi)$
+                            \item Use Gauss-Newton Method
+                            \begin{itemize}
+                                  \item {\textbf{Linearize Transformation}}
+                                  \item Solve linear system
+                                  \item Apply transformation to camera
+                            \end{itemize}
+                \end{itemize}
+        \end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - How we get it}
+\begin{columns}
+                \column{0.45\textwidth}
+                        \begin{figure}
+                                \includegraphics[scale=0.25]{camera_estimation7.png}
+                        \end{figure}
+                \column{0.55\textwidth}
+                %\vspace{-30pt}
+                        \begin{itemize}
+                            \item We search transformation from last camera position\\
+                            given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+                            \item Minimize the squared distance error $E(\xi)$
+                            \item Use Gauss-Newton Method
+                            \begin{itemize}
+                                  \item {\textbf{Linearize Transformation}}
+                                  \item Solve linear system
+                                  \item Apply transformation to camera
+                            \end{itemize}
+                \end{itemize}
+        \end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - How we get it}
+\begin{columns}
+                \column{0.45\textwidth}
+                        \begin{figure}
+                                \includegraphics[scale=0.25]{camera_estimation8.png}
+                        \end{figure}
+                \column{0.55\textwidth}
+                %\vspace{-30pt}
+                        \begin{itemize}
+                            \item We search transformation from last camera position\\
+                            given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+                            \item Minimize the squared distance error $E(\xi)$
+                            \item Use Gauss-Newton Method
+                            \begin{itemize}
+                                  \item Linearize Transformation
+                                  \item \textbf{Solve linear system $\nabla E = 0 \to \xi$}
+                                  \item Apply transformation to camera
+                            \end{itemize}
+                \end{itemize}
+        \end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - How we get it}
+\begin{columns}
+                \column{0.45\textwidth}
+                        \begin{figure}
+                                \includegraphics[scale=0.25]{camera_estimation9.png}
+                        \end{figure}
+                \column{0.55\textwidth}
+                %\vspace{-30pt}
+                        \begin{itemize}
+                            \item We search transformation from last camera position\\
+                            given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+                            \item Minimize the squared distance error $E(\xi)$
+                            \item Use Gauss-Newton Method
+                            \begin{itemize}
+                                  \item Linearize Transformation
+                                  \item Solve linear system $\nabla E = 0 \to \xi$
+                                  \item \textbf{Apply transformation to camera}
+                                  
+                            \end{itemize}
+                \end{itemize}
+        \end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - How we get it}
+\begin{columns}
+                \column{0.45\textwidth}
+                        \begin{figure}
+                                \includegraphics[scale=0.25]{camera_estimation10.png}
+                        \end{figure}
+                \column{0.55\textwidth}
+                %\vspace{-30pt}
+                        \begin{itemize}
+                            \item We search transformation from last camera position\\
+                            given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+                            \item Minimize the squared distance error $E(\xi)$
+                            \item Use Gauss-Newton Method
+                            \begin{itemize}
+                                  \item Linearize Transformation
+                                  \item \textbf{Solve linear system $\nabla E = 0 \to \xi$}
+                                  \item Apply transformation to camera
+                            \end{itemize}
+                \end{itemize}
+        \end{columns}
+}
+\frame{
+\frametitle{Camera Tracking - How we get it}
+\begin{columns}
+                \column{0.45\textwidth}
+                        \begin{figure}
+                                \includegraphics[scale=0.25]{camera_estimation11.png}
+                        \end{figure}
+                \column{0.55\textwidth}
+                %\vspace{-30pt}
+                        \begin{itemize}
+                            \item We search transformation from last camera position\\
+                            given in twist coordinates $\xi = (\underbrace{v_1, v_2, v_3}_{\text{linear velocity}}, \underbrace{w_1, w_2, w_3}_{\text{angular velocity}})$
+                            \item Minimize the squared distance error $E(\xi)$
+                            \item Use Gauss-Newton Method
+                            \begin{itemize}
+                                  \item Linearize Transformation
+                                  \item Solve linear system $\nabla E = 0 \to \xi$
+                                  \item \textbf{Apply transformation to camera}
+                                  
+                            \end{itemize}
+                \end{itemize}
+        \end{columns}
+}
+%\frame{
+%\frametitle{SDF}
+%\begin{columns}
+%		\column{0.55\textwidth} 
+%			\begin{figure}
+%				\includegraphics[scale=0.8]{dia1.png}
+%				\includegraphics[scale=0.3]{exponential_weight.png}
+%			\end{figure}
+%		\column{0.55\textwidth} 
+%		\vspace{-70pt}
+%			\begin{itemize}
+%				\item Implemented Point-to-point and Point-to-plane distances 
+%				\item Truncation and exponential weighting of distance
+%		\end{itemize}
+%	\end{columns}
+%}
+\frame{
+\frametitle{3D Reconstruction: Marching Cubes}
 \begin{figure}[h]
         \centering
         \captionsetup[subfigure]{labelformat=empty}
@@ -137,111 +477,75 @@ Using Signed Distance Functions}\\
                 \caption{Source: Wikipedia}
 \end{figure}
 }
-\section{Implementation}
-\frame{
-\frametitle{SDF Reconstruction}
-\begin{columns}
-		\column{0.4\textwidth} 
-			\begin{figure}
-				\includegraphics[scale=0.33]{visualization1.png}
-			\end{figure}
-		\column{0.5\textwidth} 
-		%\vspace{-40pt}
-			\begin{itemize}
-				\item Extended PCL Marching Cubes
-\item Draw SDF mesh in Rviz
-\item Color Interpolation
-			\end{itemize} 
-	\end{columns}
-
-}
-
-\frame{
-\frametitle{Perception}
-\begin{columns}
-		\column{0.45\textwidth} 
-			\begin{figure}
-				\includegraphics[scale=0.5]{pcl2.png}
-			\end{figure}
-		\column{0.55\textwidth} 
-		%\vspace{-40pt}
-			\begin{itemize}
-				\item Creating Point Clouds on the fly from RGB and Depth images
-				\item Preprocessing for point-to-plane:
-				\begin{itemize}
-				\item Computing point cloud normals
-				\item Applying bilateral filter
-				\end{itemize}
-				\item Reading trajectory ground truth  with TF
-				\item Record Kinect data with rosbag to validate approach
-			\end{itemize} 
-	\end{columns}
-
-}
-\frame{
-\frametitle{Camera Tracking}
-\begin{columns}
-		\column{0.45\textwidth} 
-			\begin{figure}
-				\includegraphics[scale=0.35]{cam2.png}
-			\end{figure}
-		\column{0.55\textwidth} 
-		%\vspace{-30pt}
-			\begin{itemize}
-				\item Minimize reprojection error with Gauss-Newton using Twist coordinates
-				\item Computation of SDF partial derivatives
-				\item Exponential mapping
-		\end{itemize}
-	\end{columns}
-}
-
-\frame{
-\frametitle{SDF}
-\begin{columns}
-		\column{0.45\textwidth} 
-			\begin{figure}
-				\includegraphics[scale=0.35]{cam2.png}
-			\end{figure}
-		\column{0.55\textwidth} 
-		%\vspace{-30pt}
-			\begin{itemize}
-				\item Implemented Point-to-point and Point-to-plane distances 
-				\item Truncation and exponential weighting of distance
-		\end{itemize}
-	\end{columns}
-}
-
 \frame{
 \frametitle{Optimizations}
 
 			\begin{itemize}
 				\item Extensive use of OpenMP to parallelize:
 				\begin{itemize}
-				 \item SDF update, Camera Tracking and Marching Cubes
-				 \item Initial difficulties due to need to concatenate results
+				 \item SDF update, Pose Tracking and Marching Cubes
+				 \item In Marching Cubes, creating a point cloud per thread and combining them at the end is necessary
+				 \begin{itemize}
+				 \item In Pose Tracking, similar approach needed to parallelize matrix computation for solving linear system
+				 \end{itemize}
 				 \end{itemize} 
 				\item Usage of Valgrind profiler to detect bottlenecks and memory leaks
 		\end{itemize}
 
 }
 
-\frame{
-\frametitle{Live Demo!}
-}
 
 
-\section{Results}
+%\section{Results}
 
 \frame{
 \frametitle{Evaluation}
 
-			\begin{itemize}
-				\item RGB-D SLAM Dataset and Benchmark online evaluation
-		\end{itemize}
+%			\begin{itemize}
+%				\item RGB-D SLAM Dataset and Benchmark online evaluation
+%		\end{itemize}
+		\begin{table}[h]
+\vspace{-20pt}
+\centering
+\begin{tabular}{|c|c|c|c|c|l|}
+\hline
+m  & method &  max $\Delta$$\xi$ &  play rate & trans error& notes\\
+\hline
+200   & Point-To-Plane& 0.001  & 0.04 & 0.125 m& laptop\\
+256  & Point-To-Plane& 0.001  & 1.0 & 0.418 m&desktop\\
+256  & Point-To-Plane& 0.001  & 0.1 & 0.060 m&\\
+256  & Point-To-Plane& 0.0001  & 0.1 & 0.060 m&\\
+512 & Point-To-Plane & 0.01 &  0.1 & 0.320 m &\\
+512  & Point-To-Plane& 0.001  & 0.1 & 0.071 m & out of memory\\
+256  & Point-To-Plane& 0.001  & 0.1 & 0.060 m & gram schmidt\\
+256  & Point-To-Point& 0.001  & 0.1 & \textbf{0.057 m} & \\
+\hline
+256 & Point-To-Point&  & & 0.047 m & \pbox{20cm}{Paper: same \\params as our}\\
+& & & & &     \\
+512 & Point-To-Plane&  & & \textbf{0.041 m} & \pbox{20cm}{Paper: best \\params}\\
+\hline
+\end{tabular}
+\caption{$\delta$$=0.3m$, $\epsilon$$=0.025$, Gauss-Newton every 9th pixel, RMSE absolute translational error }
+\end{table}
+
+}
+\frame{
+\frametitle{Results}
+\begin{figure}[h]
+\centering
+ \begin{subfigure}[h]{0.5\textwidth}
+\includegraphics[scale=0.34]{absolute_trajectory_error_best.png}
+\caption{Our best result, 0.057 m error}
+ \end{subfigure}
+ %\qquad
+                \begin{subfigure}[h]{0.49\textwidth}
+                \includegraphics[scale=0.345]{absolute_trajectory_error_worst.png}
+                \caption{1.0 publish rate, 0.418 m error }
+        \end{subfigure}
+\end{figure}
 
 }
 
-%Do some problems encountered and solutions found slide somewhere?
 
 
 
@@ -253,6 +557,9 @@ Using Signed Distance Functions}\\
 	\hspace*{-0.045\paperwidth}\pgfuseshading{frametitlebarhshad}
 }
 
+\frame{
+\frametitle{Demo!}
+}
 \begin{frame}
 \frametitle{\centerline{QA}}
 \begin{figure}[h]
@@ -261,7 +568,7 @@ Using Signed Distance Functions}\\
 \end{figure}
 \end{frame}
 
-\section{Bibliography}
+%\section{Bibliography}
 %\clearpage
 \begin{frame}[allowframebreaks]
 \frametitle{Bibliography}

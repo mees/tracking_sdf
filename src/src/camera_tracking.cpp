@@ -2,9 +2,9 @@
 #include "sdf_3d_reconstruction/sdf.h"
 CameraTracking::CameraTracking(int gauss_newton_max_iteration,
 		float maximum_twist_diff, float v_h, float w_h, SDF *sdf) {
-	this->trans = Eigen::Vector3d(0.909536, -0.419546, 0.798641);
+	this->trans = Eigen::Vector3d(0, 0, 1);
 	this->rot = Eigen::Matrix3d();
-	this->rot << -0.616896, -0.195746, -0.762314, 0.786585, -0.120238, -0.605662, 0.0268973, -0.973255, 0.228145;
+	this->rot << 1, 0, 0, 0, 0, -1, 0, -1, 0;
 	this->set_camera_transformation(rot, trans);
 	this->maximum_twist_diff = maximum_twist_diff;
 	this->gauss_newton_max_iteration = gauss_newton_max_iteration;

@@ -80,9 +80,9 @@ void SDF_Reconstruction::kinect_callback(
 }
 
 SDF_Reconstruction::SDF_Reconstruction() {
-	Vector3d sdf_origin(-2.5, -3.0, -0.5);
+	Vector3d sdf_origin(-3.0, -3.0, -0.5);
 	//m , width, height, depth, treshold
-	sdf = new SDF(256, 5.0, 5.0, 3.0, sdf_origin, 0.3, 0.025);
+	sdf = new SDF(256, 6.0, 6.0, 3.5, sdf_origin, 0.3, 0.025);
 	
 	_useGroundTruth = false;
         this->camera_tracking = new CameraTracking(20,0.001,1.0,0.01, sdf);
@@ -94,7 +94,7 @@ SDF_Reconstruction::SDF_Reconstruction() {
 	//Ros::Publisher(topic n)
 
 
-	std::thread visualization_thread(&SDF::visualize, sdf, 0.05);
+	std::thread visualization_thread(&SDF::visualize, sdf, 1);
 	int oldNumPub = pcl.getNumPublishers();
 	while (ros::ok()) {
 		if ((oldNumPub == 1) && (pcl.getNumPublishers() == 0)) {
